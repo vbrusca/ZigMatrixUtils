@@ -1,7 +1,11 @@
-//zig test .\src\XmtxUtils.zig
-
-//!The XmtxUtils.zig file contains a library of linear algebra functions
-//!used to solve different problems in linear algebra.
+//! The XmtxUtils.zig file contains a library of linear algebra functions
+//! used to solve different problems in linear algebra.
+//! The work here is based on the following texts.
+//! Elementary Linear Algebra by Larson, Edwards
+//! Mathematics for 3D Game Programming and Computer Graphics 3rd Edition by Eric Lengyel
+//!
+//! Developers: Carlo Bruscani, Victor Brusca
+//! How to run tests: zig test .\src\XmtxUtils.zig
 const std = @import("std");
 const len = @import("std").mem.len;
 
