@@ -1,5 +1,5 @@
-zig_projects/graphics/zig-cache/
-zig_projects/graphics/zig-out/
-zig_projects/graphics/zig-out/bin/
+zig-cache/
+zig-out/
+zig-out/bin/
 *.exe
 *.pdb
