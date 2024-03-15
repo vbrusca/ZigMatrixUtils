@@ -166,11 +166,7 @@ First we start by declaring some matrices.
 14  var sclr: f32 = 0.0;
 </pre>
 
-On lines 1 we declare a 3x4 matrix containing out test data.
-On line 2 we declare a en empty matrix used to hold the results and on line
-3 we declare an empty matrix ment to eventually hold the identity matrix.
-Next we define the dimension of the input matrix, and subsequently the column count.
-Then we set up Boolean flags to handle some function arguments. Lastly, a scalar variable to track multiplication against the matrix. This comes in handy in some cases but isn't important here.
+On line 1 we declare a 3x4 matrix containing out test data, <b>m1</b>. On line 2 we declare an empty matrix used to hold the results and on line 3 we declare the identity matrix used in calculating the inverse of matrix <b>m1</b>. Next, we define the dimension of the input matrix, and subsequently the column count. Then we set up Boolean flags to handle some function arguments. Lastly, a scalar variable to track multiplication against the matrix is declared. This comes in handy in some cases but isn't important here.
 
 <pre>
 15  b = rdcXmtx(&m1, cols, hasAug, &retM1, hasIdt, &idtM1, dim, triag, &sclr);
@@ -187,7 +183,7 @@ Then we set up Boolean flags to handle some function arguments. Lastly, a scalar
 26  
 </pre>
 
-Next on line 15 we call the rdcXmtx function and reduce the matrix to row eschelon form. The result of the operation is stored in b. We're going to look right into the matrices and ignore that value but this is a good spot for an assertion if your writing a unit test. On line 18 we print the matrix and the contents are listed on lines 23 - 25.
+Next on line 15 we call the <b>rdcXmtx</b> function and reduce the matrix to row eschelon form. The result of the operation is stored in <b>b</b>. We're going to look right into the matrices and ignore that value but this is a good spot for an assertion if your writing a unit test. On line 18 we print the matrix and the contents are listed on lines 23 - 25.
 
 <pre>
 27  std.debug.print("Matrix Ret:\n", .{});
