@@ -11,7 +11,7 @@ Carlo Bruscani
 
 ## Documentation
 I'll provide a viewable but not 100% usable link to the Zig Matrix Utils documentation here. For proper use clone or download the repo
-and view the documentation site locally.
+and view the documentation site locally.<br>
 [Zig Generated API Docs](https://htmlpreview.github.io/?https://github.com/vbrusca/ZigMatrixUtils/blob/main/docs/index.html)
 
 ## Source Material
