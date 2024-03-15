@@ -6248,6 +6248,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Problem 20 test" {
     try std.testing.expectEqual(false, isIdtXmtx(&idtM1, dim));
 }
 
+//Next guide topics
 test "XMTX: ELA - Larson, Edwards: 2.1 Example 2 test" {
     prntNl();
     var m1: [4]f32 = .{ -1, 2, 0, 1 };
