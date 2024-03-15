@@ -158,10 +158,10 @@ First we start by declaring some matrices.
 06  var b: bool = true; //holds the return value
 07
 08  const hasAug: bool = true; //toggles isAugmented flag for the reduction function
-09
-10  const hasIdt: bool = true; //indicates an matrix was provided to calculate and hold the inverse of m1.
+09  const hasIdt: bool = true; //indicates an matrix was provided to calculate and hold the inverse of m1.
+10  const triag: bool = false; //A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
 11
-12  const triag: bool = false; //A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
+12  //Function Boolean arguments are stored as local constants above
 13
 14  var sclr: f32 = 0.0;
 </pre>
