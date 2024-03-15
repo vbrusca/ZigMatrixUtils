@@ -21,6 +21,7 @@
 //!
 //! How to build a dynamic library: zig build-lib -femit-docs ./src/XmtxUtils.zig -lc -dynamic -isystem -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.dll"
 //!
+
 const std = @import("std");
 const len = @import("std").mem.len;
 
@@ -5977,9 +5978,14 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 3 test" {
 
     const dim: usize = 3; //overrides the has augment column difference of 1 and controls the zero row check
     const cols: usize = 4;
-    var b: bool = false;
+    var b: bool = false; //holds the result of the operation
+
+    const hasAug: bool = true; //toggles isAugmented flag for the reduction function
+    const hasIdt: bool = true; //indicates an matrix was provided to calculate and hold the inverse of m1.
+    const triag: bool = false; //A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
+
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
+    b = rdcXmtx(&m1, cols, hasAug, &retM1, hasIdt, &idtM1, dim, triag, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
