@@ -153,9 +153,7 @@ First we start by declaring some matrices.
 01  var m1: [12]f32 = .{ 1, -2, 3, 9, -1, 3, 0, -4, 2, -5, 5, 17 };
 02  var retM1: [12]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 03  var idtM1: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
 04  const dim: usize = 3; //overrides the has augment column difference of 1 and controls the zero row check
-
 05  const cols: usize = 4;
 06  var b: bool = true; //toggles isAugmented flag for the reduction function
 07
