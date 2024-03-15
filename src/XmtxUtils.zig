@@ -3002,21 +3002,21 @@ test "XMTX: sclMulXmtxRows test" {
 
 ///Adds a scalar to a matrix row. Performs the operation inline in the provided matrix.
 ///
-///  srcRow = The source row to apply the multiplication to.
+///  srcRow = The source row to apply the addition to.
 ///
-///  mul = The value to apply in the multiplication.
+///  amt = The value to apply in the addition.
 ///
 ///  cols = The number of columns in the matrix.
 ///
 ///  mtx = The matrix to use in this operation.
 ///
-pub fn addSclXmtxRowsInl(srcRow: usize, mul: f32, cols: usize, mtx: []f32) void {
+pub fn addSclXmtxRowsInl(srcRow: usize, amt: f32, cols: usize, mtx: []f32) void {
     const l: usize = mtx.len;
     var i: usize = (srcRow * cols);
     while (i < l) {
         if (i >= (srcRow * cols) and i < ((srcRow * cols) + cols)) {
             //std.debug.print("{} times {} = {}\n", .{mtx[i], mul, (mtx[i] * mul)});
-            mtx[i] += mul;
+            mtx[i] += amt;
             if (i == ((srcRow * cols) + cols - 1)) {
                 break;
             }
@@ -3037,9 +3037,9 @@ test "XMTX: addSclXmtxRowsInl test" {
 
 ///Adds a matrix row to a scalar.
 ///
-///  srcRow = The source row to apply the multiplication to.
+///  srcRow = The source row to apply the addition to.
 ///
-///  mul = The value to apply in the multiplication.
+///  amt = The value to apply in the addition.
 ///
 ///  cols = The number of columns in the matrix.
 ///
@@ -3047,9 +3047,9 @@ test "XMTX: addSclXmtxRowsInl test" {
 ///
 ///  ret = The return matrix that holds the newly calculated variables.
 ///
-pub fn addSclXmtxRows(srcRow: usize, mul: f32, cols: usize, mtx: []f32, ret: []f32) void {
+pub fn addSclXmtxRows(srcRow: usize, amt: f32, cols: usize, mtx: []f32, ret: []f32) void {
     cpyXmtx(mtx, ret);
-    addSclXmtxRowsInl(srcRow, mul, cols, ret);
+    addSclXmtxRowsInl(srcRow, amt, cols, ret);
 }
 
 test "XMTX: addSclXmtxRows test" {
