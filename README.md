@@ -2,12 +2,17 @@
 An open source matrix utility library written in Zig.
 The full Zig project is included in this repo.
 
-## Build Version
+## Zig Build Version
 This project was built against Zig version zig-windows-x86-0.12.0-dev.3284+153ba46a5.
 
 ## Developers
 Victor Brusca<br>
 Carlo Bruscani
+
+## Documentation
+I'll provide a viewable but not 100% usable link to the Zig Matrix Utils documentation here. For proper use clone or download the repo
+and view the documentation site locally.
+[Zig Generated API Docs](https://htmlpreview.github.io/?https://github.com/vbrusca/ZigMatrixUtils/blob/main/docs/index.html)
 
 ## Source Material
 This project was built using the following books as a basis.<br>
