@@ -3,7 +3,7 @@ An open source matrix utility library written in Zig.
 The full Zig project is included in this repo.
 
 ## Zig Build Version
-This project was built against Zig version zig-windows-x86-0.12.0-dev.3284+153ba46a5.
+This project was built against Zig version "zig-windows-x86-0.12.0-dev.3284+153ba46a5".
 
 ## Developers
 Victor Brusca<br>
