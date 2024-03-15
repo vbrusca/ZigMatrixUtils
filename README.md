@@ -137,9 +137,9 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 }
 </pre>
 
-#Introduction to the XmtxUtils Library
+## Introduction to the XmtxUtils Library
 
-## Matrix Conversion to Reduced Row Eschelon Form
+### Matrix Conversion to Reduced Row Eschelon Form
 
 The library works mainly with arrays of float 32 to represent a vector or an array.
 The library is primarily designed to work with smaller matrices 2x2, 3x3, 4x4.
