@@ -155,7 +155,7 @@ First we start by declaring some matrices.
 03  var idtM1: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 04  const dim: usize = 3; //overrides the has augment column difference of 1 and controls the zero row check
 05  const cols: usize = 4;
-06  var b: bool = true; //toggles isAugmented flag for the reduction function
+06  var b: bool = true; //holds the return value
 07
 08  const hasAug: bool = true; //toggles isAugmented flag for the reduction function
 09
