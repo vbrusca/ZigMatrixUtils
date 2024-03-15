@@ -1,36 +1,42 @@
 //! The XmtxUtils.zig file contains a library of linear algebra functions
 //! used to solve different problems in linear algebra.
+//!
 //! The work here is based on the following texts.
+//!
+//!
 //! Elementary Linear Algebra by Larson, Edwards
-//! Mathematics for 3D Game Programming and Computer Graphics 3rd Edition by Eric Lengyel
+//!
+//! Mathematics for 3D Game Programming and Computer Graphics 3rd Edition by Eric Lengyel<br/>
+//!
 //!
 //! Developers: Carlo Bruscani, Victor Brusca
+//!
 //! How to run tests: zig test .\src\XmtxUtils.zig
 const std = @import("std");
 const len = @import("std").mem.len;
 
-//The percision to use when determining if a number is zero.
+///The percision to use when determining if a number is zero.
 const ZERO_F32: f32 = 0.001;
 
-//A Boolean indicating if the library should use exact comparison, int values, or precision comparison, float.
+///A Boolean indicating if the library should use exact comparison, int values, or precision comparison, float.
 const COMPARE_MODE_EXACT: bool = false;
 
-//i^ in 2x2 space
+///i^ in 2x2 space
 const iH2: [2]f32 = .{ 1, 0 };
 
-//j^ in 2x2 space
+///j^ in 2x2 space
 const jH2: [2]f32 = .{ 0, 1 };
 
-//i^ in 3x3 space
+///i^ in 3x3 space
 const iH3: [3]f32 = .{ 1, 0, 0 };
 
-//j^ in 3x3 space
+///j^ in 3x3 space
 const jH3: [3]f32 = .{ 0, 1, 0 };
 
-//z^ in 3x3 space
+///z^ in 3x3 space
 const kH3: [3]f32 = .{ 0, 0, 1 };
 
-//Used in aiding the calculation of Eigen Values for a 2x2 matrix.
+///Used in aiding the calculation of Eigen Values for a 2x2 matrix.
 pub const EigVal2 = struct {
     lamdExp: [5]f32 = .{ 0, 0, 0, 0, 0 }, //a, -&, d, -&, (-cd)
     polyExp: [3]f32 = .{ 0, 0, 0 }, //a&^2 + b& + c = 0
@@ -47,7 +53,7 @@ pub const EigVal2 = struct {
     }
 };
 
-//Used in aiding the calculation of Eigen Values for a 3x3 matrix.
+///Used in aiding the calculation of Eigen Values for a 3x3 matrix.
 pub const EigVal3 = struct {
     // (a - &)*|(e - &), f, h, (i - &)| + (-b)*|d, f, g, (i - &)| + (c)*|d, (e - &), g, h|
     // 0    1    2   3   4  5  6    7     8     9 10 11  12   13    14   15 16   17  18 19
@@ -74,9 +80,12 @@ pub const EigVal3 = struct {
 //polyExp of len 4 = a&^3 + b&^2 + c& + d = 0   ORDER 3
 //                   [0]    [1]    [2]  [3]
 
-//Returns the order of the polynomial expression.
-//  polyExp = The polynomial expression to process.
-//  returns = The order of the polynomial expression.
+///Returns the order of the polynomial expression.
+///
+///  polyExp = The polynomial expression to process.
+///
+///  returns = The order of the polynomial expression.
+///
 pub fn getPolyOrder(polyExp: []f32) f32 {
     const l: usize = polyExp.len;
     if (l - 1 > 0) {
@@ -102,11 +111,16 @@ test "XMTX: getPolyOrder test" {
     try std.testing.expectEqual(ans3, exp3);
 }
 
-//Returns the first Z factors of the number x where Z = ret.len.
-//  x   = The number, an integer value, that factors are searched for.
-//  ret = The array to store the factors, each factor is stored in its associated array index, i.e. index = 0 would have a value of 1
-//        if 1 is a factor of x.
-//  returns = The number of factors found and stored in the ret argument.
+///Returns the first Z factors of the number x where Z = ret.len.
+///
+///  x   = The number, an integer value, that factors are searched for.
+///
+///  ret = The array to store the factors, each factor is stored in its
+///        associated array index, i.e. index = 0 would have a value of 1
+///        if 1 is a factor of x.
+///
+///  returns = The number of factors found and stored in the ret argument.
+///
 pub fn fndFactorsOf(x: f32, ret: []f32) f32 {
     var i: usize = 0;
     const l: usize = ret.len;
@@ -152,11 +166,16 @@ test "XMTX: fndFactorsOf test" {
     try std.testing.expectEqual(cnt, @intFromFloat(fnd));
 }
 
-//Returns the order 1 polynomial and remainder of a polyinomial order 1 division of an order 2 polynomial.
-//  poly1 = A pointer to an order 1 polynomial.
-//  poly2 = A pointer to an order 2 polynomial.
-//  retPoly1 = A pointer to a return polynomial of order 1.
-//  returns = The remainder after the synthetic division.
+///Returns the order 1 polynomial and remainder of a polyinomial order 1 division of an order 2 polynomial.
+///
+///  poly1 = A pointer to an order 1 polynomial.
+///
+///  poly2 = A pointer to an order 2 polynomial.
+///
+///  retPoly1 = A pointer to a return polynomial of order 1.
+///
+///  returns = The remainder after the synthetic division.
+///
 pub fn synthDivPoly1IntoPoly2(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f32) f32 {
     //  divPoly1    | poly2
     //              | wrkPoly2
@@ -210,11 +229,16 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
     try std.testing.expectEqual(exp, rmnd);
 }
 
-//Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
-//  poly1 = A pointer to an order 1 polynomial.
-//  poly3 = A pointer to an order 3 polynomial.
-//  retPoly2 = A pointer to a return polynomial of order 2.
-//  returns = The remainder after the synthetic division.
+///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
+///
+///  poly1 = A pointer to an order 1 polynomial.
+///
+///  poly3 = A pointer to an order 3 polynomial.
+///
+///  retPoly2 = A pointer to a return polynomial of order 2.
+///
+///  returns = The remainder after the synthetic division.
+///
 pub fn synthDivPoly1IntoPoly3(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f32) f32 {
     //  divPoly1    | poly3
     //              | wrkPoly3
@@ -273,8 +297,10 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
 }
 
-//A function used to print out polynomials.
-//  polyExp = The polynomial expression to print out.
+///A function used to print out polynomials.
+///
+///  polyExp = The polynomial expression to print out.
+///
 pub fn prntPolyExp(polyExp: []f32) void {
     const l: usize = polyExp.len;
     if (l == 4) {
@@ -290,10 +316,16 @@ pub fn prntPolyExp(polyExp: []f32) void {
     }
 }
 
-//Returns the value of the order 3 polynomial resolved with the provided value of x.
-//  x = The value to use for x.
-//  polyExp3 = The 3rd order polynomial expression to resolve.
-//  returns = The value of the polynomial resolved for the given value of x.
+//TODO write test for above function
+
+///Returns the value of the order 3 polynomial resolved with the provided value of x.
+///
+///  x = The value to use for x.
+///
+///  polyExp3 = The 3rd order polynomial expression to resolve.
+///
+///  returns = The value of the polynomial resolved for the given value of x.
+///
 pub fn rslvPoly3(x: f32, polyExp3: *[4]f32) f32 {
     return (x * x * x * polyExp3[0]) + (x * x * polyExp3[1]) + (x * polyExp3[2]) + polyExp3[3];
 }
@@ -356,10 +388,14 @@ test "XMTX: rslvPoly3 test" {
     try std.testing.expectEqual(exp, ans);
 }
 
-//Returns the value of the order 2 polynomial resolved with the provided value of x.
-//  x = The value to use for x.
-//  polyExp2 = The 2nd order polynomial expression to resolve.
-//  returns = The value of the polynomial resolved for the given value of x.
+///Returns the value of the order 2 polynomial resolved with the provided value of x.
+///
+///  x = The value to use for x.
+///
+///  polyExp2 = The 2nd order polynomial expression to resolve.
+///
+///  returns = The value of the polynomial resolved for the given value of x.
+///
 pub fn rslvPoly2(x: f32, polyExp2: *[3]f32) f32 {
     return (x * x * polyExp2[0]) + (x * polyExp2[1]) + polyExp2[2];
 }
@@ -402,10 +438,14 @@ test "XMTX: rslvPoly2 test" {
     try std.testing.expectEqual(exp, ans);
 }
 
-//Finds the roots of the order 3 polynomial provided.
-//  polyExp = An order 3 polynomial provided as the basis of this function.
-//  factors = An array for storing the factors of the d term, used to find roots to the polynomial before synthetic division.
-//  returns = Up to three values that are roots of the polynomial expression, using f32_nan for imaginary numbers which aren' currently supported.
+///Finds the roots of the order 3 polynomial provided.
+///
+///  polyExp = An order 3 polynomial provided as the basis of this function.
+///
+///  factors = An array for storing the factors of the d term, used to find roots to the polynomial before synthetic division.
+///
+///  returns = Up to three values that are roots of the polynomial expression, using f32_nan for imaginary numbers which aren' currently supported.
+///
 pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
     //p[0] = a*x^3, p[1] = b*x^2, p[2] = c*x, p[3] = d
     //check for two basic types of 3rd order polynomials one with a d and one without
@@ -524,9 +564,12 @@ test "XMTX: rtsPoly3 test" {
     try std.testing.expectEqual(exp3, ret[2]);
 }
 
-//Finds the roots of the order 2 polynomial provided.
-//  polyExp = An order 2 polynomial provided as the basis of this function.
-//  returns = Up to two values that are roots of the polynomial expression.
+///Finds the roots of the order 2 polynomial provided.
+///
+///  polyExp = An order 2 polynomial provided as the basis of this function.
+///
+///  returns = Up to two values that are roots of the polynomial expression.
+///
 pub fn rtsPoly2(polyExp: *[3]f32) [2]f32 {
     //eigVal1 = ( -b + sqrt(b^2 - (4ac)) ) / (2a)
     var ret: [2]f32 = .{ std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32 };
@@ -567,15 +610,18 @@ test "XMTX: rtsPoly2 test" {
     try std.testing.expectEqual(exp2, roots[1]);
 }
 
-//An enumeration that describes the solution types, discriminant, of a second order polynomial.
+///An enumeration that describes the solution types, discriminant, of a second order polynomial.
 const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
 
-//An enumeration that describes the solution types, discriminant, of a third order polynomial.
+///An enumeration that describes the solution types, discriminant, of a third order polynomial.
 const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE_REAL_TWO_IMAGINARY };
 
-//Returns an enumeration describing the descriminant of the cubic polynomial.
-//  polyExp = The cubic polynomial to process.
-//  returns = The type of solution to this cubic polynomial.
+///Returns an enumeration describing the descriminant of the cubic polynomial.
+///
+///  polyExp = The cubic polynomial to process.
+///
+///  returns = The type of solution to this cubic polynomial.
+///
 pub fn dscrPoly3(polyExp: *[4]f32) POLY3_SOL_TYPE {
     //d = 18abcd – 4b³d + b²c² – 4ac³ – 27a²d²
     //d > 0 => then the equation has three distinct real roots
@@ -600,9 +646,12 @@ test "XMTX: dscrPoly3 test" {
     try std.testing.expectEqual(POLY3_SOL_TYPE.THREE_DISTINCT_REALS, solt);
 }
 
-//Returns an enumeration value indicating the nature of the solutions for the given second order polynomial expression.
-//  polyExp = A second order polynomial expression.
-//  returns = A POLY2_SOL_TYPE enumeration entry that indicates the nature of the polynomial's solution.
+///Returns an enumeration value indicating the nature of the solutions for the given second order polynomial expression.
+///
+///  polyExp = A second order polynomial expression.
+///
+///  returns = A POLY2_SOL_TYPE enumeration entry that indicates the nature of the polynomial's solution.
+///
 pub fn dscrPoly2(poly2Exp: *[3]f32) POLY2_SOL_TYPE {
     const descr: f32 = std.math.pow(f32, poly2Exp[1], 2) - (4 * poly2Exp[0] * poly2Exp[2]);
     if (isEquF32(descr, 0.0, COMPARE_MODE_EXACT)) {
@@ -630,11 +679,16 @@ test "XMTX: dscrPoly2 test" {
     try std.testing.expectEqual(exp2, roots[1]);
 }
 
-//Find the eigen values for a 3x3 dimensional matrix.
-//  mtx = a 2x2 matrix to find eigen values for.
-//  evs = An EigVal3 pointer used for calculating the eigen values of the given matrix.
-//  factors = An array for storing the factors of the d term, used to find roots to the polynomial before synthetic division.
-//  returns = A boolean value indicating the success of the operation.
+///Find the eigen values for a 3x3 dimensional matrix.
+///
+///  mtx = a 2x2 matrix to find eigen values for.
+///
+///  evs = An EigVal3 pointer used for calculating the eigen values of the given matrix.
+///
+///  factors = An array for storing the factors of the d term, used to find roots to the polynomial before synthetic division.
+///
+///  returns = A boolean value indicating the success of the operation.
+///
 pub fn fndEigVal3(mtx: []f32, evs: *EigVal3, factors: []f32) bool {
     //Given 3x3 matrix A
     //A = a b c     0 1 2
@@ -728,10 +782,14 @@ test "XMTX: fndEigVal3 test" {
     evs.prnt();
 }
 
-//Find the eigen values for a 2x2 dimensional matrix.
-//  mtx = a 2x2 matrix to find eigen values for.
-//  evs = An EigVal2 pointer used for calculating the eigen values of the given matrix.
-//  returns = A boolean value indicating the success of the operation.
+///Find the eigen values for a 2x2 dimensional matrix.
+///
+///  mtx = a 2x2 matrix to find eigen values for.
+///
+///  evs = An EigVal2 pointer used for calculating the eigen values of the given matrix.
+///
+///  returns = A boolean value indicating the success of the operation.
+///
 pub fn fndEigVal2(mtx: []f32, evs: *EigVal2) bool {
     //Given 2x2 matrix A
     //A = a b
@@ -790,9 +848,12 @@ test "XMTX: fndEigVal2 test" {
     try std.testing.expectEqual(@as(f32, -1.0), evs.eignVals[1]);
 }
 
-//Returns the absolute value of the provided argument.
-//  v = The floating point number to calculate the absolute value of.
-//  returns = The absolute value of the argument v.
+///Returns the absolute value of the provided argument.
+///
+///  v = The floating point number to calculate the absolute value of.
+///
+///  returns = The absolute value of the argument v.
+///
 pub fn absF32(v: f32) f32 {
     if (v < 0) {
         return v * -1;
@@ -806,9 +867,12 @@ test "XMTX: absF32 test" {
     try std.testing.expectEqual(v, absF32(-7));
 }
 
-//Cleans the given matrix by rounding float values to the nearest significance, ZERO_F32, resulting in clean 0.0, 1.0, etc, values.
-//  mtx = The matrix to process.
-//  returns = A clean matrix with values truncated.
+///Cleans the given matrix by rounding float values to the nearest significance, ZERO_F32, resulting in clean 0.0, 1.0, etc, values.
+///
+///  mtx = The matrix to process.
+///
+///  returns = A clean matrix with values truncated.
+///
 pub fn clnXmtx(mtx: []f32) void {
     const l: usize = mtx.len;
     var i: usize = 0;
@@ -836,11 +900,16 @@ test "XMTX: clnXmtx test" {
     try std.testing.expectEqual(true, equXvec(&m1, &m2));
 }
 
-//Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
-//  l = The left-hand number in the comparison.
-//  r = The right-hand number in the comparison.
-//  comparisonModeExact = A Boolean value indicating if the comparison mode should be exact or within a specified precision delta.
-//  returns = A Boolean value indicating if the two numbers provided are equal under the specified comparison mode.
+///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
+///
+///  l = The left-hand number in the comparison.
+///
+///  r = The right-hand number in the comparison.
+///
+///  comparisonModeExact = A Boolean value indicating if the comparison mode should be exact or within a specified precision delta.
+///
+///  returns = A Boolean value indicating if the two numbers provided are equal under the specified comparison mode.
+///
 pub fn isEquF32(l: f32, r: f32, compareModeExact: bool) bool {
     if (compareModeExact) {
         if (l == r) {
@@ -863,9 +932,12 @@ test "XMTX: isEquF32 test" {
     try std.testing.expectEqual(true, isEquF32(1.0, 1.0, true));
 }
 
-//Copies the mtx matrix into the ret matrix argument.
-//  mtx = The matrix to copy into the ret matrix argument.
-//  ret = The return matrix, the copy to be made.
+///Copies the mtx matrix into the ret matrix argument.
+///
+///  mtx = The matrix to copy into the ret matrix argument.
+///
+///  ret = The return matrix, the copy to be made.
+///
 pub fn cpyXmtx(mtx: []f32, ret: []f32) void {
     cpyXvec(mtx, ret);
 }
@@ -882,11 +954,16 @@ test "XMTX: cpyXmtx test" {
     try std.testing.expectEqual(true, equXvec(&m1, &m3));
 }
 
-//Copies the mtx matrix into the ret matrix argument if the column is < cpyCols.
-//  mtx = The matrix to copy into the ret matrix argument, less columns >= cpyCols
-//  ret = The return matrix to store the copy in.
-//  mtxCols = The number of columns in the mtx matrix.
-//  cpyCols = The number of columns to allow to be copied into the ret matrix, 0 .. (cpyCols - 1).
+///Copies the mtx matrix into the ret matrix argument if the column is < cpyCols.
+///
+///  mtx = The matrix to copy into the ret matrix argument, less columns >= cpyCols
+///
+///  ret = The return matrix to store the copy in.
+///
+///  mtxCols = The number of columns in the mtx matrix.
+///
+///  cpyCols = The number of columns to allow to be copied into the ret matrix, 0 .. (cpyCols - 1).
+///
 pub fn cpyLessXmtx(mtx: []f32, ret: []f32, mtxCols: usize, cpyCols: usize) void {
     const mtxRows: usize = mtx.len / mtxCols;
     var r: usize = 0;
@@ -911,9 +988,12 @@ test "XMTX: cpyLessXmtx test" {
     try std.testing.expectEqual(true, equXvec(&m2, &m3));
 }
 
-//Copies the vec vector into the ret vector argument.
-//  vec = The vector to copy into the ret vector.
-//  ret = The vector to hold the new copy.
+///Copies the vec vector into the ret vector argument.
+///
+///  vec = The vector to copy into the ret vector.
+///
+///  ret = The vector to hold the new copy.
+///
 pub fn cpyXvec(vec: []f32, ret: []f32) void {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -935,10 +1015,14 @@ test "XMTX: cpyXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
 }
 
-//Returns a newly allocated matrix of the specified length.
-//  length = The length of the newly created f32 matrix.
-//  alloc = The allocator to use when creating the new matrix.
-//  returns = The newly created matrix or an error code.
+///Returns a newly allocated matrix of the specified length.
+///
+///  length = The length of the newly created f32 matrix.
+///
+///  alloc = The allocator to use when creating the new matrix.
+///
+///  returns = The newly created matrix or an error code.
+///
 pub fn crtXmtxEz(length: usize, alloc: *const std.mem.Allocator) ![]f32 {
     return try alloc.*.alloc(f32, length);
 }
@@ -957,12 +1041,18 @@ test "XMTX: crtXmtxEz test" {
     alloc.free(m2);
 }
 
-//Returns a newly created matrix of the specified length, using the provided allocator, with the provided number of columns. Optionaly filled with the identity matrix.
-//  length = The length of the new matrix to create.
-//  cols = The number of columns in the new matrix.
-//  alloc = The allocator used to create the new matrix.
-//  identity = A Boolean indicating if the resulting new matrix should be filled with the identity matrix for that order.
-//  returns = The newly created matrix or an error code.
+///Returns a newly created matrix of the specified length, using the provided allocator, with the provided number of columns. Optionaly filled with the identity matrix.
+///
+///  length = The length of the new matrix to create.
+///
+///  cols = The number of columns in the new matrix.
+///
+///  alloc = The allocator used to create the new matrix.
+///
+///  identity = A Boolean indicating if the resulting new matrix should be filled with the identity matrix for that order.
+///
+///  returns = The newly created matrix or an error code.
+///
 pub fn crtXmtx(length: usize, cols: usize, alloc: *const std.mem.Allocator, identity: bool) ![]f32 {
     var ret: []f32 = try alloc.*.alloc(f32, length);
     var i: usize = 0;
@@ -995,10 +1085,14 @@ test "XMTX: crtXmtx test" {
     alloc.free(m2);
 }
 
-//Returns a newly created vector of the specified length using the provided allocator.
-//  length = The length of the new vector to create.
-//  alloc = The allocator used to create the new vector.
-//  returns = The newly created vector or an error code.
+///Returns a newly created vector of the specified length using the provided allocator.
+///
+///  length = The length of the new vector to create.
+///
+///  alloc = The allocator used to create the new vector.
+///
+///  returns = The newly created vector or an error code.
+///
 pub fn crtXvec(length: usize, alloc: *const std.mem.Allocator) ![]f32 {
     return try alloc.*.alloc(f32, length);
 }
@@ -1015,8 +1109,10 @@ test "XMTX: crtXvec test" {
     alloc.free(v2);
 }
 
-//Clears the values of the given matrix.
-//  mtx = The matrix to reset to zero for all values.
+///Clears the values of the given matrix.
+///
+///  mtx = The matrix to reset to zero for all values.
+///
 pub fn clrXmtx(mtx: []f32) void {
     const l = mtx.len;
     var i: usize = 0;
@@ -1035,10 +1131,14 @@ test "XMTX: clrXmtx test" {
     try std.testing.expectEqual(true, equXvec(&mtx, &exp));
 }
 
-//Copies the provided matrix to a newly created matrix and returns it.
-//  mtx = The matrix to copy into a new matrix.
-//  alloc = The allocator to use to create the new matrix.
-//  returns = The newly created matrix of an error code.
+///Copies the provided matrix to a newly created matrix and returns it.
+///
+///  mtx = The matrix to copy into a new matrix.
+///
+///  alloc = The allocator to use to create the new matrix.
+///
+///  returns = The newly created matrix of an error code.
+///
 pub fn cpyXmtxNew(mtx: []f32, alloc: *const std.mem.Allocator) ![]f32 {
     return cpyXvecNew(mtx, alloc);
 }
@@ -1053,10 +1153,14 @@ test "XMTX: cpyXmtxNew test" {
     alloc.free(m2);
 }
 
-//Copies the provided vector to a newly created vector and returns it.
-//  mtx = The vector to copy into a new vector.
-//  alloc = The allocator to use to create the new vector.
-//  returns = The newly created vector of an error code.
+///Copies the provided vector to a newly created vector and returns it.
+///
+///  mtx = The vector to copy into a new vector.
+///
+///  alloc = The allocator to use to create the new vector.
+///
+///  returns = The newly created vector of an error code.
+///
 pub fn cpyXvecNew(vec: []f32, alloc: *const std.mem.Allocator) ![]f32 {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1078,9 +1182,12 @@ test "XMTX: cpyXvecNew test" {
     alloc.free(v2);
 }
 
-//Returns the magnitude of the provided vector.
-//  vec = The vector to calculate the magnitude of.
-//  returns = The magnitude of the given vector.
+///Returns the magnitude of the provided vector.
+///
+///  vec = The vector to calculate the magnitude of.
+///
+///  returns = The magnitude of the given vector.
+///
 pub fn magXvec(vec: []f32) f32 {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1101,12 +1208,17 @@ test "XMTX: magXvec test" {
     try std.testing.expectEqual(exp, val);
 }
 
-//Returns a Boolean value indicating if the matrix has an inverse.
-//Not a deep check. Does not check for reduction or the determinant of the matrix mtx.
-//  mtx = The matrix to check for an inverse.
-//  cols = The number of columns in the specified matrix.
-//  trnMtx = The transpose of the mtx matrix.
-//  returns = A Boolean value indicating if the mtx matrix has an inverse.
+///Returns a Boolean value indicating if the matrix has an inverse.
+///Not a deep check. Does not check for reduction or the determinant of the matrix mtx.
+///
+///  mtx = The matrix to check for an inverse.
+///
+///  cols = The number of columns in the specified matrix.
+///
+///  trnMtx = The transpose of the mtx matrix.
+///
+///  returns = A Boolean value indicating if the mtx matrix has an inverse.
+///
 pub fn hasInvXmtx(mtx: []f32, cols: usize, trnMtx: []f32) bool {
     if (isZeroXmtx(mtx, cols)) {
         std.debug.print("hasInvXmtx: Exit 1\n", .{});
@@ -1196,10 +1308,14 @@ test "XMTX: hasInvXmtx test" {
     try std.testing.expectEqual(true, hasInvXmtx(&origM1, cols, &trnM1));
 }
 
-//Returns a Boolean value indicating if the provided matrix, with specified column count, is a symmetrical matrix.
-//  mtx = The matrix to test for symmetry.
-//  cols = The number of columns in the specified matrix.
-//  returns = A Boolean value indicating if the matrix is symmetrical.
+///Returns a Boolean value indicating if the provided matrix, with specified column count, is a symmetrical matrix.
+///
+///  mtx = The matrix to test for symmetry.
+///
+///  cols = The number of columns in the specified matrix.
+///
+///  returns = A Boolean value indicating if the matrix is symmetrical.
+///
 pub fn isSymXmtx(mtx: []f32, cols: usize) bool {
     const rows: usize = mtx.len / cols;
     var r: usize = 0;
@@ -1230,10 +1346,14 @@ test "XMTX: isSymXmtx test" {
     try std.testing.expectEqual(true, b);
 }
 
-//Returns a Boolean value indicating if the provided matrix is a zero matrix.
-//  mtx = The matrix to check for zero rows or columns.
-//  cols = The number of columns in the matrix.
-//  returns = A Boolean value indicating if the given matrix is a zero matrix or not.
+///Returns a Boolean value indicating if the provided matrix is a zero matrix.
+///
+///  mtx = The matrix to check for zero rows or columns.
+///
+///  cols = The number of columns in the matrix.
+///
+///  returns = A Boolean value indicating if the given matrix is a zero matrix or not.
+///
 pub fn isZeroXmtx(mtx: []f32, cols: usize) bool {
     const l: usize = mtx.len;
     const rows: usize = l / cols;
@@ -1284,9 +1404,12 @@ test "XMTX: isZeroXmtx test" {
     try std.testing.expectEqual(false, isZeroXmtx(&m2, 3));
 }
 
-//Returns a Boolean value indicating if the provided vector is a zero vector.
-//  vec = The vector to check for zero rows or columns.
-//  returns = A Boolean value indicating if the given vector is a zero vector or not.
+///Returns a Boolean value indicating if the provided vector is a zero vector.
+///
+///  vec = The vector to check for zero rows or columns.
+///
+///  returns = A Boolean value indicating if the given vector is a zero vector or not.
+///
 pub fn isZeroXvec(vec: []f32) bool {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1308,10 +1431,14 @@ test "XMTX: isZeroXvec test" {
     try std.testing.expectEqual(false, isZeroXvec(&v2));
 }
 
-//Returns a Boolean indicating if the provided vectors are linearly independent or not.
-//  vecL = The left-hand side vector to compare to vecR.
-//  vecR = The right-hand side vector to compare to vecL.
-//  returns = A Boolean value indicating if the two vectors, vecL and vecR, are linearly independent.
+///Returns a Boolean indicating if the provided vectors are linearly independent or not.
+///
+///  vecL = The left-hand side vector to compare to vecR.
+///
+///  vecR = The right-hand side vector to compare to vecL.
+///
+///  returns = A Boolean value indicating if the two vectors, vecL and vecR, are linearly independent.
+///
 pub fn isLinIndXvec(vecL: []f32, vecR: []f32) bool {
     //std.debug.print("dotPrdXvec: {}\n", .{dotPrdXvec(vecL, vecR)});
     if (dotPrdXvec(vecL, vecR) == 0) {
@@ -1330,10 +1457,14 @@ test "XMTX: isLinIndXvec test" {
     try std.testing.expectEqual(false, isLinIndXvec(&v2, &v3));
 }
 
-//Returns the dot product of the two provided vectors, vecL and vecR.
-//  vecL = The left-hand side vector in the dot product calculation.
-//  vecR = The right-hand side vector in the dot product calculation.
-//  returns = The dot product of the two vectors.
+///Returns the dot product of the two provided vectors, vecL and vecR.
+///
+///  vecL = The left-hand side vector in the dot product calculation.
+///
+///  vecR = The right-hand side vector in the dot product calculation.
+///
+///  returns = The dot product of the two vectors.
+///
 pub fn dotPrdXvec(vecL: []f32, vecR: []f32) f32 {
     const l: usize = vecL.len;
     var i: usize = 0;
@@ -1355,10 +1486,14 @@ test "XMTX: dotPrdXvec test" {
     try std.testing.expectEqual(true, (dotPrdXvec(&v2, &v3) > 0));
 }
 
-//Returns the cross-product of the two provided 3x3 vectors, vecL and vecR.
-//  vecL = The left-hand vector in the cross product calculation.
-//  vecR = The right-hand vector in the cross product calculation.
-//  returns = The cross product of the two 3x3 vectors provided.
+///Returns the cross-product of the two provided 3x3 vectors, vecL and vecR.
+///
+///  vecL = The left-hand vector in the cross product calculation.
+///
+///  vecR = The right-hand vector in the cross product calculation.
+///
+///  returns = The cross product of the two 3x3 vectors provided.
+///
 pub fn crsPrdXvec(vecL: *[3]f32, vecR: *[3]f32) [3]f32 {
     return [3]f32{ (vecL[1] * vecR[2]) - (vecL[2] * vecR[1]), (vecL[2] * vecR[0]) - (vecL[0] * vecR[2]), (vecL[0] * vecR[1]) - (vecL[1] * vecR[0]) };
 }
@@ -1379,9 +1514,12 @@ test "XMTX: crsPrdXvec test" {
     try std.testing.expectEqual(true, equXvec(&exp2, &v5));
 }
 
-//Multiplies each entry in the vec vector by the provided value.
-//  vec = The vector to apply the multiplication to.
-//  val = The scalar value to multiply the vector by.
+///Multiplies each entry in the vec vector by the provided value.
+///
+///  vec = The vector to apply the multiplication to.
+///
+///  val = The scalar value to multiply the vector by.
+///
 pub fn mulXvec(vec: []f32, val: f32) void {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1402,9 +1540,12 @@ test "XMTX: mulXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-//Divides each entry in the vec vector by the provided value.
-//  vec = The vector to apply the division to.
-//  val = The scalar value to divide the vector by.
+///Divides each entry in the vec vector by the provided value.
+///
+///  vec = The vector to apply the division to.
+///
+///  val = The scalar value to divide the vector by.
+///
 pub fn divXvec(vec: []f32, val: f32) void {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1425,9 +1566,12 @@ test "XMTX: divXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-//Adds each entry in the vec vector by the provided value.
-//  vec = The vector to apply the addition to.
-//  val = The scalar value to add the vector by.
+///Adds each entry in the vec vector by the provided value.
+///
+///  vec = The vector to apply the addition to.
+///
+///  val = The scalar value to add the vector by.
+///
 pub fn addXvec(vec: []f32, val: f32) void {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1448,9 +1592,12 @@ test "XMTX: addXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-//Subtracts each entry in the vec vector by the provided value.
-//  vec = The vector to apply the subtract to.
-//  val = The scalar value to substract the vector by.
+///Subtracts each entry in the vec vector by the provided value.
+///
+///  vec = The vector to apply the subtract to.
+///
+///  val = The scalar value to substract the vector by.
+///
 pub fn subXvec(vec: []f32, val: f32) void {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1471,11 +1618,16 @@ test "XMTX: subXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-//Performs vector multiplication on the provided vectors storing the result in the ret vector.
-//  vecL = The left-hand vector in the multiplication process.
-//  vecR = The right-hand vector in the multiplication process.
-//  ret = The return vector where calculated results are stored.
-//  returns = A Boolean value indicating if the vector multiplication operation was successful.
+///Performs vector multiplication on the provided vectors storing the result in the ret vector.
+///
+///  vecL = The left-hand vector in the multiplication process.
+///
+///  vecR = The right-hand vector in the multiplication process.
+///
+///  ret = The return vector where calculated results are stored.
+///
+///  returns = A Boolean value indicating if the vector multiplication operation was successful.
+///
 pub fn tmsXvec(vecL: []f32, vecR: []f32, ret: []f32) bool {
     if (vecL.len != vecR.len) {
         std.debug.print("!! Warning tmsXvec vector arguments are not the same legnth !!", .{});
@@ -1510,14 +1662,22 @@ test "XMTX: tmsXvec test" {
     try std.testing.expectEqual(true, equXvec(&exp, &v3));
 }
 
-//Performs matrix multiplication on the provided matrices with results being stored in the ret matrix.
-//  mtxL = The matrix on the left-hand side of the matrix multiplication process.
-//  colsL = The number of columns of the left-hand matrix.
-//  mtxR = The matrix on the right-hand side of thematrix  mupltiplication process.
-//  colsR = The number of columns of the right-hand matrix.
-//  ret = The return matrix that holds all of the calculated values.
-//  colsRet = The number of columns of the return matrix.
-//  returns = A Boolean value that indicates if the matrix multiplication succeeded.
+///Performs matrix multiplication on the provided matrices with results being stored in the ret matrix.
+///
+///  mtxL = The matrix on the left-hand side of the matrix multiplication process.
+///
+///  colsL = The number of columns of the left-hand matrix.
+///
+///  mtxR = The matrix on the right-hand side of thematrix  mupltiplication process.
+///
+///  colsR = The number of columns of the right-hand matrix.
+///
+///  ret = The return matrix that holds all of the calculated values.
+///
+///  colsRet = The number of columns of the return matrix.
+///
+///  returns = A Boolean value that indicates if the matrix multiplication succeeded.
+///
 pub fn tmsXmtx(mtxL: []f32, colsL: usize, mtxR: []f32, colsR: usize, ret: []f32, colsRet: usize) bool {
     //m X p * p X n = m X n
     //2x2 * 2x3 = 2*3
@@ -1620,9 +1780,12 @@ test "XMTX: tmsXmtx test" {
     try std.testing.expectEqual(true, equXmtx(&m1, &ret));
 }
 
-//Adds the two provided vectors together storing the adjustment in the vecL argument.
-//  vecL = The left-hand side of the matrix addition process.
-//  vecR = The right-hand side of the matrix addition process.
+///Adds the two provided vectors together storing the adjustment in the vecL argument.
+///
+///  vecL = The left-hand side of the matrix addition process.
+///
+///  vecR = The right-hand side of the matrix addition process.
+///
 pub fn sum1Xvec(vecL: []f32, vecR: []f32) void {
     const l: usize = vecL.len;
     var i: usize = 0;
@@ -1643,10 +1806,14 @@ test "XMTX: sum1Xvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
 }
 
-//Adds the three provided vectors together storing the adjustment in the vecL argument.
-//  vecL = The left-hand side of the matrix addition process.
-//  vec1 = The first matrix to add to vecL.
-//  vec2 = The second matrix to add to vecL.
+///Adds the three provided vectors together storing the adjustment in the vecL argument.
+///
+///  vecL = The left-hand side of the matrix addition process.
+///
+///  vec1 = The first matrix to add to vecL.
+///
+///  vec2 = The second matrix to add to vecL.
+///
 pub fn sum2Xvec(vecL: []f32, vec1: []f32, vec2: []f32) void {
     const l: usize = vecL.len;
     var i: usize = 0;
@@ -1667,9 +1834,11 @@ test "XMTX: sum2Xvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
 }
 
-//Subtracts the two provided vectors from each other storing the adjustment in the vecL argument.
-//  vecL = The left-hand side of the matrix subtraction process.
-//  vecR = The right-hand side of the matrix subtraction process.
+///Subtracts the two provided vectors from each other storing the adjustment in the vecL argument.
+///
+///  vecL = The left-hand side of the matrix subtraction process.
+///
+///  vecR = The right-hand side of the matrix subtraction process.
 pub fn diff1Xvec(vecL: []f32, vecR: []f32) void {
     const l: usize = vecL.len;
     var i: usize = 0;
@@ -1690,10 +1859,14 @@ test "XMTX: diff1Xvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
 }
 
-//Subtracts the three provided vectors from eachother storing the adjustment in the vecL argument.
-//  vecL = The left-hand side of the matrix subtraction process.
-//  vec1 = The first matrix to subtract to vecL.
-//  vec2 = The second matrix to subtract to vecL.
+///Subtracts the three provided vectors from eachother storing the adjustment in the vecL argument.
+///
+///  vecL = The left-hand side of the matrix subtraction process.
+///
+///  vec1 = The first matrix to subtract to vecL.
+///
+///  vec2 = The second matrix to subtract to vecL.
+///
 pub fn diff2Xvec(vecL: []f32, vec1: []f32, vec2: []f32) void {
     const l: usize = vecL.len;
     var i: usize = 0;
@@ -1714,9 +1887,12 @@ test "XMTX: diff2Xvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
 }
 
-//Prints the matrix with the specified number of columns.
-//  mtx = The matrix to print.
-//  cols = The number of columns in the matrix.
+///Prints the matrix with the specified number of columns.
+///
+///  mtx = The matrix to print.
+///
+///  cols = The number of columns in the matrix.
+///
 pub fn prntXmtx(mtx: []f32, cols: usize) void {
     const l: usize = mtx.len / cols;
     var i: usize = 0;
@@ -1728,8 +1904,10 @@ pub fn prntXmtx(mtx: []f32, cols: usize) void {
     }
 }
 
-//Prints the specified vector.
-//  vec = The vector to print.
+///Prints the specified vector.
+///
+///  vec = The vector to print.
+///
 pub fn prntXvec(vec: []f32) void {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1750,10 +1928,14 @@ pub fn prntXvec(vec: []f32) void {
     std.debug.print("\n", .{});
 }
 
-//Calculates the angle between the two provided vectors.
-//  vecL = The left-hand vector in the calculation.
-//  vecR = The right-hand vector in the calculation.
-//  returns = The angle in radians between the two vectors.
+///Calculates the angle between the two provided vectors.
+///
+///  vecL = The left-hand vector in the calculation.
+///
+///  vecR = The right-hand vector in the calculation.
+///
+///  returns = The angle in radians between the two vectors.
+///
 pub fn aglBtwnXvec(vecL: []f32, vecR: []f32) f32 {
     const dotP = dotPrdXvec(vecL, vecR);
     const mag1 = magXvec(vecL);
@@ -1776,9 +1958,12 @@ test "XMTX: aglBtwnXvec test" {
     try std.testing.expectEqual(exp, angle);
 }
 
-//A function for converting radians to degrees.
-//  rad = The number of radians to convert.
-//  returns = The number of degrees.
+///A function for converting radians to degrees.
+///
+///  rad = The number of radians to convert.
+///
+///  returns = The number of degrees.
+///
 pub fn rad2Deg(rad: f32) f32 {
     return (rad * (180.0 / std.math.pi));
 }
@@ -1799,9 +1984,12 @@ test "XMTX: rad2Deg test" {
     try std.testing.expectEqual(exp2, angleDeg);
 }
 
-//A function for converting degrees to radians.
-//  deg = The number of degrees to convert.
-//  returns = The numbers of radians.
+///A function for converting degrees to radians.
+///
+///  deg = The number of degrees to convert.
+///
+///  returns = The numbers of radians.
+///
 pub fn deg2Rad(deg: f32) f32 {
     return (deg * (std.math.pi / 180.0));
 }
@@ -1828,10 +2016,14 @@ test "XMTX: deg2Rad test" {
     try std.testing.expectEqual(true, isEquF32(angleRad2, angleRad, false));
 }
 
-//Determines if the two provided matrices are equal.
-//  mtxL = The left-hand side of the matrix comparison.
-//  mtxR = The right-hand side of the matrix comparison.
-//  returns = A Boolean value indicating if the matrices are equal.
+///Determines if the two provided matrices are equal.
+///
+///  mtxL = The left-hand side of the matrix comparison.
+///
+///  mtxR = The right-hand side of the matrix comparison.
+///
+///  returns = A Boolean value indicating if the matrices are equal.
+///
 pub fn equXmtx(mtxL: []f32, mtxR: []f32) bool {
     return equXvec(mtxL, mtxR);
 }
@@ -1845,10 +2037,14 @@ test "XMTX: equXmtx test" {
     try std.testing.expectEqual(true, equXmtx(&m1, &m2));
 }
 
-//Determines if the two provided vectors are equal.
-//  vecL = The left-hand side of the vector comparison.
-//  vecR = The right-hand side of the vector comparison.
-//  returns = A Boolean value indicating if the vectors are equal.
+///Determines if the two provided vectors are equal.
+///
+///  vecL = The left-hand side of the vector comparison.
+///
+///  vecR = The right-hand side of the vector comparison.
+///
+///  returns = A Boolean value indicating if the vectors are equal.
+///
 pub fn equXvec(vecL: []f32, vecR: []f32) bool {
     return INT_equXvec(vecL, vecR, COMPARE_MODE_EXACT);
 }
@@ -1862,11 +2058,16 @@ test "XMTX: equXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-//A private function that handles matrix and vector value comparison supporting two modes, direct compare and precision compare.
-//  vecL = The left-hand side of the vector comparison.
-//  vecR = The right-hand side of the vector comparison.
-//  compareModeExact = A Boolean value indicating if an exact comparison mode should be used.
-//  returns = A Boolean value indicating if the vectors are equal.
+///A private function that handles matrix and vector value comparison supporting two modes, direct compare and precision compare.
+///
+///  vecL = The left-hand side of the vector comparison.
+///
+///  vecR = The right-hand side of the vector comparison.
+///
+///  compareModeExact = A Boolean value indicating if an exact comparison mode should be used.
+///
+///  returns = A Boolean value indicating if the vectors are equal.
+///
 fn INT_equXvec(vecL: []f32, vecR: []f32, compareModeExact: bool) bool {
     const l: usize = vecL.len;
     var i: usize = 0;
@@ -1895,8 +2096,10 @@ test "XMTX: INT_equXvec test" {
     try std.testing.expectEqual(true, INT_equXvec(&v1, &v2, false));
 }
 
-//Converts the provided matrix entries into absolute values.
-//  mtx = The matrix to convert to absolute values.
+///Converts the provided matrix entries into absolute values.
+///
+///  mtx = The matrix to convert to absolute values.
+///
 pub fn absXmtx(mtx: []f32) void {
     return absXvec(mtx);
 }
@@ -1910,8 +2113,10 @@ test "XMTX: absXmtx test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-//Converts the provided vector entries into absolute values.
-//  vec = The vector to convert to absolute values.
+///Converts the provided vector entries into absolute values.
+///
+///  vec = The vector to convert to absolute values.
+///
 pub fn absXvec(vec: []f32) void {
     const l: usize = vec.len;
     var i: usize = 0;
@@ -1930,8 +2135,10 @@ test "XMTX: absXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-//Normalizes the provided vector based on a calculated magnitude.
-//  vec = The vector to normalize the length of.
+///Normalizes the provided vector based on a calculated magnitude.
+///
+///  vec = The vector to normalize the length of.
+///
 pub fn nrmXvec(vec: []f32) void {
     const magVec: f32 = magXvec(vec);
     const invMagVec: f32 = 1 / magVec;
@@ -1948,10 +2155,14 @@ test "XMTX: nrmXvec test" {
     try std.testing.expectEqual(@as(f32, 8.01783740e-01), v1[2]);
 }
 
-//Projects vector P onto vector Q.
-//  vecP = The vector to project onto.
-//  vecQ = The vector to be projected on.
-//  returns = The parameter of the vector P that projects onto Q.
+///Projects vector P onto vector Q.
+///
+///  vecP = The vector to project onto.
+///
+///  vecQ = The vector to be projected on.
+///
+///  returns = The parameter of the vector P that projects onto Q.
+///
 pub fn projXvec_VecP_Onto_VecQ(vecP: []f32, vecQ: []f32) []f32 {
     const dotProd: f32 = dotPrdXvec(vecP, vecQ);
     const mag: f32 = magXvec(vecQ);
@@ -1981,10 +2192,14 @@ test "XMTX: projXvec_VecP_Onto_VecQ test" {
     try std.testing.expectEqual(true, equXmtx(ret, &exp));
 }
 
-//Finds the vector perpendicular to vectors P and Q.
-//  vecP = The left-hand vector in the calculation to find a perpendicular vector.
-//  vecQ = The right-hand vector in the calculation to find a perpendicular vector.
-//  returns = A vector perpendicular to vectors P and Q.
+///Finds the vector perpendicular to vectors P and Q.
+///
+///  vecP = The left-hand vector in the calculation to find a perpendicular vector.
+///
+///  vecQ = The right-hand vector in the calculation to find a perpendicular vector.
+///
+///  returns = A vector perpendicular to vectors P and Q.
+///
 pub fn perpXvec_VecP_To_VecQ(vecP: []f32, vecQ: []f32) []f32 {
     diff1Xvec(vecP, projXvec_VecP_Onto_VecQ(vecP, vecQ));
     return vecP;
@@ -2013,11 +2228,16 @@ test "XMTX: perpXvec_VecP_To_VecQ test" {
 //An enumeration of matrix operations that are used by the idnfXmtx and procXmtx function.
 const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS, MTX_IS_LIN_INDP, MTX_IS_INVERTIBLE, MTX_IS_ZERO };
 
-//A function that handles multiple operations on a provided matrix. This function returns information about the matrix.
-//  mtx = The matrix to process.
-//  cols = The numbers of columns in the matrix.
-//  op = The MTX_OPS operation to perform.
-//  returns = A Boolean indicating the result of the information operation.
+///A function that handles multiple operations on a provided matrix. This function returns information about the matrix.
+///
+///  mtx = The matrix to process.
+///
+///  cols = The numbers of columns in the matrix.
+///
+///  op = The MTX_OPS operation to perform.
+///
+///  returns = A Boolean indicating the result of the information operation.
+///
 pub fn idnfXmtx(mtx: []f32, cols: usize, op: MTX_OPS) bool {
     const l: usize = mtx.len / cols;
     var i: usize = 0;
@@ -2071,11 +2291,16 @@ test "XMTX: idnfXmtx tests" {
     try std.testing.expectEqual(true, b);
 }
 
-//A function that handles multiple operations on a provided matrix. This function returns an adjusted version of the matrix.
-//  mtx = The matrix to process.
-//  val = The adjustment value used in the specified process.
-//  cols = The numbers of columns in the matrix.
-//  op = The MTX_OPS operation to perform.
+///A function that handles multiple operations on a provided matrix. This function returns an adjusted version of the matrix.
+///
+///  mtx = The matrix to process.
+///
+///  val = The adjustment value used in the specified process.
+///
+///  cols = The numbers of columns in the matrix.
+///
+///  op = The MTX_OPS operation to perform.
+///
 pub fn procXmtx(mtx: []f32, val: f32, cols: usize, op: MTX_OPS) void {
     const l: usize = mtx.len / cols;
     var i: usize = 0;
@@ -2146,17 +2371,27 @@ test "XMTX: procXmtx tests" {
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 }
 
-//Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
-//Alters the provided matrix inline.
-//  mtx = The matrix to reduce.
-//  cols = The number of columns in the matrix.
-//  hasAug = A Boolean indicating if the matrix is an augmented matrix.
-//  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
-//  idtMtx = The identity matrix associated with the mtx matrix provided.
-//  dim = The number of matrix columns that must be zero for a zero row to exist.
-//  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
-//  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
-//  returns = A Boolean value indicating  if the matrix was reduced successfuly.
+///Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
+///Alters the provided matrix inline.
+///
+///  mtx = The matrix to reduce.
+///
+///  cols = The number of columns in the matrix.
+///
+///  hasAug = A Boolean indicating if the matrix is an augmented matrix.
+///
+///  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
+///
+///  idtMtx = The identity matrix associated with the mtx matrix provided.
+///
+///  dim = The number of matrix columns that must be zero for a zero row to exist.
+///
+///  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
+///
+///  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
+///
+///  returns = A Boolean value indicating  if the matrix was reduced successfuly.
+///
 pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx: []f32, dim: usize, triagRdcOnly: bool, sclr: *f32) bool {
     const rows: usize = mtx.len / cols;
     var r: usize = 0;
@@ -2400,17 +2635,28 @@ test "XMTX: rdcXmtxInl test" {
     prntNl();
 }
 
-//Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
-//  mtx = The matrix to reduce.
-//  cols = The number of columns in the matrix.
-//  hasAug = A Boolean indicating if the matrix is an augmented matrix.
-//  ret = The matrix that holds the reduced matrix.
-//  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
-//  idtMtx = The identity matrix associated with the mtx matrix provided.
-//  dim = The number of matrix columns that must be zero for a zero row to exist.
-//  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
-//  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
-//  returns = A Boolean value indicating  if the matrix was reduced successfuly.
+///Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
+///
+///  mtx = The matrix to reduce.
+///
+///  cols = The number of columns in the matrix.
+///
+///  hasAug = A Boolean indicating if the matrix is an augmented matrix.
+///
+///  ret = The matrix that holds the reduced matrix.
+///
+///  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
+///
+///  idtMtx = The identity matrix associated with the mtx matrix provided.
+///
+///  dim = The number of matrix columns that must be zero for a zero row to exist.
+///
+///  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
+///
+///  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
+///
+///  returns = A Boolean value indicating  if the matrix was reduced successfuly.
+///
 pub fn rdcXmtx(mtx: []f32, cols: usize, hasAug: bool, ret: []f32, hasIdtMtx: bool, idtMtx: []f32, dim: usize, triagRdcOnly: bool, sclr: *f32) bool {
     cpyXmtx(mtx, ret);
     return rdcXmtxInl(ret, cols, hasAug, hasIdtMtx, idtMtx, dim, triagRdcOnly, sclr);
@@ -2450,7 +2696,7 @@ test "XMTX: rdcXmtx test" {
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
 }
 
-//Prints a newline.
+///Prints a newline.
 pub fn prntNl() void {
     std.debug.print("\n", .{});
 }
@@ -2459,12 +2705,18 @@ test "XMTX: prntNl test" {
     prntNl();
 }
 
-//Finds the largest row, by absolute value, in the given matrix, at the specified column, starting on the given row.
-//  mtx = The matrix to search through.
-//  cols = The number of columns in the matrix.
-//  targetCol = The target column to look for values.
-//  startingRow = The row to start the search on.
-//  returns = The index of the row found or an illegal row index, the number of rows.
+///Finds the largest row, by absolute value, in the given matrix, at the specified column, starting on the given row.
+///
+///  mtx = The matrix to search through.
+///
+///  cols = The number of columns in the matrix.
+///
+///  targetCol = The target column to look for values.
+///
+///  startingRow = The row to start the search on.
+///
+///  returns = The index of the row found or an illegal row index, the number of rows.
+///
 pub fn fndLgstRowAbsXmtx(mtx: []f32, cols: usize, targetCol: usize, startingRow: usize) usize {
     const l: usize = mtx.len;
     var i: usize = (cols * startingRow);
@@ -2548,10 +2800,14 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     try std.testing.expectEqual(exp[8], v8);
 }
 
-//Returns a Boolean indicating if the provided matrix is reduced.
-//  mtx = The matrix to process.
-//  cols = The number of columns in the matrix.
-//  returns = A Boolean value indicating if the given matrix, mtx, is in reduced form.
+///Returns a Boolean indicating if the provided matrix is reduced.
+///
+///  mtx = The matrix to process.
+///
+///  cols = The number of columns in the matrix.
+///
+///  returns = A Boolean value indicating if the given matrix, mtx, is in reduced form.
+///
 pub fn isRdcFrmXmtx(mtx: []f32, cols: usize) bool {
     const l: usize = mtx.len;
     var i: usize = 0;
@@ -2601,13 +2857,19 @@ test "XMTX: isRdcFrmXmtx test" {
     try std.testing.expectEqual(false, b);
 }
 
-//Adds a scalar multiple of one matrix row to another.
-//Processes the operation inline and stores the results in the provided matrix.
-//  srcRow = The source row, multiplied by mul, to be added to the destination row.
-//  dstRow = The destination row to add the scalar multiplied source row to.
-//  mul = The multiplier to apply to the source row.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix used in the row operation.
+///Adds a scalar multiple of one matrix row to another.
+///Processes the operation inline and stores the results in the provided matrix.
+///
+///  srcRow = The source row, multiplied by mul, to be added to the destination row.
+///
+///  dstRow = The destination row to add the scalar multiplied source row to.
+///
+///  mul = The multiplier to apply to the source row.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix used in the row operation.
+///
 pub fn addSclMulXmtxRowsInl(srcRow: usize, dstRow: usize, mul: f32, cols: usize, mtx: []f32) void {
     const l: usize = mtx.len;
     var i: usize = (dstRow * cols);
@@ -2636,13 +2898,20 @@ test "XMTX: addSclMulXmtxRowsInl test" {
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 }
 
-//Adds a scalar multiple of one matrix row to another.
-//  srcRow = The source row, multiplied by mul, to be added to the destination row.
-//  dstRow = The destination row to add the scalar multiplied source row to.
-//  mul = The multiplier to apply to the source row.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix used in the row operation.
-//  ret = The return matrix used in the row operation.
+///Adds a scalar multiple of one matrix row to another.
+///
+///  srcRow = The source row, multiplied by mul, to be added to the destination row.
+///
+///  dstRow = The destination row to add the scalar multiplied source row to.
+///
+///  mul = The multiplier to apply to the source row.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix used in the row operation.
+///
+///  ret = The return matrix used in the row operation.
+///
 pub fn addSclMulXmtxRows(srcRow: usize, dstRow: usize, mul: f32, cols: usize, mtx: []f32, ret: []f32) void {
     cpyXmtx(mtx, ret);
     addSclMulXmtxRowsInl(srcRow, dstRow, mul, cols, ret);
@@ -2659,11 +2928,16 @@ test "XMTX: addSclMulXmtxRows test" {
     try std.testing.expectEqual(true, equXvec(&exp, &res));
 }
 
-//Multiplies a matrix row by a scalar. Performs the operation inline in the provided matrix.
-//  srcRow = The source row to apply the multiplication to.
-//  mul = The value to apply in the multiplication.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix to use in this operation.
+///Multiplies a matrix row by a scalar. Performs the operation inline in the provided matrix.
+///
+///  srcRow = The source row to apply the multiplication to.
+///
+///  mul = The value to apply in the multiplication.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix to use in this operation.
+///
 pub fn sclMulXmtxRowsInl(srcRow: usize, mul: f32, cols: usize, mtx: []f32) void {
     const l: usize = mtx.len;
     var i: usize = (srcRow * cols);
@@ -2689,12 +2963,18 @@ test "XMTX: sclMulXmtxRowsInl test" {
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 }
 
-//Multiplies a matrix row by a scalar.
-//  srcRow = The source row to apply the multiplication to.
-//  mul = The value to apply in the multiplication.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix to use in this operation.
-//  ret = The return matrix that holds the newly calculated variables.
+///Multiplies a matrix row by a scalar.
+///
+///  srcRow = The source row to apply the multiplication to.
+///
+///  mul = The value to apply in the multiplication.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix to use in this operation.
+///
+///  ret = The return matrix that holds the newly calculated variables.
+///
 pub fn sclMulXmtxRows(srcRow: usize, mul: f32, cols: usize, mtx: []f32, ret: []f32) void {
     cpyXmtx(mtx, ret);
     sclMulXmtxRowsInl(srcRow, mul, cols, ret);
@@ -2711,11 +2991,16 @@ test "XMTX: sclMulXmtxRows test" {
     try std.testing.expectEqual(true, equXvec(&exp, &res));
 }
 
-//Adds a scalar to a matrix row. Performs the operation inline in the provided matrix.
-//  srcRow = The source row to apply the multiplication to.
-//  mul = The value to apply in the multiplication.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix to use in this operation.
+///Adds a scalar to a matrix row. Performs the operation inline in the provided matrix.
+///
+///  srcRow = The source row to apply the multiplication to.
+///
+///  mul = The value to apply in the multiplication.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix to use in this operation.
+///
 pub fn addSclXmtxRowsInl(srcRow: usize, mul: f32, cols: usize, mtx: []f32) void {
     const l: usize = mtx.len;
     var i: usize = (srcRow * cols);
@@ -2741,12 +3026,18 @@ test "XMTX: addSclXmtxRowsInl test" {
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 }
 
-//Adds a matrix row to a scalar.
-//  srcRow = The source row to apply the multiplication to.
-//  mul = The value to apply in the multiplication.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix to use in this operation.
-//  ret = The return matrix that holds the newly calculated variables.
+///Adds a matrix row to a scalar.
+///
+///  srcRow = The source row to apply the multiplication to.
+///
+///  mul = The value to apply in the multiplication.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix to use in this operation.
+///
+///  ret = The return matrix that holds the newly calculated variables.
+///
 pub fn addSclXmtxRows(srcRow: usize, mul: f32, cols: usize, mtx: []f32, ret: []f32) void {
     cpyXmtx(mtx, ret);
     addSclXmtxRowsInl(srcRow, mul, cols, ret);
@@ -2763,11 +3054,16 @@ test "XMTX: addSclXmtxRows test" {
     try std.testing.expectEqual(true, equXvec(&exp, &res));
 }
 
-//Alternate two rows of a the given matrix, mtx. Performs the operation inline.
-//  srcRow = The source row to alternate with the destination row.
-//  dstRow = The destination row to alternate with the source row.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix to perform the operation on.
+///Alternate two rows of a the given matrix, mtx. Performs the operation inline.
+///
+///  srcRow = The source row to alternate with the destination row.
+///
+///  dstRow = The destination row to alternate with the source row.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix to perform the operation on.
+///
 pub fn altXmtxRowsInl(srcRow: usize, dstRow: usize, cols: usize, mtx: []f32) void {
     const l: usize = mtx.len;
     var i: usize = 0;
@@ -2797,12 +3093,18 @@ test "XMTX: altXmtxRowsInl test" {
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 }
 
-//Alternate two rows of a matrix.
-//  srcRow = The source row to alternate with the destination row.
-//  dstRow = The destination row to alternate with the source row.
-//  cols = The number of columns in the matrix.
-//  mtx = The matrix to perform the operation on.
-//  ret = The return matrix that holds the newly calculated variables.
+///Alternate two rows of a matrix.
+///
+///  srcRow = The source row to alternate with the destination row.
+///
+///  dstRow = The destination row to alternate with the source row.
+///
+///  cols = The number of columns in the matrix.
+///
+///  mtx = The matrix to perform the operation on.
+///
+///  ret = The return matrix that holds the newly calculated variables.
+///
 pub fn altXmtxRows(srcRow: usize, dstRow: usize, cols: usize, mtx: []f32, ret: []f32) void {
     cpyXmtx(mtx, ret);
     altXmtxRowsInl(srcRow, dstRow, cols, ret);
@@ -2819,10 +3121,14 @@ test "XMTX: altXmtxRows test" {
     try std.testing.expectEqual(true, equXvec(&exp, &alt));
 }
 
-//Transposes the provided matrix into the return matrix. Operation is performed inline. Doesn't work with rectangular matrices, square matrices only.
-//  mtx = The source matrix to rn the transpose operation on.
-//  cols = The number of columns in the matrix.
-//  alloc = A allocator used to create the return matrix.
+///Transposes the provided matrix into the return matrix. Operation is performed inline. Doesn't work with rectangular matrices, square matrices only.
+///
+///  mtx = The source matrix to rn the transpose operation on.
+///
+///  cols = The number of columns in the matrix.
+///
+///  alloc = A allocator used to create the return matrix.
+///
 pub fn trnXmtxInl(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !void {
     const ret: []f32 = try crtXmtxEz(mtx.len, alloc);
     trnXmtxRect(mtx, cols, ret, cols);
@@ -2841,10 +3147,14 @@ test "XMTX: trnXmtxInl test" {
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 }
 
-//Transposes the provided matrix into the return matrix.
-//  mtx = The source matrix to rn the transpose operation on.
-//  cols = The number of columns in the matrix.
-//  ret = The return matrix with the new transposed values.
+///Transposes the provided matrix into the return matrix.
+///
+///  mtx = The source matrix to rn the transpose operation on.
+///
+///  cols = The number of columns in the matrix.
+///
+///  ret = The return matrix with the new transposed values.
+///
 pub fn trnXmtx(mtx: []f32, cols: usize, ret: []f32) void {
     trnXmtxRect(mtx, cols, ret, cols);
 }
@@ -2862,11 +3172,16 @@ test "XMTX: trnXmtx test" {
     //alloc.free(trn);
 }
 
-//Transposes the provided matrix into the return matrix. Supports rectangular transposition using the return column argument.
-//  mtx = The source matrix to rn the transpose operation on.
-//  cols = The number of columns in the matrix.
-//  ret = The return matrix with the new transposed values.
-//  retCols = The number of columns in the return matrix.
+///Transposes the provided matrix into the return matrix. Supports rectangular transposition using the return column argument.
+///
+///  mtx = The source matrix to rn the transpose operation on.
+///
+///  cols = The number of columns in the matrix.
+///
+///  ret = The return matrix with the new transposed values.
+///
+///  retCols = The number of columns in the return matrix.
+///
 pub fn trnXmtxRect(mtx: []f32, cols: usize, ret: []f32, retCols: usize) void {
     const l = mtx.len;
     const rows: usize = (l / cols);
@@ -2908,10 +3223,14 @@ test "XMTX: trnXmtxRect test" {
     try std.testing.expectEqual(true, equXmtx(&bT, &expBt));
 }
 
-//Indicates if the provided matrix is square.
-//  mtx = The matrix to scan.
-//  cols = The number of columns in the matrix.
-//  returns = A Boolean value indicating if the matrix is a square matrix.
+///Indicates if the provided matrix is square.
+///
+///  mtx = The matrix to scan.
+///
+///  cols = The number of columns in the matrix.
+///
+///  returns = A Boolean value indicating if the matrix is a square matrix.
+///
 pub fn isSqrXmtx(mtx: []f32, cols: usize) bool {
     const l: usize = mtx.len;
     const rows = l / cols;
@@ -2930,10 +3249,14 @@ test "XMTX: isSqrXmtx test" {
     try std.testing.expectEqual(false, b2);
 }
 
-//Indicates if the provided matrix is diagonal.
-//  mtx = The matrix to scan.
-//  cols = The number of columns in the matrix.
-//  returns = A Boolean value indicating if the matrix is a diagonal matrix.
+///Indicates if the provided matrix is diagonal.
+///
+///  mtx = The matrix to scan.
+///
+///  cols = The number of columns in the matrix.
+///
+///  returns = A Boolean value indicating if the matrix is a diagonal matrix.
+///
 pub fn isDiagXmtx(mtx: []f32, cols: usize) bool {
     const l: usize = mtx.len;
     var i: usize = 0;
@@ -2961,10 +3284,14 @@ test "XMTX: isDiagXmtx test" {
     try std.testing.expectEqual(true, b2);
 }
 
-//Indicates if the provided matrix is an identity matrix.
-//  mtx = The matrix to scan.
-//  cols = The number of columns in the matrix.
-//  returns = A Boolean value indicating if the matrix is an identity matrix.
+///Indicates if the provided matrix is an identity matrix.
+///
+///  mtx = The matrix to scan.
+///
+///  cols = The number of columns in the matrix.
+///
+///  returns = A Boolean value indicating if the matrix is an identity matrix.
+///
 pub fn isIdtXmtx(mtx: []f32, cols: usize) bool {
     const l: usize = mtx.len;
     var i: usize = 0;
@@ -2996,15 +3323,23 @@ test "XMTX: isIdtXmtx test" {
     try std.testing.expectEqual(true, b2);
 }
 
-//Creates a smaller matrix for cofactor calculations based on the provided, larger, initial matrix mtx.
-//Returns a Boolean value indicating if the operation to create the cofactor matrix and store it in the ret matrix argument.
-//  mtx = The matrix to find a cofactor matrix for.
-//  cols = The number of cols in the matrix.
-//  cofR = The row to find the cofactor matrix for.
-//  cofC = The col to find the cofactor matrix for.
-//  ret = The matrix to store the resulting cofactor matrix.
-//  colsRet = The the number of columns in the return matrix.
-//  returns = A Boolean value indicating if the operation was a success.
+///Creates a smaller matrix for cofactor calculations based on the provided, larger, initial matrix mtx.
+///Returns a Boolean value indicating if the operation to create the cofactor matrix and store it in the ret matrix argument.
+///
+///  mtx = The matrix to find a cofactor matrix for.
+///
+///  cols = The number of cols in the matrix.
+///
+///  cofR = The row to find the cofactor matrix for.
+///
+///  cofC = The col to find the cofactor matrix for.
+///
+///  ret = The matrix to store the resulting cofactor matrix.
+///
+///  colsRet = The the number of columns in the return matrix.
+///
+///  returns = A Boolean value indicating if the operation was a success.
+///
 pub fn cofXmtx(mtx: []f32, cols: usize, cofR: usize, cofC: usize, ret: []f32, colsRet: usize) bool {
     const rows: usize = mtx.len / cols;
     const rowsRet: usize = ret.len / colsRet;
@@ -3076,11 +3411,16 @@ test "XMTX: cofXmtx test" {
     try std.testing.expectEqual(cofA[1], (detXmtx2(&res) * cofXmtxSign(0, 1, true)));
 }
 
-//Returns a 1 or -1 depending on the cofactor's row and column. An offset if automatically added for zero based row and column indices.
-//  cofR = The row of the desired cofactor.
-//  cofC = The column of the desired cofactor.
-//  zeroBased = A Boolean value indicating if the row and column values provided are zero based indices or 1 based.
-//  returns = A 1 or -1 which is the calculated sign of the cofactor.
+///Returns a 1 or -1 depending on the cofactor's row and column. An offset if automatically added for zero based row and column indices.
+///
+///  cofR = The row of the desired cofactor.
+///
+///  cofC = The column of the desired cofactor.
+///
+///  zeroBased = A Boolean value indicating if the row and column values provided are zero based indices or 1 based.
+///
+///  returns = A 1 or -1 which is the calculated sign of the cofactor.
+///
 pub fn cofXmtxSign(cofR: usize, cofC: usize, zeroBased: bool) f32 {
     var na: f32 = 1;
     if (zeroBased) {
@@ -3102,11 +3442,16 @@ test "XMTX: cofXmtxSign test" {
     try std.testing.expectEqual(@as(f32, -1.0), cofXmtxSign(r, c, true));
 }
 
-//Returns a new matrix based on the 4x4 matrix, mtx, with the specified row and column data removed.
-//  mtx = The matrix to use as the basis of the new matrix.
-//  row = The row to skip in the source matrix.
-//  col = The col to skip in the source matrix.
-//  returns = A new matrix based on, mtx, with the specified row and column removed.
+///Returns a new matrix based on the 4x4 matrix, mtx, with the specified row and column data removed.
+///
+///  mtx = The matrix to use as the basis of the new matrix.
+///
+///  row = The row to skip in the source matrix.
+///
+///  col = The col to skip in the source matrix.
+///
+///  returns = A new matrix based on, mtx, with the specified row and column removed.
+///
 pub fn rmvRowColXmtx4(mtx: *[16]f32, row: f32, col: f32) [9]f32 {
     const cols: usize = 4;
     const destCols: usize = 3;
@@ -3157,11 +3502,16 @@ test "XMTX: rmvRowColXmtx4 test" {
     try std.testing.expectEqual(true, equXmtx(&expA, &res));
 }
 
-//Returns a new matrix based on the 3x3 matrix, mtx, with the specified row and column data removed.
-//  mtx = The matrix to use as the basis of the new matrix.
-//  row = The row to skip in the source matrix.
-//  col = The col to skip in the source matrix.
-//  returns = A new matrix based on, mtx, with the specified row and column removed.
+///Returns a new matrix based on the 3x3 matrix, mtx, with the specified row and column data removed.
+///
+///  mtx = The matrix to use as the basis of the new matrix.
+///
+///  row = The row to skip in the source matrix.
+///
+///  col = The col to skip in the source matrix.
+///
+///  returns = A new matrix based on, mtx, with the specified row and column removed.
+///
 pub fn rmvRowColXmtx3(mtx: *[9]f32, row: f32, col: f32) [4]f32 {
     const cols: usize = 3;
     const destCols: usize = 2;
@@ -3211,9 +3561,12 @@ test "XMTX: rmvRowColXmtx3 test" {
     try std.testing.expectEqual(true, equXmtx(&expA, &res));
 }
 
-//Returns the adjoint matrix for a given 4x4 matrix, mtx.
-//  mtx = The matrix to determine the adjoint matrix for.
-//  returns = A new matrix that contains the adjoint matrix of mtx.
+///Returns the adjoint matrix for a given 4x4 matrix, mtx.
+///
+///  mtx = The matrix to determine the adjoint matrix for.
+///
+///  returns = A new matrix that contains the adjoint matrix of mtx.
+///
 pub fn adjXmtx4(mtx: *[16]f32) [16]f32 {
     var ret: [16]f32 = std.mem.zeroes([16]f32); //.{};
     var cofA: [16]f32 = cofXmtx4(mtx);
@@ -3230,9 +3583,12 @@ test "XMTX: adjXmtx4 test" {
     try std.testing.expectEqual(true, equXmtx(&expA, &retA));
 }
 
-//Returns the adjoint of the given 3x3 matrix, mtx.
-//  mtx = The matrix to find the adjoint for.
-//  returns = A new matrix with the transpose of the cofactors.
+///Returns the adjoint of the given 3x3 matrix, mtx.
+///
+///  mtx = The matrix to find the adjoint for.
+///
+///  returns = A new matrix with the transpose of the cofactors.
+///
 pub fn adjXmtx3(mtx: *[9]f32) [9]f32 {
     var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
     var cofA: [9]f32 = cofXmtx3(mtx);
@@ -3249,10 +3605,14 @@ test "XMTX: adjXmtx3 test" {
     try std.testing.expectEqual(true, equXmtx(&expA, &retA));
 }
 
-//Returns a matrix of full co-factors, sign * minor for the given 4x4 matrix.
-//  mtx = The matrix to find cofactors for.
-//  alloc = Allocator used in the calculation for lower rank determinants.
-//  returns = A new matrix of cofactors for the given matrix, mtx.
+///Returns a matrix of full co-factors, sign * minor for the given 4x4 matrix.
+///
+///  mtx = The matrix to find cofactors for.
+///
+///  alloc = Allocator used in the calculation for lower rank determinants.
+///
+///  returns = A new matrix of cofactors for the given matrix, mtx.
+///
 pub fn cofXmtx4(mtx: *[16]f32) [16]f32 {
     var mnr = mnrXmtx4(mtx);
 
@@ -3300,9 +3660,12 @@ test "XMTX: cofXmtx4 test" {
     try std.testing.expectEqual(true, b);
 }
 
-//Returns a matrix of full co-factors, sign * minor for the given 3x3 matrix.
-//  mtx = The matrix to find cofactors for.
-//  returns = A new matrix of cofactors for the given matrix, mtx.
+///Returns a matrix of full co-factors, sign * minor for the given 3x3 matrix.
+///
+///  mtx = The matrix to find cofactors for.
+///
+///  returns = A new matrix of cofactors for the given matrix, mtx.
+///
 pub fn cofXmtx3(mtx: *[9]f32) [9]f32 {
     var mnr = mnrXmtx3(mtx);
     const cofSgn = cofXmtxSign3();
@@ -3334,9 +3697,12 @@ test "XMTX: cofXmtx3 test" {
     try std.testing.expectEqual(true, b);
 }
 
-//Returns a matrix of minors for the given 4x4 matrix.
-//  mtx = The matrix to find minors for.
-//  returns = A new matrix of the calculated minors for the provided matrix, mtx.
+///Returns a matrix of minors for the given 4x4 matrix.
+///
+///  mtx = The matrix to find minors for.
+///
+///  returns = A new matrix of the calculated minors for the provided matrix, mtx.
+///
 pub fn mnrXmtx4(mtx: *[16]f32) [16]f32 {
     //A = a b c d     0  1  2  3
     //    e f g h     4  5  6  7
@@ -3455,9 +3821,12 @@ test "XMTX: mnrXmtx4 test" {
     try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
 }
 
-//Returns a matrix of minors for the given 3x3 matrix.
-//  mtx = The matrix to find minors for.
-//  returns = A new matrix of the calculated minors for the provided matrix, mtx.
+///Returns a matrix of minors for the given 3x3 matrix.
+///
+///  mtx = The matrix to find minors for.
+///
+///  returns = A new matrix of the calculated minors for the provided matrix, mtx.
+///
 pub fn mnrXmtx3(mtx: *[9]f32) [9]f32 {
     //Given 3x3 matrix A
     //A = a b c     0 1 2
@@ -3487,7 +3856,7 @@ test "XMTX: mnrXmtx3 test" {
     try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
 }
 
-//Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 4x4 matrix.
+///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 4x4 matrix.
 pub fn cofXmtxSign4() [16]f32 {
     return .{ 1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, 1, -1, 1 };
 }
@@ -3516,7 +3885,7 @@ test "XMTX: cofXmtxSign4 test" {
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[15]);
 }
 
-//Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 3x3 matrix.
+///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 3x3 matrix.
 pub fn cofXmtxSign3() [9]f32 {
     return .{ 1, -1, 1, -1, 1, -1, 1, -1, 1 };
 }
@@ -3537,9 +3906,12 @@ test "XMTX: cofXmtxSign3 test" {
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[8]);
 }
 
-//Returns the determinant of a 1x1 matrix.
-//  mtx = The 1x1 matrix to find the determinant for.
-//  returns = The value of the determinant.
+///Returns the determinant of a 1x1 matrix.
+///
+///  mtx = The 1x1 matrix to find the determinant for.
+///
+///  returns = The value of the determinant.
+///
 pub fn detXmtx1(mtx: *[1]f32) f32 {
     return mtx[0];
 }
@@ -3551,9 +3923,12 @@ test "XMTX: detXmtx1 test" {
     try std.testing.expectEqual(m1[0], detM1);
 }
 
-//Returns the determinant of a 2x2 matrix.
-//  mtx = The 2x2 matrix to find the determinant for.
-//  returns = The value of the determinant.
+///Returns the determinant of a 2x2 matrix.
+///
+///  mtx = The 2x2 matrix to find the determinant for.
+///
+///  returns = The value of the determinant.
+///
 pub fn detXmtx2(mtx: *[4]f32) f32 {
     return ((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]));
 }
@@ -3565,9 +3940,12 @@ test "XMTX: detXmtx2 test" {
     try std.testing.expectEqual(((m1[0] * m1[3]) - (m1[1] * m1[2])), detM1);
 }
 
-//Returns the determinant of a 3x3 matrix.
-//  mtx = The 3x3 matrix to find the determinant for.
-//  returns = The value of the determinant.
+///Returns the determinant of a 3x3 matrix.
+///
+///  mtx = The 3x3 matrix to find the determinant for.
+///
+///  returns = The value of the determinant.
+///
 pub fn detXmtx3(mtx: *[9]f32) f32 {
     //11 12 13 11 12
     //21 22 23 21 22
@@ -3591,9 +3969,12 @@ test "XMTX: detXmtx3 test" {
     try std.testing.expectEqual(exp, detA);
 }
 
-//Returns the determinant of a 4x4 matrix.
-//  mtx = The 4x4 matrix to find the determinant for.
-//  returns = The value of the determinant.
+///Returns the determinant of a 4x4 matrix.
+///
+///  mtx = The 4x4 matrix to find the determinant for.
+///
+///  returns = The value of the determinant.
+///
 pub fn detXmtx4(mtx: *[16]f32) f32 {
     var d1: [9]f32 = rmvRowColXmtx4(mtx, 0, 0);
     const det1: f32 = detXmtx3(&d1);
@@ -3614,10 +3995,14 @@ test "XMTX: detXmtx4 test" {
     try std.testing.expectEqual(true, isEquF32(expA, detA, true));
 }
 
-//Returns the determinant of a diagonal or triangular matrix.
-//  mtx = A matrix to calculate the determinant for.
-//  cols = The number of columns and rows in the diagonal matrix.
-//  returns = The determinant of the diagonal matrix provided.
+///Returns the determinant of a diagonal or triangular matrix.
+///
+///  mtx = A matrix to calculate the determinant for.
+///
+///  cols = The number of columns and rows in the diagonal matrix.
+///
+///  returns = The determinant of the diagonal matrix provided.
+///
 pub fn detTriangXmtx(mtx: []f32, cols: usize) f32 {
     return detDiagXmtx(mtx, cols);
 }
@@ -3635,10 +4020,14 @@ test "XMTX: detTriangXmtx test" {
     try std.testing.expectEqual(true, isEquF32(detB, 81.0, true));
 }
 
-//Returns the determinant of a diagonal or triangular matrix.
-//  mtx = A matrix to calculate the determinant for.
-//  cols = The number of columns and rows in the diagonal matrix.
-//  returns = The determinant of the diagonal matrix provided.
+///Returns the determinant of a diagonal or triangular matrix.
+///
+///  mtx = A matrix to calculate the determinant for.
+///
+///  cols = The number of columns and rows in the diagonal matrix.
+///
+///  returns = The determinant of the diagonal matrix provided.
+///
 pub fn detDiagXmtx(mtx: []f32, cols: usize) f32 {
     var row: usize = 0;
     var col: usize = 0;
@@ -3668,12 +4057,18 @@ test "XMTX: detDiagXmtx test" {
     try std.testing.expectEqual(true, isEquF32(detB, 81.0, true));
 }
 
-//Returns the determinant of the specified matrix for the given matrix row.
-//  mtx = The matrix to find the determinant for.
-//  cols = The number of columns in the matrix.
-//  alloc = The allocator used by the function to create a return matrix for the determinants as the recursion makes them smaller each iteration.
-//  cofR = The row to use as the basis for calculating the dterminant.
-//  returns = The determinant value for the given matrix.
+///Returns the determinant of the specified matrix for the given matrix row.
+///
+///  mtx = The matrix to find the determinant for.
+///
+///  cols = The number of columns in the matrix.
+///
+///  alloc = The allocator used by the function to create a return matrix for the determinants as the recursion makes them smaller each iteration.
+///
+///  cofR = The row to use as the basis for calculating the dterminant.
+///
+///  returns = The determinant value for the given matrix.
+///
 pub fn detXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator, cofR: usize) !f32 {
     var c: usize = 0;
     var a: f32 = 0;
@@ -3751,11 +4146,16 @@ test "XMTX: detXmtx test" {
     try std.testing.expectEqual(exp, v);
 }
 
-//Calculates the inverse of the provided 2x2 matrix using the determinate and stores the result in the return matrix.
-//  mtx = The matrix to calculate the inverse for.
-//  det = The determinant of the provided matrix.
-//  ret = The return matrix to hold the inverted matrix values.
-//  returns = A Boolean value indicating the operation was a success.
+///Calculates the inverse of the provided 2x2 matrix using the determinate and stores the result in the return matrix.
+///
+///  mtx = The matrix to calculate the inverse for.
+///
+///  det = The determinant of the provided matrix.
+///
+///  ret = The return matrix to hold the inverted matrix values.
+///
+///  returns = A Boolean value indicating the operation was a success.
+///
 pub fn getInvFromDet2(mtx: []f32, det: f32, ret: []f32) bool {
     if (mtx.len != 4) {
         std.debug.print("!! Warning getInvFromDet2 requires 2x2 matrices !!\n", .{});
@@ -3785,11 +4185,16 @@ test "XMTX: getInvFromDet2 test" {
     try std.testing.expectEqual(true, equXmtx(&res, &invM1));
 }
 
-//Calculates the inverse of the provided 3x3 matrix using the determinat and stores the result in the return matrix.
-//  mtx = The matrix to calculate the inverse for.
-//  det = The determinant of the provided matrix.
-//  ret = The return matrix to hold the inverted matrix values.
-//  returns = A Boolean value indicating if the operation was a success.
+///Calculates the inverse of the provided 3x3 matrix using the determinat and stores the result in the return matrix.
+///
+///  mtx = The matrix to calculate the inverse for.
+///
+///  det = The determinant of the provided matrix.
+///
+///  ret = The return matrix to hold the inverted matrix values.
+///
+///  returns = A Boolean value indicating if the operation was a success.
+///
 pub fn getInvFromDet3(mtx: []f32, det: f32, ret: []f32) bool {
     if (mtx.len != 9) {
         std.debug.print("!! Warning getInvFromDet3 requires 3x3 matrices !!\n", .{});
@@ -4162,13 +4567,20 @@ test "XMTX: getInvFromDet4 test" {
     //TODO ADD MORE TESTS
 }
 
-//Creates a Cramer's Rule support matrix based on the provided augmented matrix, mtx, and other arguments.
-//  mtx = The augmented matrix to create a support matrix for.
-//  cols = The number of columns in the mtx matrix.
-//  srcCol = The last column in the mtx matrix that contains constant values.
-//  dstCol = The target column in the return matrix, ret, to store data.
-//  ret = The return matrix that has it's dstCol, destination column, replaced with the mtx matrix's constant values.
-//  returns = A Boolean value indicating if the operation was a success.
+///Creates a Cramer's Rule support matrix based on the provided augmented matrix, mtx, and other arguments.
+///
+///  mtx = The augmented matrix to create a support matrix for.
+///
+///  cols = The number of columns in the mtx matrix.
+///
+///  srcCol = The last column in the mtx matrix that contains constant values.
+///
+///  dstCol = The target column in the return matrix, ret, to store data.
+///
+///  ret = The return matrix that has it's dstCol, destination column, replaced with the mtx matrix's constant values.
+///
+///  returns = A Boolean value indicating if the operation was a success.
+///
 pub fn getCramerSupportMtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usize, ret: []f32) bool {
     const l: usize = mtx.len;
     const rows: usize = l / cols;
@@ -4252,14 +4664,22 @@ test "XMTX: getCramerSupportMtx test" {
     try std.testing.expectEqual(true, equXmtx(&A1, &expA3));
 }
 
-//Applies Cramer's rule to the given matrix, mtx, with mtxA represented the unaugmented version of matrix mtx, and mtxAi representing Cramer's rule's supporting matrix.
-//  mtx = The augmented matrix to apply Cramer's rule to.
-//  cols = The number of columns in the mtx matrix.
-//  mtxA = The matrix representing the unaugmented version of mtx.
-//  colsA = The number of columns in the mtxA matrix.
-//  mtxAi = The supporting matrix used by Cramer's rule.
-//  ret = An array of f32 values used to store the results of Cramer's rule.
-//  returns = A Boolean value indicating if the operation was a success.
+///Applies Cramer's rule to the given matrix, mtx, with mtxA represented the unaugmented version of matrix mtx, and mtxAi representing Cramer's rule's supporting matrix.
+///
+///  mtx = The augmented matrix to apply Cramer's rule to.
+///
+///  cols = The number of columns in the mtx matrix.
+///
+///  mtxA = The matrix representing the unaugmented version of mtx.
+///
+///  colsA = The number of columns in the mtxA matrix.
+///
+///  mtxAi = The supporting matrix used by Cramer's rule.
+///
+///  ret = An array of f32 values used to store the results of Cramer's rule.
+///
+///  returns = A Boolean value indicating if the operation was a success.
+///
 pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi: []f32, ret: []f32) bool {
     const l: usize = mtx.len;
     const rows: usize = l / cols;
@@ -4350,6 +4770,284 @@ test "XMTX: rslvCramersRule test" {
     try std.testing.expectEqual(true, isEquF32(ret[1], expY, true));
     try std.testing.expectEqual(true, isEquF32(ret[2], expZ, true));
 }
+
+///This function is responsible for changing the basis of the provided vector, vec, from the basis, basis, to chgBasis.
+///
+///  vec = The vector to convert from one basis to another.
+///
+///  basis = The matrix that constitutes the current basis for vector vec, and holds the resulting transformation matrix.
+///
+///  cols = The number of columns in the matrix, basis.
+///
+///  isStd = A Boolean value indicating if the basis is considered the standard basis.
+///
+///  chgBasis = The mtrix representing the basis to change to.
+///
+///  chgCols = The number of columns in the chgCols matrix.
+///
+///  chgIsStd = A Boolean value indicating if the change basis is considered the standard basis.
+///
+///  idtMtx = The identity associated with the basis and chgBasis matrices.
+///
+///  ret = The result, left-hand side, of the tranformation matrix calculation, should result in an identity matrix.
+///
+///  verbose = A Boolean indicating if the function is verbose.
+///
+///  returns = A Boolean value indicating if the operation was a success or not.
+///
+pub fn chgVecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis: []f32, chgCols: usize, chgIsStd: bool, idtMtx: []f32, ret: []f32, nvec: []f32, verbose: bool) bool {
+    _ = idtMtx;
+    _ = isStd;
+
+    if (cols != chgCols) {
+        std.debug.print("!! Warning expected column counts to match !!\n", .{});
+        return false;
+    }
+
+    var b: bool = false;
+    if (chgIsStd) {
+        b = true;
+
+        if (verbose) {
+            std.debug.print("chgVecBasis:change basis is identity so conversion matrix = basis {}\n", .{b});
+        }
+    } else {
+        b = getBasisCnvMtx(basis, cols, chgBasis, chgCols, ret, verbose);
+
+        if (verbose) {
+            std.debug.print("chgVecBasis:getBasisCnvMtx {}\n", .{b});
+        }
+    }
+
+    if (verbose) {
+        prntXmtx(basis, cols);
+        prntNl();
+
+        prntXmtx(ret, cols);
+        prntNl();
+
+        prntXmtx(vec, 1);
+        prntNl();
+    }
+
+    if (!b) { // or equXmtx(ret, idtMtx) == false) {}
+        std.debug.print("!! Warning matrix reduction failed !!\n", .{});
+        return false;
+    }
+
+    b = tmsXmtx(basis, cols, vec, 1, nvec, 1);
+    if (!b) {
+        std.debug.print("!! Warning matrix multiplication failed !!\n", .{});
+        return false;
+    }
+    return true;
+}
+
+test "XMTX: chgVecBasis test" {
+    prntNl();
+    std.debug.print("chgVecBasis test:\n", .{});
+
+    //B = {(1,0), (1,2)}
+    //Bp = {(1,0), (0,1)}
+
+    //B = | 1  1|
+    //    | 0  2|
+    //vec = [3 2]
+
+    //Bp = | 1  0|
+    //     | 0  1|
+    //nvec = [? ?]
+
+    var B: [4]f32 = .{ 1, 1, 0, 2 };
+    var vec: [2]f32 = .{ 3, 2 };
+    var exp: [2]f32 = .{ 5, 4 };
+    var nvec: [2]f32 = .{ 0, 0 };
+
+    const cols: usize = 2;
+    var Bp: [4]f32 = .{ 1, 0, 0, 1 };
+    const colsp: usize = 2;
+    var idtMtx: [4]f32 = .{ 1, 0, 0, 1 };
+
+    var b: bool = false;
+    const vbose: bool = true;
+    var ret: [4]f32 = .{ 0, 0, 0, 0 };
+
+    b = chgVecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
+    try std.testing.expectEqual(true, b);
+
+    std.debug.print("chgVecBasis test:chgVecBasis ret {}\n", .{b});
+    prntXmtx(&ret, cols);
+    prntNl();
+
+    std.debug.print("chgVecBasis test:chgVecBasis B\n", .{});
+    prntXmtx(&B, cols);
+    prntNl();
+
+    std.debug.print("chgVecBasis test:chgVecBasis nvec\n", .{});
+    prntXmtx(&nvec, 1);
+    prntNl();
+
+    try std.testing.expectEqual(true, equXmtx(&exp, &nvec));
+}
+
+///Returns the basis conversion, tranformation, matrix for the given current basis and change of basis.
+///
+///  basis = The matrix that constitutes the current basis and holds the resulting transformation matrix.
+///
+///  cols = The number of columns in the basis matrix.
+///
+///  chgBasis = The matrix that constitues the new basis to find coordinates in.
+///
+///  ret = The result, left-hand side, of the tranformation matrix calculation, should result in an identity matrix.
+///
+///  verbose = A Boolean indicating if the function is verbose.
+///
+///  returns = A Boolean value indicating if this function was successful or not.
+///
+pub fn getBasisCnvMtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) bool {
+    if (cols != chgCols) {
+        std.debug.print("!! Warning expected column counts to match !!\n", .{});
+        return false;
+    }
+
+    //Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
+    //  mtx = The matrix to reduce.
+    //  cols = The number of columns in the matrix.
+    //  hasAug = A Boolean indicating if the matrix is an augmented matrix.
+    //  ret = The matrix that holds the reduced matrix.
+    //  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
+    //  idtMtx = The identity matrix associated with the mtx matrix provided.
+    //  dim = The number of matrix columns that must be zero for a zero row to exist.
+    //  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
+    //  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
+    //  returns = A Boolean value indicating  if the matrix was reduced successfuly.
+    var b: bool = false;
+    const hasAug: bool = false;
+    const hasIdtMtx: bool = true;
+    const dim: usize = cols;
+    var sclr: f32 = 0.0;
+    const triagRdcOnly: bool = false;
+    b = rdcXmtx(chgBasis, chgCols, hasAug, ret, hasIdtMtx, basis, dim, triagRdcOnly, &sclr);
+
+    if (verbose) {
+        std.debug.print("getBasisCnvMtx:rdcXmtx {}\n", .{b});
+        prntXmtx(ret, cols);
+        prntNl();
+    }
+
+    if (!b) {
+        std.debug.print("!! Warning could not reduce the transfomation matrix !!\n", .{});
+        return false;
+    }
+
+    return true;
+}
+
+test "XMTX: getBasisCnvMtx test" {
+    prntNl();
+    std.debug.print("getBasisCnvMtx test:\n", .{});
+
+    //B = {(1,0,0), (0, 1, 0), (0, 0, 1)};
+    //B' = {(1,0,1), (0, -1, 2), (2, 3, -5)};
+
+    //B = | 1  0  0|
+    //    | 0  1  0|
+    //    | 0  0  1|
+    const vbose: bool = false;
+    var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
+    var B: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    const cols: usize = 3;
+
+    //B' = | 1  0  2|
+    //     | 0 -1  3|
+    //     | 1  2 -5|
+    var Bp: [9]f32 = .{ 1, 0, 2, 0, -1, 3, 1, 2, -5 };
+    const colsp: usize = 3;
+
+    var b: bool = false;
+    b = getBasisCnvMtx(&B, cols, &Bp, colsp, &ret, vbose);
+    try std.testing.expectEqual(true, b);
+
+    std.debug.print("getBasisCnvMtx test:getBasisCnvMtx ret {}\n", .{b});
+    prntXmtx(&ret, cols);
+    prntNl();
+
+    std.debug.print("getBasisCnvMtx test:getBasisCnvMtx B\n", .{});
+    prntXmtx(&B, cols);
+    prntNl();
+
+    var exp: [9]f32 = .{ -1, 4, 2, 3, -7, -3, 1, -2, -1 };
+    try std.testing.expectEqual(true, equXmtx(&exp, &B));
+}
+
+///Returns a Boolean value indicating if the mtx argument is an orthogonal matrix.
+///
+///  mtx = The matrix to determine othogonality for.
+///
+///  cols = The number of columns in the matrix mtx.
+///
+///  ret = An empty matrix the same siz as mtx used to hold return information from the reduce matrix call.
+///
+///  idtMtx = An identity matrix with the same dimensions as the mtx matrix.
+///
+///  trnMtx = An empty matrix the same siz as mtx used to hold transpose matrix information.
+///
+///  return = A Boolean value indicating if mtx is orthogonal or not.
+///
+pub fn isOrthogonal(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []f32) bool {
+    //get the inverse
+
+    //Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
+    //  mtx = The matrix to reduce.
+    //  cols = The number of columns in the matrix.
+    //  hasAug = A Boolean indicating if the matrix is an augmented matrix.
+    //  ret = The matrix that holds the reduced matrix.
+    //  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
+    //  idtMtx = The identity matrix associated with the mtx matrix provided.
+    //  dim = The number of matrix columns that must be zero for a zero row to exist.
+    //  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
+    //  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
+    //  returns = A Boolean value indicating  if the matrix was reduced successfuly.
+    var b: bool = false;
+    const hasAug: bool = false;
+    const hasIdtMtx: bool = true;
+    const dim: usize = cols;
+    var sclr: f32 = 0.0;
+    const triagRdcOnly: bool = false;
+    b = rdcXmtx(mtx, cols, hasAug, ret, hasIdtMtx, idtMtx, dim, triagRdcOnly, &sclr);
+
+    //get the transpose
+    trnXmtx(mtx, cols, trnMtx);
+
+    //check equality
+    b = equXmtx(idtMtx, trnMtx);
+    return b;
+}
+
+test "XMTX: isOrthogonal test" {
+    prntNl();
+    std.debug.print("isOrthogonal test:\n", .{});
+
+    var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    const cols: usize = 3;
+    var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
+    var idtMtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var trnMtx: [9]f32 = std.mem.zeroes([9]f32); //.{};
+    const expB: bool = true;
+    const b: bool = isOrthogonal(&mtx, cols, &ret, &idtMtx, &trnMtx);
+    try std.testing.expectEqual(expB, b);
+}
+
+///Check for handedness.
+//TODO
+pub fn isRightHanded(vecI: *[3]f32, vecJ: *[3]f32, vecK: *[3]f32) bool {
+    _ = vecK;
+    _ = vecJ;
+    _ = vecI;
+    //TODO
+}
+
+//TODO write test
 
 //START THEOREMS
 //Mathematics for 3D Game Programming and Computer Graphics - Eric Lengyel - 3rd Edition
@@ -8173,196 +8871,6 @@ test "XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test" {
     prntNl();
 }
 
-//This function is responsible for changing the basis of the provided vector, vec, from the basis, basis, to chgBasis.
-//  vec = The vector to convert from one basis to another.
-//  basis = The matrix that constitutes the current basis for vector vec, and holds the resulting transformation matrix.
-//  cols = The number of columns in the matrix, basis.
-//  isStd = A Boolean value indicating if the basis is considered the standard basis.
-//  chgBasis = The mtrix representing the basis to change to.
-//  chgCols = The number of columns in the chgCols matrix.
-//  chgIsStd = A Boolean value indicating if the change basis is considered the standard basis.
-//  idtMtx = The identity associated with the basis and chgBasis matrices.
-//  ret = The result, left-hand side, of the tranformation matrix calculation, should result in an identity matrix.
-//  verbose = A Boolean indicating if the function is verbose.
-//  returns = A Boolean value indicating if the operation was a success or not.
-pub fn chgVecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis: []f32, chgCols: usize, chgIsStd: bool, idtMtx: []f32, ret: []f32, nvec: []f32, verbose: bool) bool {
-    _ = idtMtx;
-    _ = isStd;
-
-    if (cols != chgCols) {
-        std.debug.print("!! Warning expected column counts to match !!\n", .{});
-        return false;
-    }
-
-    var b: bool = false;
-    if (chgIsStd) {
-        b = true;
-
-        if (verbose) {
-            std.debug.print("chgVecBasis:change basis is identity so conversion matrix = basis {}\n", .{b});
-        }
-    } else {
-        b = getBasisCnvMtx(basis, cols, chgBasis, chgCols, ret, verbose);
-
-        if (verbose) {
-            std.debug.print("chgVecBasis:getBasisCnvMtx {}\n", .{b});
-        }
-    }
-
-    if (verbose) {
-        prntXmtx(basis, cols);
-        prntNl();
-
-        prntXmtx(ret, cols);
-        prntNl();
-
-        prntXmtx(vec, 1);
-        prntNl();
-    }
-
-    if (!b) { // or equXmtx(ret, idtMtx) == false) {}
-        std.debug.print("!! Warning matrix reduction failed !!\n", .{});
-        return false;
-    }
-
-    b = tmsXmtx(basis, cols, vec, 1, nvec, 1);
-    if (!b) {
-        std.debug.print("!! Warning matrix multiplication failed !!\n", .{});
-        return false;
-    }
-    return true;
-}
-
-test "XMTX: chgVecBasis test" {
-    prntNl();
-    std.debug.print("chgVecBasis test:\n", .{});
-
-    //B = {(1,0), (1,2)}
-    //Bp = {(1,0), (0,1)}
-
-    //B = | 1  1|
-    //    | 0  2|
-    //vec = [3 2]
-
-    //Bp = | 1  0|
-    //     | 0  1|
-    //nvec = [? ?]
-
-    var B: [4]f32 = .{ 1, 1, 0, 2 };
-    var vec: [2]f32 = .{ 3, 2 };
-    var exp: [2]f32 = .{ 5, 4 };
-    var nvec: [2]f32 = .{ 0, 0 };
-
-    const cols: usize = 2;
-    var Bp: [4]f32 = .{ 1, 0, 0, 1 };
-    const colsp: usize = 2;
-    var idtMtx: [4]f32 = .{ 1, 0, 0, 1 };
-
-    var b: bool = false;
-    const vbose: bool = true;
-    var ret: [4]f32 = .{ 0, 0, 0, 0 };
-
-    b = chgVecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
-    try std.testing.expectEqual(true, b);
-
-    std.debug.print("chgVecBasis test:chgVecBasis ret {}\n", .{b});
-    prntXmtx(&ret, cols);
-    prntNl();
-
-    std.debug.print("chgVecBasis test:chgVecBasis B\n", .{});
-    prntXmtx(&B, cols);
-    prntNl();
-
-    std.debug.print("chgVecBasis test:chgVecBasis nvec\n", .{});
-    prntXmtx(&nvec, 1);
-    prntNl();
-
-    try std.testing.expectEqual(true, equXmtx(&exp, &nvec));
-}
-
-//Returns the basis conversion, tranformation, matrix for the given current basis and change of basis.
-//  basis = The matrix that constitutes the current basis and holds the resulting transformation matrix.
-//  cols = The number of columns in the basis matrix.
-//  chgBasis = The matrix that constitues the new basis to find coordinates in.
-//  ret = The result, left-hand side, of the tranformation matrix calculation, should result in an identity matrix.
-//  verbose = A Boolean indicating if the function is verbose.
-//  returns = A Boolean value indicating if this function was successful or not.
-pub fn getBasisCnvMtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) bool {
-    if (cols != chgCols) {
-        std.debug.print("!! Warning expected column counts to match !!\n", .{});
-        return false;
-    }
-
-    //Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
-    //  mtx = The matrix to reduce.
-    //  cols = The number of columns in the matrix.
-    //  hasAug = A Boolean indicating if the matrix is an augmented matrix.
-    //  ret = The matrix that holds the reduced matrix.
-    //  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
-    //  idtMtx = The identity matrix associated with the mtx matrix provided.
-    //  dim = The number of matrix columns that must be zero for a zero row to exist.
-    //  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
-    //  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
-    //  returns = A Boolean value indicating  if the matrix was reduced successfuly.
-    var b: bool = false;
-    const hasAug: bool = false;
-    const hasIdtMtx: bool = true;
-    const dim: usize = cols;
-    var sclr: f32 = 0.0;
-    const triagRdcOnly: bool = false;
-    b = rdcXmtx(chgBasis, chgCols, hasAug, ret, hasIdtMtx, basis, dim, triagRdcOnly, &sclr);
-
-    if (verbose) {
-        std.debug.print("getBasisCnvMtx:rdcXmtx {}\n", .{b});
-        prntXmtx(ret, cols);
-        prntNl();
-    }
-
-    if (!b) {
-        std.debug.print("!! Warning could not reduce the transfomation matrix !!\n", .{});
-        return false;
-    }
-
-    return true;
-}
-
-test "XMTX: getBasisCnvMtx test" {
-    prntNl();
-    std.debug.print("getBasisCnvMtx test:\n", .{});
-
-    //B = {(1,0,0), (0, 1, 0), (0, 0, 1)};
-    //B' = {(1,0,1), (0, -1, 2), (2, 3, -5)};
-
-    //B = | 1  0  0|
-    //    | 0  1  0|
-    //    | 0  0  1|
-    const vbose: bool = false;
-    var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
-    var B: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    const cols: usize = 3;
-
-    //B' = | 1  0  2|
-    //     | 0 -1  3|
-    //     | 1  2 -5|
-    var Bp: [9]f32 = .{ 1, 0, 2, 0, -1, 3, 1, 2, -5 };
-    const colsp: usize = 3;
-
-    var b: bool = false;
-    b = getBasisCnvMtx(&B, cols, &Bp, colsp, &ret, vbose);
-    try std.testing.expectEqual(true, b);
-
-    std.debug.print("getBasisCnvMtx test:getBasisCnvMtx ret {}\n", .{b});
-    prntXmtx(&ret, cols);
-    prntNl();
-
-    std.debug.print("getBasisCnvMtx test:getBasisCnvMtx B\n", .{});
-    prntXmtx(&B, cols);
-    prntNl();
-
-    var exp: [9]f32 = .{ -1, 4, 2, 3, -7, -3, 1, -2, -1 };
-    try std.testing.expectEqual(true, equXmtx(&exp, &B));
-}
-
 test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     prntNl();
 
@@ -8700,67 +9208,5 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 1, 3, 5 test" {
     std.debug.print("5.1 Problem 5 mag: {}\n", .{mag});
     try std.testing.expectEqual(true, isEquF32(mag, exp, false));
 }
-
-//Returns a Boolean value indicating if the mtx argument is an orthogonal matrix.
-//  mtx = The matrix to determine othogonality for.
-//  cols = The number of columns in the matrix mtx.
-//  ret = An empty matrix the same siz as mtx used to hold return information from the reduce matrix call.
-//  idtMtx = An identity matrix with the same dimensions as the mtx matrix.
-//  trnMtx = An empty matrix the same siz as mtx used to hold transpose matrix information.
-//  return = A Boolean value indicating if mtx is orthogonal or not.
-pub fn isOrthogonal(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []f32) bool {
-    //get the inverse
-
-    //Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
-    //  mtx = The matrix to reduce.
-    //  cols = The number of columns in the matrix.
-    //  hasAug = A Boolean indicating if the matrix is an augmented matrix.
-    //  ret = The matrix that holds the reduced matrix.
-    //  hasIdtMtx = A Boolean indicating if the identity matrix has been provided.
-    //  idtMtx = The identity matrix associated with the mtx matrix provided.
-    //  dim = The number of matrix columns that must be zero for a zero row to exist.
-    //  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
-    //  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
-    //  returns = A Boolean value indicating  if the matrix was reduced successfuly.
-    var b: bool = false;
-    const hasAug: bool = false;
-    const hasIdtMtx: bool = true;
-    const dim: usize = cols;
-    var sclr: f32 = 0.0;
-    const triagRdcOnly: bool = false;
-    b = rdcXmtx(mtx, cols, hasAug, ret, hasIdtMtx, idtMtx, dim, triagRdcOnly, &sclr);
-
-    //get the transpose
-    trnXmtx(mtx, cols, trnMtx);
-
-    //check equality
-    b = equXmtx(idtMtx, trnMtx);
-    return b;
-}
-
-test "XMTX: isOrthogonal test" {
-    prntNl();
-    std.debug.print("isOrthogonal test:\n", .{});
-
-    var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    const cols: usize = 3;
-    var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
-    var idtMtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    var trnMtx: [9]f32 = std.mem.zeroes([9]f32); //.{};
-    const expB: bool = true;
-    const b: bool = isOrthogonal(&mtx, cols, &ret, &idtMtx, &trnMtx);
-    try std.testing.expectEqual(expB, b);
-}
-
-//check for handedness
-//TODO
-pub fn isRightHanded(vecI: *[3]f32, vecJ: *[3]f32, vecK: *[3]f32) bool {
-    _ = vecK;
-    _ = vecJ;
-    _ = vecI;
-    //TODO
-}
-
-//TODO write test
 
 //STOP PROBLEMS
