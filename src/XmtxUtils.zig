@@ -3572,9 +3572,9 @@ test "XMTX: rmvRowColXmtx3 test" {
 
 ///Returns the adjoint matrix for a given 4x4 matrix, mtx.
 ///
-///  mtx = The matrix to determine the adjoint matrix for.
+///  mtx = The 4x4 matrix to determine the adjoint matrix for.
 ///
-///  returns = A new matrix that contains the adjoint matrix of mtx.
+///  returns = A new 4x4 matrix that contains the adjoint matrix of mtx.
 ///
 pub fn adjXmtx4(mtx: *[16]f32) [16]f32 {
     var ret: [16]f32 = std.mem.zeroes([16]f32); //.{};
@@ -3594,9 +3594,9 @@ test "XMTX: adjXmtx4 test" {
 
 ///Returns the adjoint of the given 3x3 matrix, mtx.
 ///
-///  mtx = The matrix to find the adjoint for.
+///  mtx = The 3x3 matrix to find the adjoint matrix for.
 ///
-///  returns = A new matrix with the transpose of the cofactors.
+///  returns = A new 3x3 matrix with the transpose of the cofactors of the original matrix, mtx.
 ///
 pub fn adjXmtx3(mtx: *[9]f32) [9]f32 {
     var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
@@ -3616,11 +3616,11 @@ test "XMTX: adjXmtx3 test" {
 
 ///Returns a matrix of full co-factors, sign * minor for the given 4x4 matrix.
 ///
-///  mtx = The matrix to find cofactors for.
+///  mtx = The 4x4 matrix to find cofactors for.
 ///
-///  alloc = Allocator used in the calculation for lower rank determinants.
+///  alloc = Allocator used in the calculation of lower rank determinants.
 ///
-///  returns = A new matrix of cofactors for the given matrix, mtx.
+///  returns = A new 4x4 matrix of cofactors for the given matrix, mtx.
 ///
 pub fn cofXmtx4(mtx: *[16]f32) [16]f32 {
     var mnr = mnrXmtx4(mtx);
@@ -3669,11 +3669,11 @@ test "XMTX: cofXmtx4 test" {
     try std.testing.expectEqual(true, b);
 }
 
-///Returns a matrix of full co-factors, sign * minor for the given 3x3 matrix.
+///Returns a matrix of full cofactors, sign * minor, for the given 3x3 matrix.
 ///
-///  mtx = The matrix to find cofactors for.
+///  mtx = The 3x3 matrix to find cofactors for.
 ///
-///  returns = A new matrix of cofactors for the given matrix, mtx.
+///  returns = A new 3x3 matrix of cofactors for the given matrix, mtx.
 ///
 pub fn cofXmtx3(mtx: *[9]f32) [9]f32 {
     var mnr = mnrXmtx3(mtx);
@@ -3708,9 +3708,9 @@ test "XMTX: cofXmtx3 test" {
 
 ///Returns a matrix of minors for the given 4x4 matrix.
 ///
-///  mtx = The matrix to find minors for.
+///  mtx = The 4x4 matrix to find minors for.
 ///
-///  returns = A new matrix of the calculated minors for the provided matrix, mtx.
+///  returns = A new 4x4 matrix of the calculated minors for the provided matrix, mtx.
 ///
 pub fn mnrXmtx4(mtx: *[16]f32) [16]f32 {
     //A = a b c d     0  1  2  3
@@ -3832,9 +3832,9 @@ test "XMTX: mnrXmtx4 test" {
 
 ///Returns a matrix of minors for the given 3x3 matrix.
 ///
-///  mtx = The matrix to find minors for.
+///  mtx = The 3x3 matrix to find minors for.
 ///
-///  returns = A new matrix of the calculated minors for the provided matrix, mtx.
+///  returns = A new 3x3 matrix of the calculated minors for the provided matrix, mtx.
 ///
 pub fn mnrXmtx3(mtx: *[9]f32) [9]f32 {
     //Given 3x3 matrix A
@@ -3936,7 +3936,7 @@ test "XMTX: detXmtx1 test" {
 ///
 ///  mtx = The 2x2 matrix to find the determinant for.
 ///
-///  returns = The value of the determinant.
+///  returns = The determinant of the diagonal matrix, mtx, provided.
 ///
 pub fn detXmtx2(mtx: *[4]f32) f32 {
     return ((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]));
@@ -3953,7 +3953,7 @@ test "XMTX: detXmtx2 test" {
 ///
 ///  mtx = The 3x3 matrix to find the determinant for.
 ///
-///  returns = The value of the determinant.
+///  returns = The determinant of the diagonal matrix, mtx, provided.
 ///
 pub fn detXmtx3(mtx: *[9]f32) f32 {
     //11 12 13 11 12
@@ -3982,7 +3982,7 @@ test "XMTX: detXmtx3 test" {
 ///
 ///  mtx = The 4x4 matrix to find the determinant for.
 ///
-///  returns = The value of the determinant.
+///  returns = The determinant of the diagonal matrix, mtx, provided.
 ///
 pub fn detXmtx4(mtx: *[16]f32) f32 {
     var d1: [9]f32 = rmvRowColXmtx4(mtx, 0, 0);
@@ -4010,7 +4010,7 @@ test "XMTX: detXmtx4 test" {
 ///
 ///  cols = The number of columns and rows in the diagonal matrix.
 ///
-///  returns = The determinant of the diagonal matrix provided.
+///  returns = The determinant of the diagonal matrix, mtx, provided.
 ///
 pub fn detTriangXmtx(mtx: []f32, cols: usize) f32 {
     return detDiagXmtx(mtx, cols);
@@ -4035,7 +4035,7 @@ test "XMTX: detTriangXmtx test" {
 ///
 ///  cols = The number of columns and rows in the diagonal matrix.
 ///
-///  returns = The determinant of the diagonal matrix provided.
+///  returns = The determinant of the diagonal matrix, mtx, provided.
 ///
 pub fn detDiagXmtx(mtx: []f32, cols: usize) f32 {
     var row: usize = 0;
@@ -4074,9 +4074,9 @@ test "XMTX: detDiagXmtx test" {
 ///
 ///  alloc = The allocator used by the function to create a return matrix for the determinants as the recursion makes them smaller each iteration.
 ///
-///  cofR = The row to use as the basis for calculating the dterminant.
+///  cofR = The row to use as the basis for calculating the determinant.
 ///
-///  returns = The determinant value for the given matrix.
+///  returns = The determinant value for the given matrix,mtx.
 ///
 pub fn detXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator, cofR: usize) !f32 {
     var c: usize = 0;
@@ -4155,13 +4155,13 @@ test "XMTX: detXmtx test" {
     try std.testing.expectEqual(exp, v);
 }
 
-///Calculates the inverse of the provided 2x2 matrix using the determinate and stores the result in the return matrix.
+///Calculates the inverse of the provided 2x2 matrix using the determinant and stores the result in the return matrix.
 ///
-///  mtx = The matrix to calculate the inverse for.
+///  mtx = The 2x2 matrix to calculate the inverse for.
 ///
 ///  det = The determinant of the provided matrix.
 ///
-///  ret = The return matrix to hold the inverted matrix values.
+///  ret = The return 2x2 matrix to hold the inverted matrix values.
 ///
 ///  returns = A Boolean value indicating the operation was a success.
 ///
@@ -4194,13 +4194,13 @@ test "XMTX: getInvFromDet2 test" {
     try std.testing.expectEqual(true, equXmtx(&res, &invM1));
 }
 
-///Calculates the inverse of the provided 3x3 matrix using the determinat and stores the result in the return matrix.
+///Calculates the inverse of the provided 3x3 matrix using the determinant and stores the result in the return matrix.
 ///
-///  mtx = The matrix to calculate the inverse for.
+///  mtx = The 3x3 matrix to calculate the inverse for.
 ///
 ///  det = The determinant of the provided matrix.
 ///
-///  ret = The return matrix to hold the inverted matrix values.
+///  ret = The return 3x3 matrix to hold the inverted matrix values.
 ///
 ///  returns = A Boolean value indicating if the operation was a success.
 ///
@@ -4271,7 +4271,16 @@ test "XMTX: getInvFromDet3 test" {
     try std.testing.expectEqual(true, equXmtx(&res, &invA));
 }
 
-//TODO
+///Calculates the inverse of the provided 4x4 matrix using the determinant and stores the result in the return matrix.
+///
+///  mtx = The 4x4 matrix to calculate the inverse for.
+///
+///  det = The determinant of the provided matrix.
+///
+///  ret = The return 4x4 matrix to hold the inverted matrix values.
+///
+///  returns = A Boolean value indicating if the operation was a success.
+///
 pub fn getInvFromDet4(mtx: []f32, det: f32, ret: []f32) bool {
     if (mtx.len != 16) {
         std.debug.print("!! Warning getInvFromDet4 requires 4x4 matrices !!\n", .{});
