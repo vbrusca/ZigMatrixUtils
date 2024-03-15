@@ -12,6 +12,15 @@
 //! Developers: Carlo Bruscani, Victor Brusca
 //!
 //! How to run tests: zig test .\src\XmtxUtils.zig
+//!
+//! How to build an exe (not used): zig build-exe -femit-docs ./src/main.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/bin/main.exe"
+//!
+//! How to build a static library: zig build-lib -femit-docs ./src/XmtxUtils.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.lib"
+//!
+//! How to build an object: zig build-obj -femit-docs ./src/XmtxUtils.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.obj"
+//!
+//! How to build a dynamic library: zig build-lib -femit-docs ./src/XmtxUtils.zig -lc -dynamic -isystem -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.dll"
+//!
 const std = @import("std");
 const len = @import("std").mem.len;
 

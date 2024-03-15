@@ -31,6 +31,15 @@ zig test ./src/XmtxUtils.zig
 </pre>
 There are over 180 test ran to verify functionality. Feel free to think of them as demonstrations of the associated functions.
 
+## Project Build Commands
+How to build an exe (not used): zig build-exe -femit-docs ./src/main.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/bin/main.exe"
+<br>
+How to build a static library: zig build-lib -femit-docs ./src/XmtxUtils.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.lib"
+<br>
+How to build an object: zig build-obj -femit-docs ./src/XmtxUtils.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.obj"
+<br>
+How to build a dynamic library: zig build-lib -femit-docs ./src/XmtxUtils.zig -lc -dynamic -isystem -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.dll"
+
 ## Rough Example of Usage
 <pre>
 test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
