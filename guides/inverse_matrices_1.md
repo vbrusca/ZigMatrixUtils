@@ -7,7 +7,7 @@ while tracking the matrix permutations on an identity matrix. This can all be ha
 Arguments 5 and 6 of the function call are a Boolean value that indicates if an identity matrix has been provided 
 
 <!-- //"XMTX: ELA - Larson, Edwards: 2.3 Example 2 test" -->
-</pre>
+<pre>
 01 //Find the inverse of A and verify it is correct.
 02 //A = 1  4
 03 //   -1  3
