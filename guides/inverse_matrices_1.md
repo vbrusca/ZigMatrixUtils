@@ -4,7 +4,7 @@ To find the inverse of a matrix we need to reduce it to row eschelon form
 while tracking the matrix permutations on an identity matrix. This can all be handled with one call to the <b>rdcXmtx</b> function.
 <br>
 <br>
-Arguments 5 and 6 of the function call are a Boolean value that indicates if an identity matrix has been provided 
+Arguments 5 and 6 of the function call are a Boolean value, that indicates if an identity matrix has been provided, and the identity matrix for the given matrix being reduced. 
 
 <!-- //"XMTX: ELA - Larson, Edwards: 2.3 Example 2 test" -->
 <pre>
