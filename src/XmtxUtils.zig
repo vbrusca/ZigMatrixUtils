@@ -1524,7 +1524,7 @@ test "XMTX: crsPrdXvec test" {
     try std.testing.expectEqual(true, equXvec(&exp2, &v5));
 }
 
-///Multiplies each entry in the vec vector by the provided value.
+///Multiplies each entry in the vec vector by the provided scalar value.
 ///
 ///  vec = The vector to apply the multiplication to.
 ///
@@ -6002,8 +6002,8 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 3 test" {
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
-    prntXmtx(&idtM1, dim);
     clnXmtx(&idtM1);
+    prntXmtx(&idtM1, dim);
     prntNl();
     try std.testing.expectEqual(true, isIdtXmtx(&idtM1, dim));
 }

@@ -1,4 +1,4 @@
-#Introduction to the XmtxUtils Library
+#Introduction and Reduction of Matrices
 
 ## Matrix Conversion to Reduced Row Eschelon Form
 
@@ -10,6 +10,7 @@ Some operations can be performed on arbitrarily sized matrices or vectors when i
 In this example we'll convert a matrix to reduced row eschelon form.
 First we start by declaring some matrices.
 
+//"XMTX: ELA - Larson, Edwards: 1.2 Example 3 test"
 <pre>
 01  var m1: [12]f32 = .{ 1, -2, 3, 9, -1, 3, 0, -4, 2, -5, 5, 17 };
 02  var retM1: [12]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -50,7 +51,7 @@ Then we set up Boolean flags to handle some function arguments. Lastly, a scalar
 26  
 </pre>
 
-Next on line 15 we call the rdcXmtx function and reduce the matrix to row eschelon form. The result of the operation is stored in b. We're going to look right into the matrices and ignore that value but this is a good spot for an assertion if your writing a unit test. On line 18 we print the matrix and the contents are listed on lines 23 - 25.
+Next on line 15 we call the rdcXmtx function and reduce the matrix to row eschelon form. The result of the operation is stored in b. We're going to look right into the matrices and ignore that value but this is a good spot for an assertion if your writing a unit test. On line 18 we print the matrix and the contents are listed on lines 23 - 25. Note that the output is from the <b>printXmtx<b> function.
 
 <pre>
 27  std.debug.print("Matrix Ret:\n", .{});
@@ -85,8 +86,8 @@ The matrix inverse is calculated from the provided identity matrix.
 <pre>
 47  cpyLessXmtx(&retM1, &idtM1, cols, dim);
 48  std.debug.print("Copy Matrix M1:\n", .{});
-49  prntXmtx(&idtM1, dim);
-50  clnXmtx(&idtM1);
+49  clnXmtx(&idtM1);
+50  prntXmtx(&idtM1, dim);
 51  prntNl();
 52
 53  //Partial copy of the resulting row eschelon form matrix
@@ -98,4 +99,4 @@ The matrix inverse is calculated from the provided identity matrix.
 </pre>
 
 Lastly we copy of a part of the solution matrix, the 3x3 non-augmentes matrix
-and show that it is the identity matrix.
+and show that it is the identity matrix. Note the call on line 49 to the <b>clnXmtx</b> function used to clean up the matrix entry values rounding them to the nearest significance.
