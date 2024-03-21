@@ -1,10 +1,8 @@
-# Introduction and Reduction of Matrices
+# Reduction of Matrices
 
 ## Matrix Conversion to Reduced Row Eschelon Form
 
-The library works mainly with arrays of float 32 to represent a vector or an array.
-The library is primarily designed to work with smaller matrices 2x2, 3x3, 4x4.
-Some operations can be performed on arbitrarily sized matrices or vectors when it makes sense.
+The library works mainly with arrays of float 32 to represent a vector or an array. The library is primarily designed to work with smaller matrices 2x2, 3x3, 4x4. Some operations can be performed on arbitrarily sized matrices or vectors when it makes sense.
 <br>
 <br>
 In this example we'll convert a matrix to reduced row eschelon form.
@@ -51,7 +49,7 @@ Then we set up Boolean flags to handle some function arguments. Lastly, a scalar
 26  
 </pre>
 
-Next on line 15 we call the rdcXmtx function and reduce the matrix to row eschelon form. The result of the operation is stored in b. We're going to look right into the matrices and ignore that value but this is a good spot for an assertion if your writing a unit test. On line 18 we print the matrix and the contents are listed on lines 23 - 25. Note that the output is from the <b>printXmtx<b> function.
+Next on line 15 we call the rdcXmtx function and reduce the matrix to row eschelon form. The result of the operation is stored in b. We're going to look right into the matrices and ignore that value but this is a good spot for an assertion if your writing a unit test. On line 18 we print the matrix and the contents are listed on lines 23 - 25. Note that the output is from the <b>printXmtx</b> function.
 
 <pre>
 27  std.debug.print("Matrix Ret:\n", .{});
