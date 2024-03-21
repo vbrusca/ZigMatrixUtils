@@ -52,6 +52,12 @@ How to build a dynamic library.
 zig build-lib -femit-docs ./src/XmtxUtils.zig -lc -dynamic -isystem -fstrip -fsingle-threaded -femit-bin="zig-out/lib/XmtxUtils.dll"
 </pre>
 
+## Guides
+
+You can look into specific use cases for the library in the "Guides" section.
+
+[Guides](https://github.com/vbrusca/ZigMatrixUtils/tree/main/guides)
+
 ## Rough Example of Usage
 <pre>
 test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
@@ -136,9 +142,3 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     try std.testing.expectEqual(true, equXmtx(&idtF2, &invF2));
 }
 </pre>
-
-## Guides
-
-You can look into specific use cases for the library in the "Guides" section.
-
-[Guides](https://github.com/vbrusca/ZigMatrixUtils/tree/main/guides)

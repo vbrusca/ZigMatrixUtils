@@ -1,7 +1,7 @@
 # Determinant of Marices 3
 
 To calculate the determinant of a diagonal matrix use the <b>detDiagXmtx</b>
-function with a reference to the matrix and its column ize.
+function with a reference to the matrix and its column size.
 
 <!-- "XMTX: ELA - Larson, Edwards: 3.1 Example 6 test" -->
 <pre>
