@@ -1,9 +1,9 @@
-#Multiplication of Matrices
+# Multiplication of Matrices
 
 Multiplying to matrices together using matrix multiplication can be
 accomplished using the <b>tmsXmtx</b> function which takes two input matrices, with column counts, as arguments along with an output matrix, with column count, as the last two arguments to the function call.
 
-//"XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test"
+<!-- //"XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" -->
 <pre>
 //Example 1
 01 var m3: [4]f32 = .{ 3, 4, -2, 5 };
@@ -17,7 +17,7 @@ accomplished using the <b>tmsXmtx</b> function which takes two input matrices, w
 In the second example, listed subsequently, we have in-line print outs
 of the matrix values.
 
-//XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test
+<!-- //XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test -->
 <pre>
 //Example 2
 01 var m5: [3]f32 = .{ 1, -2, -3 };

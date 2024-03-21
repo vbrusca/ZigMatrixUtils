@@ -1,8 +1,8 @@
-#Transpose of Matrices
+# Transpose of Matrices
 
 The transpose of a matrix can be calculated using the <b>trnXmtx</b> or <b>trnXmtxRect</b> functions, lines 31 - 32, 33 - 34, respectively.
 
-//"XMTX: ELA - Larson, Edwards: 2.2 Example 8 test"
+<!-- //"XMTX: ELA - Larson, Edwards: 2.2 Example 8 test" -->
 <pre>
 01 var m1: [2]f32 = .{ 2, 8 };
 02 var r1: [2]f32 = .{ 0, 0 };

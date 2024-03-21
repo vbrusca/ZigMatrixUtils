@@ -1,9 +1,9 @@
-#Difference of Vectors 1
+# Difference of Vectors 1
 
 To find the difference between two vectors use the <b>diff1Xvec</b> function
 which takes the difference of <b>m2 - m1</b> and stores the result in <b>m1</b>.
 
-//"XMTX: ELA - Larson, Edwards: 2.1 Example 3 test"
+<!-- //"XMTX: ELA - Larson, Edwards: 2.1 Example 3 test" -->
 <pre>
 01 var m1: [9]f32 = .{ 3, 6, 12, -9, 0, -3, 6, 3, 6 };
 02 var m2: [9]f32 = .{ 2, 0, 0, 1, -4, 3, -1, 3, 2 };

@@ -1,10 +1,10 @@
 
-#Copy of Vectors
+# Copy of Vectors
 
 To copy a vector use the <b>cpyXvec</b> function shown on line
 4 below.
 
-//"XMTX: ELA - Larson, Edwards: 2.1 Problem 1 test"
+<!-- //"XMTX: ELA - Larson, Edwards: 2.1 Problem 1 test" -->
 <pre>
 01 var a: [4]f32 = .{ 1, -1, 2, -1 };
 02 var aPb: [4]f32 = .{ 0, 0, 0, 0 };

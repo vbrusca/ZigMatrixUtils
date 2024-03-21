@@ -1,4 +1,4 @@
-#Introduction and Reduction of Matrices
+# Introduction and Reduction of Matrices
 
 ## Matrix Conversion to Reduced Row Eschelon Form
 
@@ -10,7 +10,7 @@ Some operations can be performed on arbitrarily sized matrices or vectors when i
 In this example we'll convert a matrix to reduced row eschelon form.
 First we start by declaring some matrices.
 
-//"XMTX: ELA - Larson, Edwards: 1.2 Example 3 test"
+<!-- //"XMTX: ELA - Larson, Edwards: 1.2 Example 3 test" -->
 <pre>
 01  var m1: [12]f32 = .{ 1, -2, 3, 9, -1, 3, 0, -4, 2, -5, 5, 17 };
 02  var retM1: [12]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
