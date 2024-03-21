@@ -7703,8 +7703,8 @@ test "XMTX: ELA - Larson, Edwards: 3.1 Example 1, 2, 3, 4, 5 test" {
             b = cofXmtx(&B, cols, row, col, &retB, 2);
             try std.testing.expectEqual(true, b);
 
-            //std.debug.print("XMTX: B:\n", .{});
-            //prntXmtx(&B, 3);
+            std.debug.print("XMTX: B:\n", .{});
+            prntXmtx(&B, cols);
 
             std.debug.print("XMTX: retB:\n", .{});
             prntXmtx(&retB, 2);

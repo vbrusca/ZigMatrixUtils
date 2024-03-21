@@ -137,4 +137,8 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 }
 </pre>
 
+## Guides
+
+You can look into specific use cases for the library in the "Guides" section.
+
 [Guides](https://github.com/vbrusca/ZigMatrixUtils/tree/main/guides)
