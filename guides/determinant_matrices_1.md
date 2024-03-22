@@ -3,7 +3,7 @@
 To calculate the determinant of a diagonal matrix use the <b>detDiagXmtx</b>
 function with a reference to the matrix and its column size as shown below on lines 5 and 6.
 
-<!-- "XMTX: ELA - Larson, Edwards: 3.1 Example 6 test" -->
+<!-- //"XMTX: ELA - Larson, Edwards: 3.1 Example 6 test" -->
 <pre>
 01 var A: [16]f32 = .{ 2, 0, 0, 0, 4, -2, 0, 0, -5, 6, 1, 0, 1, 5, 3, 3 };
 02 var B: [25]f32 = .{ -1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, -2 };
@@ -19,7 +19,7 @@ function with a reference to the matrix and its column size as shown below on li
 To calculate the determinant of a triangular matrix use the <b>detTriangXmtx</b>
 function with a reference to the matrix and its column size as shown below on lines 5 and 6.
 
-<!-- "XMTX: detTriangXmtx test" -->
+<!-- //"XMTX: detTriangXmtx test" -->
 <pre>
 01 var A: [9]f32 = .{ 2, 0, 0, 0, 2, 0, 0, 0, 2 };
 02 var B: [16]f32 = .{ 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3 };
@@ -32,7 +32,7 @@ function with a reference to the matrix and its column size as shown below on li
 09 try std.testing.expectEqual(true, isEquF32(detB, 81.0, true));
 </pre>
 
-For a given matrix of a specific size you can use more direct calculation method. To find the determinant of a 1x1 matrix you can use the <b>detXmtx1</b> function which takes a reference to the matrix as its only argument.
+For a given matrix of a specific size you can use a more direct calculation method. To find the determinant of a 1x1 matrix you can use the <b>detXmtx1</b> function which takes a reference to the matrix as its only argument.
 
 <!-- //"XMTX: detXmtx1 test" -->
 <pre>
@@ -41,7 +41,7 @@ For a given matrix of a specific size you can use more direct calculation method
 03 try std.testing.expectEqual(m1[0], detM1);
 </pre>
 
-To find the determinant of a 2x2 matrx you can use the <b>detXmtx2</b> function show below on line 2.
+To find the determinant of a 2x2 matrx you can use the <b>detXmtx2</b> function shown below on line 2.
 
 <!-- //"XMTX: ELA - Larson, Edwards: 3.1 Example 1, 2, 3, 4, 5 test" -->
 <pre>

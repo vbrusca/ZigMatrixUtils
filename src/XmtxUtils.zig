@@ -303,6 +303,7 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     try std.testing.expectEqual(pexp[1], retPoly2Exp[1]);
     try std.testing.expectEqual(pexp[2], retPoly2Exp[2]);
 
+    //TODO
     //Possible second test
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
 }
@@ -326,7 +327,7 @@ pub fn prntPolyExp(polyExp: []f32) void {
     }
 }
 
-//TODO write test for above function
+//TODO: write test for above function
 
 ///Returns the value of the order 3 polynomial resolved with the provided value of x.
 ///
@@ -3618,8 +3619,6 @@ test "XMTX: adjXmtx3 test" {
 ///Returns a matrix of full co-factors, sign * minor for the given 4x4 matrix.
 ///
 ///  mtx = The 4x4 matrix to find cofactors for.
-///
-///  alloc = Allocator used in the calculation of lower rank determinants.
 ///
 ///  returns = A new 4x4 matrix of cofactors for the given matrix, mtx.
 ///

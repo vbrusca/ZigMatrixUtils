@@ -22,3 +22,5 @@ For a 4x4 matrix you can calculate the adjoint matrix using the <b>adjXmtx4</b> 
 04 var expA: [16]f32 = .{ -4, -4, -4, 4, -4, -4, 4, -4, -4, 4, -4, -4, 4, -4, -4, -4 };
 05 try std.testing.expectEqual(true, equXmtx(&expA, &retA));
 </pre>
+
+Note that both the <b>adjXmtx3</b> and <b>adjXmtx4</b> functions create a matrix to hold the results and returns it.

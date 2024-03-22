@@ -13,9 +13,7 @@ which takes the difference of <b>m2 - m1</b> and stores the result in <b>m1</b>.
 06 const b: bool = equXmtx(&exp1, &m1);
 </pre>
 
-Notice that we clean the resulting matrix, <b>m1</b>, before using it as an argument in the <b>equXmtx</b> function.
-
-The second method for finding a difference of vectors requires 3 vectors to work with and will store the differences from all three vectors at the given index in the first argument, line 12.
+Notice that we clean the resulting matrix, <b>m1</b>, before using it as an argument in the <b>equXmtx</b> function. The second function for finding a difference of vectors requires 3 vectors to work with and will store the differences from all three vectors at the given index in the first argument, line 5.
 
 <!-- //XMTX: ELA - Larson, Edwards: 2.1 Problem 1 test -->
 <pre>

@@ -1,6 +1,6 @@
 # Cofactor of Matrices 2
 
-Another approach to working with cofactors of matrices is to calculate them in one step by using the <b>cofXmtx</b> function call. In the example shown below two cofactors are calculated by hand and compared to the function output on lines 31 and 41.
+Another approach to working with cofactors of matrices is to calculate them in one step by using the <b>cofXmtx</b> function. In the following example, shown below, two cofactors are calculated by hand and compared to the function output on lines 31 and 41.
 
 <!-- //"XMTX: cofXmtx test" -->
 <pre>
@@ -47,7 +47,7 @@ Another approach to working with cofactors of matrices is to calculate them in o
 41 try std.testing.expectEqual(cofA[1], (detXmtx2(&res) * cofXmtxSign(0, 1, true)));
 </pre>
 
-A more direct way to handle calculating the cofactor matrix is to use a function specific for the matrix size. For a 3x3 matrix you can use <b>cofXmtx3</b> as shown below on line 6.
+A more direct way to handle calculating the cofactor matrix is to use a function specific for the given matrix size. For a 3x3 matrix you can use <b>cofXmtx3</b> as shown below on line 6.
 
 <!-- //"XMTX: cofXmtx3 test" -->
 <pre>
@@ -77,27 +77,37 @@ Similarly for 4x4 matrices you can use the <b>cofXmtx4</b> function as shown bel
 10 try std.testing.expectEqual(true, b);
 </pre>
 
+To generate the sign of a cofactor matrix of arbitrary size you can use the <b>cofXmtxSign</b> method shown on lines 3 and 6 below. The matrix takes two arguments the row and column index to find a cofactor sign for and a Boolean value indicating if the row and column index counting is zero-based.
+
 <!-- //"XMTX: cofXmtxSign test" -->
 <pre>
-var c: usize = 0;
-var r: usize = 0;
-try std.testing.expectEqual(@as(f32, 1.0), cofXmtxSign(r, c, true));
-c = 1;
-r = 0;
-try std.testing.expectEqual(@as(f32, -1.0), cofXmtxSign(r, c, true));
+01 var c: usize = 0;
+02 var r: usize = 0;
+03 try std.testing.expectEqual(@as(f32, 1.0), cofXmtxSign(r, c, true));
+04 c = 1;
+05 r = 0;
+06 try std.testing.expectEqual(@as(f32, -1.0), cofXmtxSign(r, c, true));
 </pre>
 
-<!-- //"XMTX: cofXmtx3 test" -->
+To generate an entire matrix that is based on a 3x3 matrix you can use the <b>cofXmtxSign3</b> function, line 1 in the following example.
+
+<!-- //"XMTX: cofXmtxSign3 test" -->
 <pre>
-//A = 0  2  1
-//    3  -1 2
-//    4  0  1
-var A: [9]f32 = .{ 0, 2, 1, 3, -1, 2, 4, 0, 1 };
-var exp: [9]f32 = .{ -1, 5, 4, -2, -4, 8, 5, 3, -6 };
-var cof: [9]f32 = cofXmtx3(&A);
-const b: bool = equXmtx(&cof, &exp);
-try std.testing.expectEqual(true, b);
+01 const cofSgn: [9]f32 = cofXmtxSign3();
+02 try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
+03 try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
+04 try std.testing.expectEqual(@as(f32, 1.0), cofSgn[2]);
+05 
+06 try std.testing.expectEqual(@as(f32, -1.0), cofSgn[3]);
+07 try std.testing.expectEqual(@as(f32, 1.0), cofSgn[4]);
+08 try std.testing.expectEqual(@as(f32, -1.0), cofSgn[5]);
+09 
+10 try std.testing.expectEqual(@as(f32, 1.0), cofSgn[6]);
+11 try std.testing.expectEqual(@as(f32, -1.0), cofSgn[7]);
+12 try std.testing.expectEqual(@as(f32, 1.0), cofSgn[8]);
 </pre>
+
+To generate an entire matrix that is based on a 4x4 matrix you can use the <b>cofXmtxSign4</b> function, line 1 in the following example.
 
 <!-- //"XMTX: cofXmtxSign4 test" -->
 <pre>
@@ -122,3 +132,5 @@ try std.testing.expectEqual(true, b);
 19 try std.testing.expectEqual(@as(f32, -1.0), cofSgn[14]);
 20 try std.testing.expectEqual(@as(f32, 1.0), cofSgn[15]);
 </pre>
+
+Note that the <b>cofXmtxSign3</b> and <b>cofXmtxSign4</b> functions create and return a new matrix to hold the resulting data while the <b>cofXmtxSign</b> function simply returns a scalar value for the row and column index arguments provided.

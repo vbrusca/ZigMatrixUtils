@@ -1,6 +1,6 @@
 # Clean and Clear Matrices
 
-To clear a matrix to have only zero values use the following function.
+To clear a matrix, zero out all matrix values, you can use the <b>clrXmtx</b> function as shown below on line 5.
 
 <!-- "XMTX: clrXmtx test" -->
 <pre>
@@ -12,7 +12,7 @@ To clear a matrix to have only zero values use the following function.
 06 try std.testing.expectEqual(true, equXvec(&mtx, &exp));
 </pre>
 
-When cleaning a matrix to normalize the floating point value of matrix entries use the method, line 18, of the following example.
+When cleaning a matrix to normalize the floating point value of matrix entries use the <b>clnXmtx</b> function, line 18, of the following example.
 
 <!-- "XMTX: hasInvXmtx test" -->
 <pre>
@@ -41,3 +41,5 @@ When cleaning a matrix to normalize the floating point value of matrix entries u
 23 try std.testing.expectEqual(true, isDiagXmtx(&m2, 3));
 24 try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 </pre>
+
+Note that the <b>clrXmtx</b> and <b>clnXmtx</b> function work on the provided matrix and make changes directly to the matrix.
