@@ -1,4 +1,4 @@
-# Cofactor of Matrices
+# Cofactor of Matrices 1
 
 In order to calculate the cofactors of a given X by X marix you need to calculate the determinant of a number of (X - 1) by (X - 1) matrices.
 <br>
@@ -108,4 +108,4 @@ XMTX: retB:
 Sign: 1.0e+00 Val: -6.0e+00
 </pre>
 
-Note the values found here and the epexed values in the <b>expB</b> matrix.
+Note the values found here and the expected values in the <b>expB</b> matrix.

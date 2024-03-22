@@ -15,3 +15,12 @@ To copy a vector use the <b>cpyXvec</b> function shown on line
 </pre>
 
 Note that you can use the method with larger matrices it will simply view them as large vectors.
+
+<!-- //"XMTX: cpyXvecNew test" -->
+<pre>
+const alloc: std.mem.Allocator = std.testing.allocator;
+var v1: [3]f32 = .{ 1, 2, 3 };
+const v2: []f32 = try cpyXvecNew(&v1, &alloc);
+try std.testing.expectEqual(true, equXvec(&v1, v2));
+alloc.free(v2);
+</pre>

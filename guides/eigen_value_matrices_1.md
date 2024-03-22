@@ -1,4 +1,4 @@
-# Eigen Values and Matrices 1
+# Eigen Values and Matrices
 
 Calculating Eigen values for 2x2 matries is supported by using the EigVal2 structure. The fields of the structure are listed subsequently.
 

@@ -27,13 +27,17 @@ When cleaning a matrix to normalize the floating point value of matrix entries u
 09 std.debug.print("hasInvXmtx test: initial matrix\n", .{});
 10 prntXmtx(&m1, 4);
 11 
-12 var sclr: f32 = 0.0;
-13 b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
-14 try std.testing.expectEqual(true, b);
-15 cpyXmtx(&m1, &m2);
-16 cpyXmtx(&origM1, &m1);
-17 
-18 clnXmtx(&m2);
-19 try std.testing.expectEqual(true, isDiagXmtx(&m2, 3));
-20 try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
+12 //hasInvXmtx test: initial matrix
+13 //0: x: 3.0e+00 y: 2.0e+00 z: -3.0e+00 w: 4.0e+00 
+14 //1: x: -3.0e+00 y: 6.0e+00 z: 1.0e+00 w: 0.0e+00 
+15 
+16 var sclr: f32 = 0.0;
+17 b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
+18 try std.testing.expectEqual(true, b);
+19 cpyXmtx(&m1, &m2);
+20 cpyXmtx(&origM1, &m1);
+21 
+22 clnXmtx(&m2);
+23 try std.testing.expectEqual(true, isDiagXmtx(&m2, 3));
+24 try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 </pre>

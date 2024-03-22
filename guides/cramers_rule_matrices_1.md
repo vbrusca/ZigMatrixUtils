@@ -1,6 +1,6 @@
 # Cramer's Rule and Marices
 
-Applies Cramer’s rule to the given matrix, <b>B</b>, with <b>BA</b> representing the un-augmented version of matrix <b>B</b>, and <b>BAi</b> representing Cramer’s rule’s supporting matrix.
+To apply Cramer’s rule to the given matrix, <b>B</b>, with <b>BA</b> representing the un-augmented version of matrix <b>B</b>, and <b>BAi</b> representing Cramer rule’s supporting matrix.
 
 <!-- "XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" -->
 <pre>
