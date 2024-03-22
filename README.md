@@ -29,7 +29,10 @@ You can run the unit tests from inside the project with the following command.<b
 <pre>
 zig test ./src/XmtxUtils.zig
 </pre>
-There are over 180 test ran to verify functionality. Feel free to think of them as demonstrations of the associated functions.
+There are over 180 test ran to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on certain terminals.
+<pre>
+zig test ./src/XmtxUtils.zig > all_test_output.txt 2>&1
+</pre>
 
 ## Project Build Commands
 How to build an exe (not used).
