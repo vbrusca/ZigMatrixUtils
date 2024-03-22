@@ -1,5 +1,6 @@
 # Properties of Matrices
 
+TODO
 <!--
 fn hasInvXmtx(mtx: []f32, cols: usize, trnMtx: []f32) bool 
 fn isDiagXmtx(mtx: []f32, cols: usize) bool

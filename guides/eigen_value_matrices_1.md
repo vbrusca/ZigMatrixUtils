@@ -14,7 +14,7 @@ Fields:
     eignVec2: [2]f32 = .{0, 0},
 </pre>
 
-The main purpose of the EigenVal2 structure is to hold pertinent information during the process of calculating the Eigen values of the given matrix.
+The main purpose of the <b>EigenVal2</b> structure is to hold pertinent information during the process of calculating the Eigen values of the given matrix.
 
 <!-- "XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" -->
 <pre>

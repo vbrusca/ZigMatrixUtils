@@ -2101,9 +2101,9 @@ test "XMTX: INT_equXvec test" {
     prntNl();
     std.debug.print("INT_equXvec test:\n", .{});
     var v1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    var v2: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    var v2: [9]f32 = .{ 1.0001, 2.0001, 3.0001, 4, 5, 6, 7, 8, 9 };
     prntXvec(&v1);
-    try std.testing.expectEqual(true, INT_equXvec(&v1, &v2, true));
+    try std.testing.expectEqual(false, INT_equXvec(&v1, &v2, true));
     try std.testing.expectEqual(true, INT_equXvec(&v1, &v2, false));
 }
 

@@ -1,7 +1,7 @@
 # Inverse of Matrices
 
 To find the inverse of a matrix we need to reduce it to row eschelon form
-while tracking the matrix permutations on an identity matrix. This can all be handled with one call to the <b>rdcXmtx</b> function.
+while tracking the matrix row manipulations on an identity matrix. This can all be handled with one call to the <b>rdcXmtx</b> function.
 <br>
 <br>
 Arguments 5 and 6 of the function call are a Boolean value, that indicates if an identity matrix has been provided, and the identity matrix for the given matrix being reduced. 
@@ -27,7 +27,14 @@ Arguments 5 and 6 of the function call are a Boolean value, that indicates if an
 17 prntXmtx(&B, 2);
 18 prntNl();
 19 
-20 prntXmtx(&I, 2);
-21 prntNl();
-22 const b1: bool = equXmtx(&exp, &I);
+20 //0: x: 1.0e+00 y: 0.0e+00 
+21 //1: x: 0.0e+00 y: 1.0e+00 
+22
+23 prntXmtx(&I, 2);
+24 prntNl();
+25 
+26 //0: x: -3.0e+00 y: -4.0e+00 
+27 //1: x: 1.0e+00 y: 1.0e+00 
+28 
+29 const b1: bool = equXmtx(&exp, &I);
 </pre>

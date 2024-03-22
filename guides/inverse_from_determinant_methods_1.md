@@ -1,5 +1,7 @@
 # Inverse from Matrix Determinants
 
+To calculate the inverse of a 2x2 matrix from its determinant you can use the <b>getInvFromDet2</b> function which takes a reference to the original matrix, the determinant of the original matrix, and an empty matrix to store the results as argument, line 5 in the following example.
+
 <!-- "XMTX: getInvFromDet2 test" -->
 <pre>
 01 var m1: [4]f32 = .{ 2, 1, 7, 4 };
@@ -10,6 +12,8 @@
 06 try std.testing.expectEqual(true, b);
 07 try std.testing.expectEqual(true, equXmtx(&res, &invM1));
 </pre>
+
+To calculate the inverse of a 3x3 matrix from its determinant you can use the <b>getInvFromDet3</b> function as shown on line 17 in the subsequent example.
 
 <!-- "XMTX: getInvFromDet3 test" -->
 <pre>
@@ -33,6 +37,8 @@
 18 try std.testing.expectEqual(true, b);
 19 try std.testing.expectEqual(true, equXmtx(&res, &invA));
 </pre>
+
+Lastly, to calculate the inverse of a 4x4 matrix from its determinant you can use the <b>getInvFromDet4</b> function as shown on line 6 in the following example.
 
 <!-- "XMTX: getInvFromDet4 test" -->
 <pre>
