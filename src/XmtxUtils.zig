@@ -46,6 +46,12 @@ const jH3: [3]f32 = .{ 0, 1, 0 };
 ///z^ in 3x3 space
 const kH3: [3]f32 = .{ 0, 0, 1 };
 
+///An enumeration that describes the solution types, discriminant, of a second order polynomial.
+const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
+
+///An enumeration that describes the solution types, discriminant, of a third order polynomial.
+const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE_REAL_TWO_IMAGINARY };
+
 ///Used in aiding the calculation of Eigen Values for a 2x2 matrix.
 pub const EigVal2 = struct {
     lamdExp: [5]f32 = .{ 0, 0, 0, 0, 0 }, //a, -&, d, -&, (-cd)
@@ -54,6 +60,7 @@ pub const EigVal2 = struct {
     eignVec1: [2]f32 = .{ 0, 0 },
     eignVec2: [2]f32 = .{ 0, 0 },
 
+    ///Supports printing out the Eigen value structure in a readable form.
     pub fn prnt(self: EigVal2) void {
         std.debug.print("(a + -&)(d + -&) + (-bc)\n", .{});
         std.debug.print("({} + -&)({} + -&) + ({})\n", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4] });
@@ -74,6 +81,7 @@ pub const EigVal3 = struct {
     eignVec2: [3]f32 = .{ 0, 0, 0 },
     eignVec3: [3]f32 = .{ 0, 0, 0 },
 
+    ///Supports printing out the Eigen value structure in a readable form.
     pub fn prnt(self: EigVal3) void {
         std.debug.print("(a - &)*|(e - &), f, h, (i - &)| + (-b)*|d, f, g, (i - &)| + (c)*|d, (e - &), g, h|\n", .{});
         std.debug.print("({} - &)*|({} - &), {}, {}, ({} - &)| + (-{})*|{}, {}, {}, ({} - &)| + ({})*|{}, ({} - &), {}, {}|\n", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4], self.lamdExp[5], self.lamdExp[6], self.lamdExp[8], self.lamdExp[9], self.lamdExp[10], self.lamdExp[11], self.lamdExp[12], self.lamdExp[14], self.lamdExp[15], self.lamdExp[16], self.lamdExp[18], self.lamdExp[19] });
@@ -83,6 +91,72 @@ pub const EigVal3 = struct {
     }
 };
 
+///Returns the absolute value of the provided argument.
+///
+///  v = The floating point number to calculate the absolute value of.
+///
+///  returns = The absolute value of the argument v.
+///
+pub fn absF32(v: f32) f32 {
+    if (v < 0) {
+        return v * -1;
+    }
+    return v;
+}
+
+test "XMTX: absF32 test" {
+    prntNl();
+    const v: f32 = 7;
+    try std.testing.expectEqual(v, absF32(-7));
+}
+
+///Calculates and stores the absolute value of the given f32.
+///
+///  v = A reference to the floating point number to calculate and store the absolute value of.
+///
+pub fn absF32Inl(v: *f32) void {
+    if (v.* < 0) {
+        v.* *= -1;
+    }
+}
+
+test "XMTX: absF32Inl test" {
+    prntNl();
+    std.debug.print("XMTX: absF32Inl test", .{});
+    const exp: f32 = 7;
+    var v: f32 = -7;
+    std.debug.print("\n Before Exp = {}, V = {}", .{ exp, v });
+
+    absF32Inl(&v);
+    std.debug.print("\n After Exp = {}, V = {}", .{ exp, v });
+    try std.testing.expectEqual(exp, v);
+}
+
+///Calculates and stores the absolute value of the given f32.
+///
+///  v = A reference to the floating point number to calculate and store the absolute value of.
+///
+pub fn absF32Ret(v: *const f32, ret: *f32) void {
+    ret.* = v.*;
+    if (v.* < 0) {
+        ret.* *= -1;
+    }
+}
+
+test "XMTX: absF32Ret test" {
+    prntNl();
+    std.debug.print("XMTX: absF32Ret test", .{});
+    const exp: f32 = 7;
+    var v: f32 = -7;
+    var ret: f32 = 0;
+    std.debug.print("\n Before Exp = {}, V = {}, Ret = {}", .{ exp, v, ret });
+
+    absF32Ret(&v, &ret);
+    std.debug.print("\n After Exp = {}, V = {}, Ret = {}", .{ exp, v, ret });
+    try std.testing.expectEqual(false, (exp == v));
+    try std.testing.expectEqual(true, (exp == ret));
+}
+
 //polyExp of len 2 = a& + b = 0                 ORDER 1
 //                   [0]  [1]
 //polyExp of len 3 = a&^2 + b& + c = 0          ORDER 2
@@ -90,9 +164,9 @@ pub const EigVal3 = struct {
 //polyExp of len 4 = a&^3 + b&^2 + c& + d = 0   ORDER 3
 //                   [0]    [1]    [2]  [3]
 
-///Returns the order of the polynomial expression.
+///Returns the order of the polynomial expression represented as an f32 array.
 ///
-///  polyExp = The polynomial expression to process.
+///  polyExp = The polynomial expression to process, represented as an f32 array.
 ///
 ///  returns = The order of the polynomial expression.
 ///
@@ -621,12 +695,6 @@ test "XMTX: rtsPoly2 test" {
     try std.testing.expectEqual(exp2, roots[1]);
 }
 
-///An enumeration that describes the solution types, discriminant, of a second order polynomial.
-const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
-
-///An enumeration that describes the solution types, discriminant, of a third order polynomial.
-const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE_REAL_TWO_IMAGINARY };
-
 ///Returns an enumeration describing the descriminant of the cubic polynomial.
 ///
 ///  polyExp = The cubic polynomial to process.
@@ -692,7 +760,7 @@ test "XMTX: dscrPoly2 test" {
 
 ///Find the eigen values for a 3x3 dimensional matrix.
 ///
-///  mtx = a 2x2 matrix to find eigen values for.
+///  mtx = A 3x3 matrix to find eigen values for.
 ///
 ///  evs = An EigVal3 pointer used for calculating the eigen values of the given matrix.
 ///
@@ -795,7 +863,7 @@ test "XMTX: fndEigVal3 test" {
 
 ///Find the eigen values for a 2x2 dimensional matrix.
 ///
-///  mtx = a 2x2 matrix to find eigen values for.
+///  mtx = A 2x2 matrix to find eigen values for.
 ///
 ///  evs = An EigVal2 pointer used for calculating the eigen values of the given matrix.
 ///
@@ -857,25 +925,6 @@ test "XMTX: fndEigVal2 test" {
     evs.prnt();
     try std.testing.expectEqual(@as(f32, 5.0), evs.eignVals[0]);
     try std.testing.expectEqual(@as(f32, -1.0), evs.eignVals[1]);
-}
-
-///Returns the absolute value of the provided argument.
-///
-///  v = The floating point number to calculate the absolute value of.
-///
-///  returns = The absolute value of the argument v.
-///
-pub fn absF32(v: f32) f32 {
-    if (v < 0) {
-        return v * -1;
-    }
-    return v;
-}
-
-test "XMTX: absF32 test" {
-    prntNl();
-    const v: f32 = 7;
-    try std.testing.expectEqual(v, absF32(-7));
 }
 
 ///Cleans the given matrix by rounding float values to the nearest significance, ZERO_F32, resulting in clean 0.0, 1.0, etc, values.
@@ -3706,6 +3755,51 @@ test "XMTX: cofXmtx3 test" {
     try std.testing.expectEqual(true, b);
 }
 
+//TODO Add documentation
+pub fn mnrXmtxRet4(mtx: *[16]f32, ret: *[16]f32) void {
+    var T1: [9]f32 = .{ mtx[5], mtx[6], mtx[7], mtx[9], mtx[10], mtx[11], mtx[13], mtx[14], mtx[15] };
+    var T2: [9]f32 = .{ mtx[4], mtx[6], mtx[7], mtx[8], mtx[10], mtx[11], mtx[12], mtx[14], mtx[15] };
+    var T3: [9]f32 = .{ mtx[4], mtx[5], mtx[7], mtx[8], mtx[9], mtx[11], mtx[12], mtx[13], mtx[15] };
+    var T4: [9]f32 = .{ mtx[4], mtx[5], mtx[6], mtx[8], mtx[9], mtx[10], mtx[12], mtx[13], mtx[14] };
+
+    var T5: [9]f32 = .{ mtx[1], mtx[2], mtx[3], mtx[9], mtx[10], mtx[11], mtx[13], mtx[14], mtx[15] };
+    var T6: [9]f32 = .{ mtx[0], mtx[2], mtx[3], mtx[8], mtx[10], mtx[11], mtx[12], mtx[14], mtx[15] };
+    var T7: [9]f32 = .{ mtx[0], mtx[1], mtx[3], mtx[8], mtx[9], mtx[11], mtx[12], mtx[13], mtx[15] };
+    var T8: [9]f32 = .{ mtx[0], mtx[1], mtx[2], mtx[8], mtx[9], mtx[10], mtx[12], mtx[13], mtx[14] };
+
+    var T9: [9]f32 = .{ mtx[1], mtx[2], mtx[3], mtx[5], mtx[6], mtx[7], mtx[13], mtx[14], mtx[15] };
+    var T10: [9]f32 = .{ mtx[0], mtx[2], mtx[3], mtx[4], mtx[6], mtx[7], mtx[12], mtx[14], mtx[15] };
+    var T11: [9]f32 = .{ mtx[0], mtx[1], mtx[3], mtx[4], mtx[5], mtx[7], mtx[12], mtx[13], mtx[15] };
+    var T12: [9]f32 = .{ mtx[0], mtx[1], mtx[2], mtx[4], mtx[5], mtx[6], mtx[12], mtx[13], mtx[14] };
+
+    var T13: [9]f32 = .{ mtx[1], mtx[2], mtx[3], mtx[5], mtx[6], mtx[7], mtx[9], mtx[10], mtx[11] };
+    var T14: [9]f32 = .{ mtx[0], mtx[2], mtx[3], mtx[4], mtx[6], mtx[7], mtx[8], mtx[10], mtx[11] };
+    var T15: [9]f32 = .{ mtx[0], mtx[1], mtx[3], mtx[4], mtx[5], mtx[7], mtx[8], mtx[9], mtx[11] };
+    var T16: [9]f32 = .{ mtx[0], mtx[1], mtx[2], mtx[4], mtx[5], mtx[6], mtx[8], mtx[9], mtx[10] };
+
+    ret[0] = detXmtx3(&T1);
+    ret[1] = detXmtx3(&T2);
+    ret[2] = detXmtx3(&T3);
+    ret[3] = detXmtx3(&T4);
+
+    ret[4] = detXmtx3(&T5);
+    ret[5] = detXmtx3(&T6);
+    ret[6] = detXmtx3(&T7);
+    ret[7] = detXmtx3(&T8);
+
+    ret[8] = detXmtx3(&T9);
+    ret[9] = detXmtx3(&T10);
+    ret[10] = detXmtx3(&T11);
+    ret[11] = detXmtx3(&T12);
+
+    ret[12] = detXmtx3(&T13);
+    ret[13] = detXmtx3(&T14);
+    ret[14] = detXmtx3(&T15);
+    ret[15] = detXmtx3(&T16);
+}
+
+//TODO Add tests
+
 ///Returns a matrix of minors for the given 4x4 matrix.
 ///
 ///  mtx = The 4x4 matrix to find minors for.
@@ -3830,6 +3924,35 @@ test "XMTX: mnrXmtx4 test" {
     try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
 }
 
+//TODO documentation
+pub fn mnrXmtxRet3(mtx: *[9]f32, ret: *[9]f32) void {
+    var T1: [4]f32 = .{ mtx[4], mtx[5], mtx[7], mtx[8] };
+    var T2: [4]f32 = .{ mtx[3], mtx[5], mtx[6], mtx[8] };
+    var T3: [4]f32 = .{ mtx[3], mtx[4], mtx[6], mtx[7] };
+
+    var T4: [4]f32 = .{ mtx[1], mtx[2], mtx[7], mtx[8] };
+    var T5: [4]f32 = .{ mtx[0], mtx[2], mtx[6], mtx[8] };
+    var T6: [4]f32 = .{ mtx[0], mtx[1], mtx[6], mtx[7] };
+
+    var T7: [4]f32 = .{ mtx[1], mtx[2], mtx[4], mtx[5] };
+    var T8: [4]f32 = .{ mtx[0], mtx[2], mtx[3], mtx[5] };
+    var T9: [4]f32 = .{ mtx[0], mtx[1], mtx[3], mtx[4] };
+
+    ret[0] = detXmtx2(&T1);
+    ret[1] = detXmtx2(&T2);
+    ret[2] = detXmtx2(&T3);
+
+    ret[3] = detXmtx2(&T4);
+    ret[4] = detXmtx2(&T5);
+    ret[5] = detXmtx2(&T6);
+
+    ret[6] = detXmtx2(&T7);
+    ret[7] = detXmtx2(&T8);
+    ret[8] = detXmtx2(&T9);
+}
+
+//TODO add tests
+
 ///Returns a matrix of minors for the given 3x3 matrix.
 ///
 ///  mtx = The 3x3 matrix to find minors for.
@@ -3865,6 +3988,39 @@ test "XMTX: mnrXmtx3 test" {
     try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
 }
 
+//TODO: docs
+pub fn mnrXmtxRet2(mtx: *[4]f32, ret: *[4]f32) void {
+    //Given 2x2 matrix A
+    //A = a b     0 1
+    //    c d     2 3
+    var T1: [1]f32 = .{mtx[3]};
+    var T2: [1]f32 = .{mtx[2]};
+    var T3: [1]f32 = .{mtx[1]};
+    var T4: [1]f32 = .{mtx[0]};
+
+    ret[0] = detXmtx1(&T1);
+    ret[1] = detXmtx1(&T2);
+    ret[2] = detXmtx1(&T3);
+    ret[3] = detXmtx1(&T4);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn mnrXmtx2(mtx: *[4]f32) [4]f32 {
+    //Given 2x2 matrix A
+    //A = a b     0 1
+    //    c d     2 3
+    var T1: [1]f32 = .{mtx[3]};
+    var T2: [1]f32 = .{mtx[2]};
+    var T3: [1]f32 = .{mtx[1]};
+    var T4: [1]f32 = .{mtx[0]};
+
+    return .{ detXmtx1(&T1), detXmtx1(&T2), detXmtx1(&T3), detXmtx1(&T4) };
+}
+
+//TODO: tests
+
 ///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 4x4 matrix.
 pub fn cofXmtxSign4() [16]f32 {
     return .{ 1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, 1, -1, 1 };
@@ -3894,6 +4050,37 @@ test "XMTX: cofXmtxSign4 test" {
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[15]);
 }
 
+//TODO: docs
+pub fn cofXmtxSignRet4(ret: *[16]f32) void {
+    ret[0] = 1;
+    ret[1] = -1;
+    ret[2] = 1;
+    ret[3] = -1;
+
+    ret[4] = -1;
+    ret[5] = 1;
+    ret[6] = -1;
+    ret[7] = 1;
+
+    ret[8] = 1;
+    ret[9] = -1;
+    ret[10] = 1;
+    ret[11] = -1;
+
+    ret[12] = -1;
+    ret[13] = 1;
+    ret[14] = -1;
+    ret[5] = 1;
+
+    //return .{ 1,-1, 1,-1,
+    //         -1, 1,-1, 1,
+    //          1,-1, 1,-1,
+    //         -1, 1,-1, 1
+    //};
+}
+
+//TODO: tests
+
 ///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 3x3 matrix.
 pub fn cofXmtxSign3() [9]f32 {
     return .{ 1, -1, 1, -1, 1, -1, 1, -1, 1 };
@@ -3914,6 +4101,44 @@ test "XMTX: cofXmtxSign3 test" {
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[7]);
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[8]);
 }
+
+//TODO: docs
+pub fn cofXmtxSignRet3(ret: *[9]f32) void {
+    ret[0] = 1;
+    ret[1] = -1;
+    ret[2] = 1;
+
+    ret[3] = -1;
+    ret[4] = 1;
+    ret[5] = -1;
+
+    ret[6] = 1;
+    ret[7] = -1;
+    ret[8] = 1;
+
+    //return .{ 1,-1, 1,
+    //           -1, 1,-1,
+    //            1,-1, 1 };
+}
+
+//TODO: docs
+pub fn cofXmtxSign2() [4]f32 {
+    return .{ 1, -1, -1, 1 };
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn cofXmtxSignRet2(ret: *[4]f32) void {
+    ret[0] = 1;
+    ret[1] = -1;
+    ret[2] = 1;
+    ret[3] = -1;
+    //return .{ 1,-1,
+    //         -1, 1 };
+}
+
+//TODO: tests
 
 ///Returns the determinant of a 1x1 matrix.
 ///
