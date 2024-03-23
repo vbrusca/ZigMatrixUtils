@@ -433,6 +433,13 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
     try std.testing.expectEqual(exp, rmnd);
 }
 
+//TODO: docs
+pub fn synthDivPoly1IntoPoly2Ret(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f32, ret: *f32) void {
+    ret.* = synthDivPoly1IntoPoly2(poly1, poly2, retPoly1);
+}
+
+//TODO: tests
+
 ///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
 ///
 ///  poly1 = A pointer to an order 1 polynomial.
@@ -501,6 +508,13 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     //Possible second test
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
 }
+
+//TODO: docs
+pub fn synthDivPoly1IntoPoly3Ret(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f32, ret: *f32) void {
+    ret.* = synthDivPoly1IntoPoly3(poly1, poly3, retPoly2);
+}
+
+//TODO: tests
 
 ///A function used to print out polynomials.
 ///
@@ -603,6 +617,20 @@ test "XMTX: rslvPoly3 test" {
     try std.testing.expectEqual(exp, ans);
 }
 
+//TODO: docs
+pub fn rslvPoly3Ref(x: *f32, polyExp3: *[4]f32) f32 {
+    return rslvPoly3(&x, polyExp3);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn rslvPoly3Ret(x: *f32, polyExp3: *[4]f32, ret: *f32) void {
+    ret.* = rslvPoly3(&x, polyExp3);
+}
+
+//TODO: tests
+
 ///Returns the value of the order 2 polynomial resolved with the provided value of x.
 ///
 ///  x = The value to use for x.
@@ -652,6 +680,20 @@ test "XMTX: rslvPoly2 test" {
     ans = rslvPoly2(arg, &p3);
     try std.testing.expectEqual(exp, ans);
 }
+
+//TODO: docs
+pub fn rslvPoly2Ref(x: *f32, polyExp2: *[3]f32) f32 {
+    return rslvPoly2(&x, polyExp2);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn rslvPoly2Ret(x: *f32, polyExp2: *[3]f32, ret: *f32) void {
+    ret.* = rslvPoly2(&x, polyExp2);
+}
+
+//TODO: tests
 
 ///Finds the roots of the order 3 polynomial provided.
 ///
@@ -779,6 +821,14 @@ test "XMTX: rtsPoly3 test" {
     try std.testing.expectEqual(exp3, ret[2]);
 }
 
+//TODO: docs
+
+pub fn rtsPoly3Ret(polyExp: *[4]f32, factors: []f32, ret: *[3]f32) void {
+    ret.* = rtsPoly3(polyExp, factors);
+}
+
+//TODO: tests
+
 ///Finds the roots of the order 2 polynomial provided.
 ///
 ///  polyExp = An order 2 polynomial provided as the basis of this function.
@@ -825,7 +875,14 @@ test "XMTX: rtsPoly2 test" {
     try std.testing.expectEqual(exp2, roots[1]);
 }
 
-///Returns an enumeration describing the descriminant of the cubic polynomial.
+//TODO: docs
+pub fn rtsPoly2Ret(polyExp: *[3]f32, ret: *[2]f32) void {
+    ret.* = rtsPoly2(polyExp);
+}
+
+//TODO: tests
+
+///Returns an enumeration value describing the descriminant of the cubic polynomial.
 ///
 ///  polyExp = The cubic polynomial to process.
 ///
@@ -1121,6 +1178,32 @@ test "XMTX: isEquF32 test" {
     try std.testing.expectEqual(true, isEquF32(1.0, 1.00001, false));
     try std.testing.expectEqual(true, isEquF32(1.0, 1.0, true));
 }
+
+//TODO:docs
+pub fn isEquF32Ref(l: *f32, r: *f32, compareModeExact: *bool) bool {
+    if (compareModeExact.*) {
+        if (l == r) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        if (absF32(l.* - r.*) < ZERO_F32) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+//TODO: tests
+
+//TODO:docs
+pub fn isEquF32Ret(l: *f32, r: *f32, compareModeExact: *bool, ret: *bool) void {
+    ret.* = isEquF32Ref(l, r, compareModeExact);
+}
+
+//TODO: tests
 
 ///Copies the mtx matrix into the ret matrix argument.
 ///
@@ -1756,11 +1839,11 @@ test "XMTX: divXvec test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-///Adds each entry in the vec vector by the provided value.
+///Adds the value, val, to the data in the vector, vec.
 ///
 ///  vec = The vector to apply the addition to.
 ///
-///  val = The scalar value to add the vector by.
+///  val = The scalar value to add to the vector data.
 ///
 pub fn addXvec(vec: []f32, val: f32) void {
     const l: usize = vec.len;
@@ -2286,9 +2369,9 @@ test "XMTX: INT_equXvec test" {
     try std.testing.expectEqual(true, INT_equXvec(&v1, &v2, false));
 }
 
-///Converts the provided matrix entries into absolute values.
+///Converts the provided matrix data into absolute values.
 ///
-///  mtx = The matrix to convert to absolute values.
+///  mtx = The matrix data to convert to absolute values.
 ///
 pub fn absXmtx(mtx: []f32) void {
     return absXvec(mtx);
@@ -2303,9 +2386,9 @@ test "XMTX: absXmtx test" {
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
 }
 
-///Converts the provided vector entries into absolute values.
+///Converts the provided vector data into absolute values.
 ///
-///  vec = The vector to convert to absolute values.
+///  vec = The vector data to convert to absolute values.
 ///
 pub fn absXvec(vec: []f32) void {
     const l: usize = vec.len;
@@ -3237,7 +3320,7 @@ test "XMTX: addSclXmtxRowsInl test" {
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 }
 
-///Adds a matrix row to a scalar.
+///Adds a scalar to a matrix row.
 ///
 ///  srcRow = The source row to apply the addition to.
 ///
