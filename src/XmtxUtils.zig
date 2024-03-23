@@ -105,7 +105,7 @@ pub fn absF32(v: f32) f32 {
 }
 
 test "XMTX: absF32 test" {
-    prntNl();
+    prntNlStr("XMTX: absF32 test");
     const v: f32 = 7;
     try std.testing.expectEqual(v, absF32(-7));
 }
@@ -121,8 +121,7 @@ pub fn absF32Inl(v: *f32) void {
 }
 
 test "XMTX: absF32Inl test" {
-    prntNl();
-    std.debug.print("XMTX: absF32Inl test", .{});
+    prntNlStr("XMTX: absF32Inl test");
     const exp: f32 = 7;
     var v: f32 = -7;
     std.debug.print("\n Before Exp = {}, V = {}", .{ exp, v });
@@ -134,18 +133,16 @@ test "XMTX: absF32Inl test" {
 
 ///Calculates and stores the absolute value of the given f32.
 ///
-///  v = A reference to the floating point number to calculate and store the absolute value of.
+///  v = A constant reference to the floating point number to calculate and store the absolute value of.
+///
+///  ret = A reference to the f32 variable that will store the absolute value result.
 ///
 pub fn absF32Ret(v: *const f32, ret: *f32) void {
-    ret.* = v.*;
-    if (v.* < 0) {
-        ret.* *= -1;
-    }
+    ret.* = absF32(v.*);
 }
 
 test "XMTX: absF32Ret test" {
-    prntNl();
-    std.debug.print("XMTX: absF32Ret test", .{});
+    prntNlStr("XMTX: absF32Ret test");
     const exp: f32 = 7;
     var v: f32 = -7;
     var ret: f32 = 0;
@@ -157,36 +154,90 @@ test "XMTX: absF32Ret test" {
     try std.testing.expectEqual(true, (exp == ret));
 }
 
-//polyExp of len 2 = a& + b = 0                 ORDER 1
-//                   [0]  [1]
-//polyExp of len 3 = a&^2 + b& + c = 0          ORDER 2
-//                   [0]    [1]  [2]
-//polyExp of len 4 = a&^3 + b&^2 + c& + d = 0   ORDER 3
-//                   [0]    [1]    [2]  [3]
-
 ///Returns the order of the polynomial expression represented as an f32 array.
 ///
 ///  polyExp = The polynomial expression to process, represented as an f32 array.
 ///
 ///  returns = The order of the polynomial expression.
 ///
+///  Description of how polynomials are represented as arrays.
+///
+///  polyExp of len 2 = a& + b = 0                 ORDER 1
+///
+///                     [0]  [1]
+///
+///  polyExp of len 3 = a&^2 + b& + c = 0          ORDER 2
+///
+///                     [0]    [1]  [2]
+///
+///  polyExp of len 4 = a&^3 + b&^2 + c& + d = 0   ORDER 3
+///
+///                     [0]    [1]    [2]  [3]
+///
 pub fn getPolyOrder(polyExp: []f32) f32 {
     const l: usize = polyExp.len;
     if (l - 1 > 0) {
-        return @floatFromInt(l - 1); //return @as(f32, @floatFromInt((l - 1)));
+        return @floatFromInt(l - 1);
     } else {
         return 0;
     }
 }
 
 test "XMTX: getPolyOrder test" {
-    prntNl();
+    prntNlStr("XMTX: getPolyOrder test");
     var pOdr1: [2]f32 = .{ 0, 0 };
     var pOdr2: [3]f32 = .{ 0, 0, 0 };
     var pOdr3: [4]f32 = .{ 0, 0, 0, 0 };
     const ans1 = getPolyOrder(&pOdr1);
     const ans2 = getPolyOrder(&pOdr2);
     const ans3 = getPolyOrder(&pOdr3);
+    const exp1: f32 = 1;
+    const exp2: f32 = 2;
+    const exp3: f32 = 3;
+    try std.testing.expectEqual(ans1, exp1);
+    try std.testing.expectEqual(ans2, exp2);
+    try std.testing.expectEqual(ans3, exp3);
+}
+
+///Sets the order of the polynomial expression, represented as an f32 array, to the return variable reference.
+///
+///  polyExp = The constant reference to the polynomial expression to process, represented as an f32 array.
+///
+///  ret = A reference to the f32 variable that will hold the value of the polynomial order.
+///
+///  Description of how polynomials are represented as arrays.
+///
+///  polyExp of len 2 = a& + b = 0                 ORDER 1
+///
+///                     [0]  [1]
+///
+///  polyExp of len 3 = a&^2 + b& + c = 0          ORDER 2
+///
+///                     [0]    [1]  [2]
+///
+///  polyExp of len 4 = a&^3 + b&^2 + c& + d = 0   ORDER 3
+///
+///                     [0]    [1]    [2]  [3]
+///
+pub fn getPolyOrderRet(polyExp: []f32, ret: *f32) void {
+    ret.* = getPolyOrder(polyExp);
+}
+
+test "XMTX: getPolyOrderRet test" {
+    prntNlStr("XMTX: getPolyOrderRet test");
+    var pOdr1: [2]f32 = .{ 0, 0 };
+    var pOdr2: [3]f32 = .{ 0, 0, 0 };
+    var pOdr3: [4]f32 = .{ 0, 0, 0, 0 };
+
+    var ans1: f32 = -1;
+    getPolyOrderRet(&pOdr1, &ans1);
+
+    var ans2: f32 = -1;
+    getPolyOrderRet(&pOdr2, &ans2);
+
+    var ans3: f32 = -1;
+    getPolyOrderRet(&pOdr3, &ans3);
+
     const exp1: f32 = 1;
     const exp2: f32 = 2;
     const exp3: f32 = 3;
@@ -210,13 +261,13 @@ pub fn fndFactorsOf(x: f32, ret: []f32) f32 {
     const l: usize = ret.len;
     var fnd: f32 = 0;
     const lx: f32 = absF32(x);
-    const t: usize = @intFromFloat(lx); //@as(usize, @intFromFloat(lx));
+    const t: usize = @intFromFloat(lx);
 
     while (i < t) : (i += 1) {
         if (i < l) {
             //std.debug.print("t = {}, (i + 1) = {}, (t % (i + 1)) = {}\n", .{t, (i + 1), (t % (i + 1))});
             if ((t % (i + 1)) == 0) {
-                ret[i] = @floatFromInt(i + 1); //@as(f32, @floatFromInt((i + 1)));
+                ret[i] = @floatFromInt(i + 1);
                 fnd += 1;
             } else {
                 ret[i] = 0;
@@ -246,7 +297,77 @@ test "XMTX: fndFactorsOf test" {
             try std.testing.expectEqual(exp[i], ret[i]);
         }
     }
-    //try std.testing.expectEqual(cnt, @as(usize, @intFromFloat(fnd)));
+    try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+}
+
+///Returns the first Z factors of the number x where Z = ret.len.
+///
+///  x   = A reference to the constant number reference, an integer value, that factors are searched for.
+///
+///  ret = The array to store the factors, each factor is stored in its
+///        associated array index, i.e. index = 0 would have a value of 1
+///        if 1 is a factor of x.
+///
+///  returns = The number of factors found and stored in the ret argument.
+///
+pub fn fndFactorsOfRef(x: *const f32, ret: []f32) f32 {
+    return fndFactorsOf(x.*, ret);
+}
+
+test "XMTX: fndFactorsOfRef test" {
+    prntNlStr("XMTX: fndFactorsOfRef test");
+    const a: f32 = 6;
+    var ret: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
+    const exp: [6]f32 = .{ 1, 2, 3, 0, 0, 6 };
+    const fnd: f32 = fndFactorsOfRef(&a, &ret);
+    std.debug.print("Given X = {} we have found {} factors.\n", .{ a, fnd });
+
+    const l: usize = ret.len;
+    var i: usize = 0;
+    var cnt: usize = 0;
+    while (i < l) : (i += 1) {
+        if (ret[i] != 0) {
+            cnt += 1;
+            std.debug.print("{} is a factor of {}\n", .{ ret[i], a });
+            try std.testing.expectEqual(exp[i], ret[i]);
+        }
+    }
+    try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+}
+
+///Returns the first Z factors of the number x where Z = ret.len.
+///
+///  x   = The constant number reference, an integer value, that factors are searched for.
+///
+///  ret = The array to store the factors, each factor is stored in its
+///        associated array index, i.e. index = 0 would have a value of 1
+///        if 1 is a factor of x.
+///
+///  retc = A reference to the variabl that holds the number of factors found and stored in the ret argument.
+///
+pub fn fndFactorsOfRet(x: *const f32, ret: []f32, retc: *f32) void {
+    retc.* = fndFactorsOf(x.*, ret);
+}
+
+test "XMTX: fndFactorsOfRet test" {
+    prntNlStr("XMTX: fndFactorsOfRet test");
+    const a: f32 = 6;
+    var ret: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
+    const exp: [6]f32 = .{ 1, 2, 3, 0, 0, 6 };
+    var fnd: f32 = -1;
+    fndFactorsOfRet(&a, &ret, &fnd);
+    std.debug.print("Given X = {} we have found {} factors.\n", .{ a, fnd });
+
+    const l: usize = ret.len;
+    var i: usize = 0;
+    var cnt: usize = 0;
+    while (i < l) : (i += 1) {
+        if (ret[i] != 0) {
+            cnt += 1;
+            std.debug.print("{} is a factor of {}\n", .{ ret[i], a });
+            try std.testing.expectEqual(exp[i], ret[i]);
+        }
+    }
     try std.testing.expectEqual(cnt, @intFromFloat(fnd));
 }
 
@@ -290,8 +411,7 @@ pub fn synthDivPoly1IntoPoly2(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f32)
 }
 
 test "XMTX: synthDivPoly1IntoPoly2 test" {
-    prntNl();
-
+    prntNlStr("XMTX: synthDivPoly1IntoPoly2 test");
     var poly2Exp: [3]f32 = .{ 1, 5, 6 };
     var poly1Exp: [2]f32 = .{ 1, -1 };
     var retPoly1Exp: [2]f32 = .{ 0, 0 };
@@ -358,7 +478,7 @@ pub fn synthDivPoly1IntoPoly3(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f32)
 }
 
 test "XMTX: synthDivPoly1IntoPoly3 test" {
-    prntNl();
+    prntNlStr("XMTX: synthDivPoly1IntoPoly3 test");
     var poly3Exp: [4]f32 = .{ 2, -3, 4, -1 };
     var poly1Exp: [2]f32 = .{ 1, 1 };
     var retPoly2Exp: [3]f32 = .{ 0, 0, 0 };
@@ -401,7 +521,17 @@ pub fn prntPolyExp(polyExp: []f32) void {
     }
 }
 
-//TODO: write test for above function
+test "XMTX: prntPolyExp test" {
+    prntNlStr("XMTX: prntPolyExp test");
+    var p4: [4]f32 = .{ 4, 3, 2, 1 };
+    var p3: [3]f32 = .{ 3, 2, 1 };
+    var p2: [2]f32 = .{ 2, 1 };
+    var p1: [1]f32 = .{1};
+    prntPolyExp(&p4);
+    prntPolyExp(&p3);
+    prntPolyExp(&p2);
+    prntPolyExp(&p1);
+}
 
 ///Returns the value of the order 3 polynomial resolved with the provided value of x.
 ///
@@ -2755,6 +2885,27 @@ test "XMTX: rdcXmtx test" {
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
 }
+
+///Prints a new line followed by the given string.
+pub fn prntNlStr(comptime s: []const u8) void {
+    std.debug.print("\n {s}\n", .{s});
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn prntNlStrArgs(comptime s: []const u8, args: anytype) void {
+    const test_allocator = std.testing.allocator;
+    const str = try std.fmt.allocPrint(
+        test_allocator,
+        s,
+        args,
+    );
+    std.debug.print("\n {}", .{str});
+    test_allocator.free(str);
+}
+
+//TODO: tests
 
 ///Prints a newline.
 pub fn prntNl() void {
