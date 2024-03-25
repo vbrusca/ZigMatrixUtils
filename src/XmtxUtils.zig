@@ -52,6 +52,9 @@ const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
 ///An enumeration that describes the solution types, discriminant, of a third order polynomial.
 const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE_REAL_TWO_IMAGINARY };
 
+///An enumeration of matrix operations that are used by the idnfXmtx and procXmtx function.
+const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS, MTX_IS_LIN_INDP, MTX_IS_INVERTIBLE, MTX_IS_ZERO };
+
 ///Used in aiding the calculation of Eigen Values for a 2x2 matrix.
 pub const EigVal2 = struct {
     lamdExp: [5]f32 = .{ 0, 0, 0, 0, 0 }, //a, -&, d, -&, (-cd)
@@ -114,7 +117,7 @@ test "XMTX: absF32 test" {
 ///
 ///  v = A reference to the floating point number to calculate and store the absolute value of.
 ///
-pub fn absF32Inl(v: *f32) void {
+pub fn absF32Ref(v: *f32) void {
     if (v.* < 0) {
         v.* *= -1;
     }
@@ -126,7 +129,7 @@ test "XMTX: absF32Inl test" {
     var v: f32 = -7;
     std.debug.print("\n Before Exp = {}, V = {}", .{ exp, v });
 
-    absF32Inl(&v);
+    absF32Ref(&v);
     std.debug.print("\n After Exp = {}, V = {}", .{ exp, v });
     try std.testing.expectEqual(exp, v);
 }
@@ -257,30 +260,11 @@ test "XMTX: getPolyOrderRet test" {
 ///  returns = The number of factors found and stored in the ret argument.
 ///
 pub fn fndFactorsOf(x: f32, ret: []f32) f32 {
-    var i: usize = 0;
-    const l: usize = ret.len;
-    var fnd: f32 = 0;
-    const lx: f32 = absF32(x);
-    const t: usize = @intFromFloat(lx);
-
-    while (i < t) : (i += 1) {
-        if (i < l) {
-            //std.debug.print("t = {}, (i + 1) = {}, (t % (i + 1)) = {}\n", .{t, (i + 1), (t % (i + 1))});
-            if ((t % (i + 1)) == 0) {
-                ret[i] = @floatFromInt(i + 1);
-                fnd += 1;
-            } else {
-                ret[i] = 0;
-            }
-        } else {
-            break;
-        }
-    }
-    return fnd;
+    return fndFactorsOfRef(&x, ret);
 }
 
 test "XMTX: fndFactorsOf test" {
-    prntNl();
+    prntNlStr("XMTX: fndFactorsOf test");
     const a: f32 = 6;
     var ret: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
     const exp: [6]f32 = .{ 1, 2, 3, 0, 0, 6 };
@@ -311,7 +295,26 @@ test "XMTX: fndFactorsOf test" {
 ///  returns = The number of factors found and stored in the ret argument.
 ///
 pub fn fndFactorsOfRef(x: *const f32, ret: []f32) f32 {
-    return fndFactorsOf(x.*, ret);
+    var i: usize = 0;
+    const l: usize = ret.len;
+    var fnd: f32 = 0;
+    const lx: f32 = absF32(x.*);
+    const t: usize = @intFromFloat(lx);
+
+    while (i < t) : (i += 1) {
+        if (i < l) {
+            //std.debug.print("t = {}, (i + 1) = {}, (t % (i + 1)) = {}\n", .{t, (i + 1), (t % (i + 1))});
+            if ((t % (i + 1)) == 0) {
+                ret[i] = @floatFromInt(i + 1);
+                fnd += 1;
+            } else {
+                ret[i] = 0;
+            }
+        } else {
+            break;
+        }
+    }
+    return fnd;
 }
 
 test "XMTX: fndFactorsOfRef test" {
@@ -346,7 +349,7 @@ test "XMTX: fndFactorsOfRef test" {
 ///  retc = A reference to the variabl that holds the number of factors found and stored in the ret argument.
 ///
 pub fn fndFactorsOfRet(x: *const f32, ret: []f32, retc: *f32) void {
-    retc.* = fndFactorsOf(x.*, ret);
+    retc.* = fndFactorsOfRef(x, ret);
 }
 
 test "XMTX: fndFactorsOfRet test" {
@@ -433,12 +436,43 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
     try std.testing.expectEqual(exp, rmnd);
 }
 
-//TODO: docs
+///Returns the order 1 polynomial and remainder of a polyinomial order 1 division of an order 2 polynomial.
+///
+///  poly1 = A pointer to an order 1 polynomial.
+///
+///  poly2 = A pointer to an order 2 polynomial.
+///
+///  retPoly1 = A pointer to a return polynomial of order 1.
+///
+///  ret = Stores the remainder after the synthetic division.
+///
 pub fn synthDivPoly1IntoPoly2Ret(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f32, ret: *f32) void {
     ret.* = synthDivPoly1IntoPoly2(poly1, poly2, retPoly1);
 }
 
-//TODO: tests
+test "XMTX: synthDivPoly1IntoPoly2Ret test" {
+    prntNlStr("XMTX: synthDivPoly1IntoPoly2Ret test");
+    var poly2Exp: [3]f32 = .{ 1, 5, 6 };
+    var poly1Exp: [2]f32 = .{ 1, -1 };
+    var retPoly1Exp: [2]f32 = .{ 0, 0 };
+    var exp: f32 = 12.0;
+    var rmnd: f32 = -1;
+    synthDivPoly1IntoPoly2Ret(&poly1Exp, &poly2Exp, &retPoly1Exp, &rmnd);
+    std.debug.print("AAA Found remainder: {}\n", .{rmnd});
+    prntXvec(&retPoly1Exp);
+    prntNl();
+    try std.testing.expectEqual(exp, rmnd);
+
+    poly2Exp = .{ 1, 1, -2 };
+    poly1Exp = .{ 1, 2 };
+    retPoly1Exp = .{ 0, 0 };
+    exp = 0.0;
+    synthDivPoly1IntoPoly2Ret(&poly1Exp, &poly2Exp, &retPoly1Exp, @constCast(&rmnd));
+    std.debug.print("BBB Found remainder: {}\n", .{rmnd});
+    prntXvec(&retPoly1Exp);
+    prntNl();
+    try std.testing.expectEqual(exp, rmnd);
+}
 
 ///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
 ///
@@ -509,12 +543,45 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
 }
 
-//TODO: docs
+///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
+///
+///  poly1 = A pointer to an order 1 polynomial.
+///
+///  poly3 = A pointer to an order 3 polynomial.
+///
+///  retPoly2 = A pointer to a return polynomial of order 2.
+///
+///  ret = Stores the remainder after the synthetic division.
+///
 pub fn synthDivPoly1IntoPoly3Ret(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f32, ret: *f32) void {
     ret.* = synthDivPoly1IntoPoly3(poly1, poly3, retPoly2);
 }
 
-//TODO: tests
+test "XMTX: synthDivPoly1IntoPoly3Ret test" {
+    prntNlStr("XMTX: synthDivPoly1IntoPoly3Ret test");
+    var poly3Exp: [4]f32 = .{ 2, -3, 4, -1 };
+    var poly1Exp: [2]f32 = .{ 1, 1 };
+    var retPoly2Exp: [3]f32 = .{ 0, 0, 0 };
+    const exp: f32 = -10.0;
+    var rmnd: f32 = -1;
+    synthDivPoly1IntoPoly3Ret(&poly1Exp, &poly3Exp, &retPoly2Exp, &rmnd);
+
+    prntNl();
+    std.debug.print("AAA Found remainder: {}\n", .{rmnd});
+    std.debug.print("synthDivPoly1IntoPoly3 Answers: {any}\n", .{retPoly2Exp});
+
+    const pexp: [3]f32 = .{ 2.0, -5.0, 9.0 };
+    prntXvec(&retPoly2Exp);
+    prntNl();
+    try std.testing.expectEqual(exp, rmnd);
+    try std.testing.expectEqual(pexp[0], retPoly2Exp[0]);
+    try std.testing.expectEqual(pexp[1], retPoly2Exp[1]);
+    try std.testing.expectEqual(pexp[2], retPoly2Exp[2]);
+
+    //TODO
+    //Possible second test
+    //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
+}
 
 ///A function used to print out polynomials.
 ///
@@ -556,11 +623,12 @@ test "XMTX: prntPolyExp test" {
 ///  returns = The value of the polynomial resolved for the given value of x.
 ///
 pub fn rslvPoly3(x: f32, polyExp3: *[4]f32) f32 {
-    return (x * x * x * polyExp3[0]) + (x * x * polyExp3[1]) + (x * polyExp3[2]) + polyExp3[3];
+    return rslvPoly3Ref(&x, polyExp3);
+    //return (x * x * x * polyExp3[0]) + (x * x * polyExp3[1]) + (x * polyExp3[2]) + polyExp3[3];
 }
 
 test "XMTX: rslvPoly3 test" {
-    prntNl();
+    prntNlStr("XMTX: rslvPoly3 test");
 
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
@@ -617,19 +685,155 @@ test "XMTX: rslvPoly3 test" {
     try std.testing.expectEqual(exp, ans);
 }
 
-//TODO: docs
-pub fn rslvPoly3Ref(x: *f32, polyExp3: *[4]f32) f32 {
-    return rslvPoly3(&x, polyExp3);
+///Returns the value of the order 3 polynomial resolved with the provided value of x.
+///
+///  x = A reference to the value to use for x.
+///
+///  polyExp3 = The 3rd order polynomial expression to resolve.
+///
+///  returns = The value of the polynomial resolved for the given value of x.
+///
+pub fn rslvPoly3Ref(x: *const f32, polyExp3: *[4]f32) f32 {
+    //return rslvPoly3(&x, polyExp3);
+    return (x.* * x.* * x.* * polyExp3[0]) + (x.* * x.* * polyExp3[1]) + (x.* * polyExp3[2]) + polyExp3[3];
 }
 
-//TODO: tests
+test "XMTX: rslvPoly3Ref test" {
+    prntNlStr("XMTX: rslvPoly3Ref test");
 
-//TODO: docs
-pub fn rslvPoly3Ret(x: *f32, polyExp3: *[4]f32, ret: *f32) void {
-    ret.* = rslvPoly3(&x, polyExp3);
+    //2x^3 + 3x^2 – 11x – 6 = 0
+    //x = 2, -1/2, and -3
+    var p1: [4]f32 = .{ 2, 3, -11, -6 };
+    var exp: f32 = 0.0;
+    var arg: f32 = 2.0;
+    var ans: f32 = rslvPoly3Ref(&arg, &p1);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = -0.5;
+    ans = rslvPoly3Ref(&arg, &p1);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = -3.0;
+    ans = rslvPoly3Ref(&arg, &p1);
+    try std.testing.expectEqual(exp, ans);
+
+    //x^3 – 2x^2 – x + 2 = 0
+    //x = 1, -1, and 2
+    var p2: [4]f32 = .{ 1, -2, -1, 2 };
+    exp = 0.0;
+    arg = 1.0;
+    ans = rslvPoly3Ref(&arg, &p2);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = -1.0;
+    ans = rslvPoly3Ref(&arg, &p2);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = 2.0;
+    ans = rslvPoly3Ref(&arg, &p2);
+    try std.testing.expectEqual(exp, ans);
+
+    //x^3 − 6x^2 + 11x – 6 = 0
+    //x = 1, x = 2 and x = 3
+    var p3: [4]f32 = .{ 1, -6, 11, -6 };
+    exp = 0.0;
+    arg = 1.0;
+    ans = rslvPoly3Ref(&arg, &p3);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = 2.0;
+    ans = rslvPoly3Ref(&arg, &p3);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = 3.0;
+    ans = rslvPoly3Ref(&arg, &p3);
+    try std.testing.expectEqual(exp, ans);
 }
 
-//TODO: tests
+///Returns the value of the order 3 polynomial resolved with the provided value of x.
+///
+///  x = A reference to the value to use for x.
+///
+///  polyExp3 = The 3rd order polynomial expression to resolve.
+///
+///  ret = Stores the value of the polynomial resolved for the given value of x.
+///
+pub fn rslvPoly3Ret(x: *const f32, polyExp3: *[4]f32, ret: *f32) void {
+    ret.* = rslvPoly3Ref(x, polyExp3);
+}
+
+test "XMTX: rslvPoly3Ret test" {
+    prntNlStr("XMTX: rslvPoly3Ret test");
+
+    //2x^3 + 3x^2 – 11x – 6 = 0
+    //x = 2, -1/2, and -3
+    var p1: [4]f32 = .{ 2, 3, -11, -6 };
+    var exp: f32 = 0.0;
+    var arg: f32 = 2.0;
+    var ans: f32 = -1;
+    rslvPoly3Ret(&arg, &p1, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = -0.5;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p1, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = -3.0;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p1, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    //x^3 – 2x^2 – x + 2 = 0
+    //x = 1, -1, and 2
+    var p2: [4]f32 = .{ 1, -2, -1, 2 };
+    exp = 0.0;
+    arg = 1.0;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p2, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = -1.0;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p2, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = 2.0;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p2, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    //x^3 − 6x^2 + 11x – 6 = 0
+    //x = 1, x = 2 and x = 3
+    var p3: [4]f32 = .{ 1, -6, 11, -6 };
+    exp = 0.0;
+    arg = 1.0;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p3, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = 2.0;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p3, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    exp = 0.0;
+    arg = 3.0;
+    ans = -1.0;
+    rslvPoly3Ret(&arg, &p3, &ans);
+    try std.testing.expectEqual(exp, ans);
+}
 
 ///Returns the value of the order 2 polynomial resolved with the provided value of x.
 ///
@@ -640,11 +844,12 @@ pub fn rslvPoly3Ret(x: *f32, polyExp3: *[4]f32, ret: *f32) void {
 ///  returns = The value of the polynomial resolved for the given value of x.
 ///
 pub fn rslvPoly2(x: f32, polyExp2: *[3]f32) f32 {
-    return (x * x * polyExp2[0]) + (x * polyExp2[1]) + polyExp2[2];
+    //return (x * x * polyExp2[0]) + (x * polyExp2[1]) + polyExp2[2];
+    return rslvPoly2Ref(&x, polyExp2);
 }
 
 test "XMTX: rslvPoly2 test" {
-    prntNl();
+    prntNlStr("XMTX: rslvPoly2 test");
 
     //x 2 – 6 x - 16 = 0
     //( x – 8)( x + 2) = 0
@@ -681,19 +886,70 @@ test "XMTX: rslvPoly2 test" {
     try std.testing.expectEqual(exp, ans);
 }
 
-//TODO: docs
-pub fn rslvPoly2Ref(x: *f32, polyExp2: *[3]f32) f32 {
-    return rslvPoly2(&x, polyExp2);
+///Returns the value of the order 2 polynomial resolved with the provided value of x.
+///
+///  x = A reference to the value to use for x.
+///
+///  polyExp2 = The 2nd order polynomial expression to resolve.
+///
+///  returns = The value of the polynomial resolved for the given value of x.
+///
+pub fn rslvPoly2Ref(x: *const f32, polyExp2: *[3]f32) f32 {
+    return (x.* * x.* * polyExp2[0]) + (x.* * polyExp2[1]) + polyExp2[2];
+    //return rslvPoly2(&x, polyExp2);
 }
 
-//TODO: tests
+test "XMTX: rslvPoly2Ref test" {
+    prntNlStr("XMTX: rslvPoly2Ref test");
 
-//TODO: docs
+    //x 2 – 6 x - 16 = 0
+    //( x – 8)( x + 2) = 0
+    var p1: [3]f32 = .{ 1, -6, -16 };
+    const exp: f32 = 0.0;
+    var arg: f32 = 8.0;
+    var ans: f32 = rslvPoly2Ref(&arg, &p1);
+    try std.testing.expectEqual(exp, ans);
+
+    arg = -2.0;
+    ans = rslvPoly2Ref(&arg, &p1);
+    try std.testing.expectEqual(exp, ans);
+
+    //x 2 + 6 x + 5 = 0
+    //( x + 5)( x + 1) = 0
+    var p2: [3]f32 = .{ 1, 6, 5 };
+    arg = -5.0;
+    ans = rslvPoly2Ref(&arg, &p2);
+    try std.testing.expectEqual(exp, ans);
+
+    arg = -1.0;
+    ans = rslvPoly2Ref(&arg, &p2);
+    try std.testing.expectEqual(exp, ans);
+
+    //x 2 – 16 = 0
+    //( x + 4)( x - 4) = 0
+    var p3: [3]f32 = .{ 1, 0, -16 };
+    arg = -4.0;
+    ans = rslvPoly2Ref(&arg, &p3);
+    try std.testing.expectEqual(exp, ans);
+
+    arg = 4.0;
+    ans = rslvPoly2Ref(&arg, &p3);
+    try std.testing.expectEqual(exp, ans);
+}
+
+///Returns the value of the order 2 polynomial resolved with the provided value of x.
+///
+///  x = A reference to the value to use for x.
+///
+///  polyExp2 = The 2nd order polynomial expression to resolve.
+///
+///  ret = Stores the value of the polynomial resolved for the given value of x.
+///
 pub fn rslvPoly2Ret(x: *f32, polyExp2: *[3]f32, ret: *f32) void {
-    ret.* = rslvPoly2(&x, polyExp2);
+    ret.* = rslvPoly2Ref(x, polyExp2);
 }
 
-//TODO: tests
+//TODO: tests cph
 
 ///Finds the roots of the order 3 polynomial provided.
 ///
@@ -821,8 +1077,14 @@ test "XMTX: rtsPoly3 test" {
     try std.testing.expectEqual(exp3, ret[2]);
 }
 
-//TODO: docs
-
+///Finds the roots of the order 3 polynomial provided.
+///
+///  polyExp = An order 3 polynomial provided as the basis of this function.
+///
+///  factors = An array for storing the factors of the d term, used to find roots to the polynomial before synthetic division.
+///
+///  ret = Stores up to three values that are roots of the polynomial expression, using f32_nan for imaginary numbers which aren' currently supported.
+///
 pub fn rtsPoly3Ret(polyExp: *[4]f32, factors: []f32, ret: *[3]f32) void {
     ret.* = rtsPoly3(polyExp, factors);
 }
@@ -875,7 +1137,12 @@ test "XMTX: rtsPoly2 test" {
     try std.testing.expectEqual(exp2, roots[1]);
 }
 
-//TODO: docs
+///Finds the roots of the order 2 polynomial provided.
+///
+///  polyExp = An order 2 polynomial provided as the basis of this function.
+///
+///  ret = Stores up to two values that are roots of the polynomial expression.
+///
 pub fn rtsPoly2Ret(polyExp: *[3]f32, ret: *[2]f32) void {
     ret.* = rtsPoly2(polyExp);
 }
@@ -1179,7 +1446,16 @@ test "XMTX: isEquF32 test" {
     try std.testing.expectEqual(true, isEquF32(1.0, 1.0, true));
 }
 
-//TODO:docs
+///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
+///
+///  l = A reference to the left-hand number in the comparison.
+///
+///  r = A reference to the right-hand number in the comparison.
+///
+///  comparisonModeExact = A reference to a Boolean value indicating if the comparison mode should be exact or within a specified precision delta.
+///
+///  returns = A Boolean value indicating if the two numbers provided are equal under the specified comparison mode.
+///
 pub fn isEquF32Ref(l: *f32, r: *f32, compareModeExact: *bool) bool {
     if (compareModeExact.*) {
         if (l == r) {
@@ -1198,7 +1474,16 @@ pub fn isEquF32Ref(l: *f32, r: *f32, compareModeExact: *bool) bool {
 
 //TODO: tests
 
-//TODO:docs
+///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
+///
+///  l = A reference to the left-hand number in the comparison.
+///
+///  r = A reference to the right-hand number in the comparison.
+///
+///  comparisonModeExact = A reference to a Boolean value indicating if the comparison mode should be exact or within a specified precision delta.
+///
+///  ret = Stores a Boolean value indicating if the two numbers provided are equal under the specified comparison mode.
+///
 pub fn isEquF32Ret(l: *f32, r: *f32, compareModeExact: *bool, ret: *bool) void {
     ret.* = isEquF32Ref(l, r, compareModeExact);
 }
@@ -1250,6 +1535,56 @@ pub fn cpyLessXmtx(mtx: []f32, ret: []f32, mtxCols: usize, cpyCols: usize) void 
         }
     }
 }
+
+//TODO: docs
+pub fn cpyLessColRowXmtx(mtx: []f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
+    const mtxRows: usize = mtx.len / mtxCols;
+    _ = mtxRows;
+    var r: usize = 0;
+    var dstR: usize = 0;
+    var c: usize = 0;
+    var dstC: usize = 0;
+    while (r < endRow) : (r += 1) {
+        if (r >= strtRow) {
+            c = 0;
+            dstC = 0;
+            while (c < endCol) : (c += 1) {
+                if (c >= strtCol) {
+                    ret[((dstR * cpyCols) + dstC)] = mtx[((r * mtxCols) + c)];
+                    dstC += 1;
+                }
+            }
+            dstR += 1;
+        }
+    }
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn cpyLessColRowXmtx3(mtx: *const [9]f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
+    const mtxRows: usize = mtx.len / mtxCols;
+    _ = mtxRows;
+    var r: usize = 0;
+    var dstR: usize = 0;
+    var c: usize = 0;
+    var dstC: usize = 0;
+    while (r < endRow) : (r += 1) {
+        if (r >= strtRow) {
+            c = 0;
+            dstC = 0;
+            while (c < endCol) : (c += 1) {
+                if (c >= strtCol) {
+                    ret[((dstR * cpyCols) + dstC)] = mtx[((r * mtxCols) + c)];
+                    dstC += 1;
+                }
+            }
+            dstR += 1;
+        }
+    }
+}
+
+//TODO: tests
 
 test "XMTX: cpyLessXmtx test" {
     prntNl();
@@ -1759,6 +2094,20 @@ test "XMTX: dotPrdXvec test" {
     try std.testing.expectEqual(true, (dotPrdXvec(&v2, &v3) > 0));
 }
 
+//TODO: docs
+pub fn dotPrdXvec3(vecL: *const [3]f32, vecR: *const [3]f32) f32 {
+    const l: usize = vecL.len;
+    var i: usize = 0;
+    var val: f32 = 0;
+    while (i < l) {
+        val += (vecL[i] * vecR[i]);
+        i += 1;
+    }
+    return val;
+}
+
+//TODO: tests
+
 ///Returns the cross-product of the two provided 3x3 vectors, vecL and vecR.
 ///
 ///  vecL = The left-hand vector in the cross product calculation.
@@ -1767,7 +2116,7 @@ test "XMTX: dotPrdXvec test" {
 ///
 ///  returns = The cross product of the two 3x3 vectors provided.
 ///
-pub fn crsPrdXvec(vecL: *[3]f32, vecR: *[3]f32) [3]f32 {
+pub fn crsPrdXvec3(vecL: *const [3]f32, vecR: *const [3]f32) [3]f32 {
     return [3]f32{ (vecL[1] * vecR[2]) - (vecL[2] * vecR[1]), (vecL[2] * vecR[0]) - (vecL[0] * vecR[2]), (vecL[0] * vecR[1]) - (vecL[1] * vecR[0]) };
 }
 
@@ -1785,6 +2134,10 @@ test "XMTX: crsPrdXvec test" {
     prntXvec(&v5);
     try std.testing.expectEqual(true, equXvec(&exp1, &v4));
     try std.testing.expectEqual(true, equXvec(&exp2, &v5));
+}
+
+pub fn crsPrdXvec(vecL: []f32, vecR: []f32) [3]f32 {
+    return [3]f32{ (vecL[1] * vecR[2]) - (vecL[2] * vecR[1]), (vecL[2] * vecR[0]) - (vecL[0] * vecR[2]), (vecL[0] * vecR[1]) - (vecL[1] * vecR[0]) };
 }
 
 ///Multiplies each entry in the vec vector by the provided scalar value.
@@ -2497,9 +2850,6 @@ test "XMTX: perpXvec_VecP_To_VecQ test" {
     prntNl();
     try std.testing.expectEqual(true, equXmtx(ret, &exp));
 }
-
-//An enumeration of matrix operations that are used by the idnfXmtx and procXmtx function.
-const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS, MTX_IS_LIN_INDP, MTX_IS_INVERTIBLE, MTX_IS_ZERO };
 
 ///A function that handles multiple operations on a provided matrix. This function returns information about the matrix.
 ///
@@ -3990,7 +4340,7 @@ test "XMTX: cofXmtx3 test" {
 }
 
 //TODO Add documentation
-pub fn mnrXmtxRet4(mtx: *[16]f32, ret: *[16]f32) void {
+pub fn mnrXmtx4Ret(mtx: *[16]f32, ret: *[16]f32) void {
     var T1: [9]f32 = .{ mtx[5], mtx[6], mtx[7], mtx[9], mtx[10], mtx[11], mtx[13], mtx[14], mtx[15] };
     var T2: [9]f32 = .{ mtx[4], mtx[6], mtx[7], mtx[8], mtx[10], mtx[11], mtx[12], mtx[14], mtx[15] };
     var T3: [9]f32 = .{ mtx[4], mtx[5], mtx[7], mtx[8], mtx[9], mtx[11], mtx[12], mtx[13], mtx[15] };
@@ -4159,7 +4509,7 @@ test "XMTX: mnrXmtx4 test" {
 }
 
 //TODO documentation
-pub fn mnrXmtxRet3(mtx: *[9]f32, ret: *[9]f32) void {
+pub fn mnrXmtx3Ret(mtx: *[9]f32, ret: *[9]f32) void {
     var T1: [4]f32 = .{ mtx[4], mtx[5], mtx[7], mtx[8] };
     var T2: [4]f32 = .{ mtx[3], mtx[5], mtx[6], mtx[8] };
     var T3: [4]f32 = .{ mtx[3], mtx[4], mtx[6], mtx[7] };
@@ -4223,7 +4573,7 @@ test "XMTX: mnrXmtx3 test" {
 }
 
 //TODO: docs
-pub fn mnrXmtxRet2(mtx: *[4]f32, ret: *[4]f32) void {
+pub fn mnrXmtx2Ret(mtx: *[4]f32, ret: *[4]f32) void {
     //Given 2x2 matrix A
     //A = a b     0 1
     //    c d     2 3
@@ -4285,7 +4635,7 @@ test "XMTX: cofXmtxSign4 test" {
 }
 
 //TODO: docs
-pub fn cofXmtxSignRet4(ret: *[16]f32) void {
+pub fn cofXmtxSign4Ret(ret: *[16]f32) void {
     ret[0] = 1;
     ret[1] = -1;
     ret[2] = 1;
@@ -4337,7 +4687,7 @@ test "XMTX: cofXmtxSign3 test" {
 }
 
 //TODO: docs
-pub fn cofXmtxSignRet3(ret: *[9]f32) void {
+pub fn cofXmtxSign3Ret(ret: *[9]f32) void {
     ret[0] = 1;
     ret[1] = -1;
     ret[2] = 1;
@@ -4363,7 +4713,7 @@ pub fn cofXmtxSign2() [4]f32 {
 //TODO: tests
 
 //TODO: docs
-pub fn cofXmtxSignRet2(ret: *[4]f32) void {
+pub fn cofXmtxSign2Ret(ret: *[4]f32) void {
     ret[0] = 1;
     ret[1] = -1;
     ret[2] = 1;
@@ -5515,19 +5865,88 @@ test "XMTX: isOrthogonal test" {
     try std.testing.expectEqual(expB, b);
 }
 
+///An enumeration that is used to describe the type of basis of a 3D set of vectors.
+const BASIS_HAND = enum { RIGHT, LEFT, ERROR_ZERO, ERROR_INVALID_MATRIX };
+
 ///Check for handedness.
-//TODO
-pub fn isRightHanded(vecI: *[3]f32, vecJ: *[3]f32, vecK: *[3]f32) bool {
-    _ = vecK;
-    _ = vecJ;
-    _ = vecI;
-    //TODO
+//TODO: docs
+pub fn getBasisHndXvec3(vecI: *const [3]f32, vecJ: *const [3]f32, vecK: *const [3]f32) BASIS_HAND {
+    //note these functions should have const parameters soon and this will need to be adjusted
+    const iCrossJ: [3]f32 = crsPrdXvec3(vecI, vecJ);
+    const iCrossJdotK: f32 = dotPrdXvec3(&iCrossJ, vecK);
+    if (iCrossJdotK > 0) {
+        return BASIS_HAND.RIGHT;
+    } else if (iCrossJdotK < 0) {
+        return BASIS_HAND.LEFT;
+    } else {
+        return BASIS_HAND.ERROR_ZERO;
+    }
 }
 
-//TODO write test
+test "XMTX: getBasisHndXvec3 test" {
+    prntNlStr("XMTX: getBasisHndXvec3 test");
+    var v1: [3]f32 = .{ 1, 0, 0 };
+    var v2: [3]f32 = .{ 0, 1, 0 };
+    var v3: [3]f32 = .{ 0, 0, 1 };
+    var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
+    var resHnd: BASIS_HAND = getBasisHndXvec3(&v1, &v2, &v3);
+    try std.testing.expectEqual(expResHnd, resHnd);
 
+    v1 = .{ 1, 0, 0 };
+    v2 = .{ 0, 1, 0 };
+    v3 = .{ 0, 0, -1 };
+    expResHnd = BASIS_HAND.LEFT;
+    resHnd = getBasisHndXvec3(&v1, &v2, &v3);
+    try std.testing.expectEqual(expResHnd, resHnd);
+
+    v1 = .{ 0, 0, 0 };
+    v2 = .{ 0, 0, 0 };
+    v3 = .{ 0, 0, -1 };
+    expResHnd = BASIS_HAND.ERROR_ZERO;
+    resHnd = getBasisHndXvec3(&v1, &v2, &v3);
+    try std.testing.expectEqual(expResHnd, resHnd);
+}
+
+//TODO: docs
+pub fn getBasisHndXvec3Ret(vecI: *const [3]f32, vecJ: *const [3]f32, vecK: *const [3]f32, ret: *BASIS_HAND) void {
+    ret.* = getBasisHndXvec3(vecI, vecJ, vecK);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn getBasisHndXmtx3(mtx: *const [9]f32, cols: usize) BASIS_HAND {
+    if (cols != 3 or mtx.len != 9) {
+        return BASIS_HAND.ERROR_INVALID_MATRIX;
+    }
+    var vecI: [3]f32 = .{ 0, 0, 0 };
+    cpyLessColRowXmtx3(mtx, &vecI, 0, cols, 0, 1, cols, cols);
+
+    var vecJ: [3]f32 = .{ 0, 0, 0 };
+    cpyLessColRowXmtx3(mtx, &vecJ, 0, cols, 1, 2, cols, cols);
+
+    var vecK: [3]f32 = .{ 0, 0, 0 };
+    cpyLessColRowXmtx3(mtx, &vecK, 0, cols, 2, 3, cols, cols);
+    return getBasisHndXvec3(&vecI, &vecJ, &vecK);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn getBasisHndXmtx3Ret(mtx: []f32, cols: usize, ret: *BASIS_HAND) void {
+    ret.* = getBasisHndXmtx3(mtx, cols);
+}
+
+//TODO: tests
+
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 //START THEOREMS
 //Mathematics for 3D Game Programming and Computer Graphics - Eric Lengyel - 3rd Edition
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
 test "XMTX: MF3D - Lengyel: Theorem 2.1 test" {
     prntNl();
