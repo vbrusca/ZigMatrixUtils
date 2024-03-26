@@ -55,6 +55,9 @@ const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE
 ///An enumeration of matrix operations that are used by the idnfXmtx and procXmtx function.
 const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS, MTX_IS_LIN_INDP, MTX_IS_INVERTIBLE, MTX_IS_ZERO };
 
+///An enumeration that is used to describe the type of basis of a 3D set of vectors.
+const BASIS_HAND = enum { RIGHT, LEFT, ERROR_ZERO, ERROR_INVALID_MATRIX };
+
 ///Used in aiding the calculation of Eigen Values for a 2x2 matrix.
 pub const EigVal2 = struct {
     lamdExp: [5]f32 = .{ 0, 0, 0, 0, 0 }, //a, -&, d, -&, (-cd)
@@ -949,7 +952,49 @@ pub fn rslvPoly2Ret(x: *f32, polyExp2: *[3]f32, ret: *f32) void {
     ret.* = rslvPoly2Ref(x, polyExp2);
 }
 
-//TODO: tests cph
+test "XMTX: rslvPoly2Ret test" {
+    prntNlStr("XMTX: rslvPoly2Ret test");
+
+    //x 2 – 6 x - 16 = 0
+    //( x – 8)( x + 2) = 0
+    var p1: [3]f32 = .{ 1, -6, -16 };
+    const exp: f32 = 0.0;
+    var arg: f32 = 8.0;
+    var ans: f32 = -1;
+    rslvPoly2Ret(&arg, &p1, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    arg = -2.0;
+    ans = -1;
+    rslvPoly2Ret(&arg, &p1, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    //x 2 + 6 x + 5 = 0
+    //( x + 5)( x + 1) = 0
+    var p2: [3]f32 = .{ 1, 6, 5 };
+    arg = -5.0;
+    ans = -1;
+    rslvPoly2Ret(&arg, &p2, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    arg = -1.0;
+    ans = -1;
+    rslvPoly2Ret(&arg, &p2, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    //x 2 – 16 = 0
+    //( x + 4)( x - 4) = 0
+    var p3: [3]f32 = .{ 1, 0, -16 };
+    arg = -4.0;
+    ans = -1;
+    rslvPoly2Ret(&arg, &p3, &ans);
+    try std.testing.expectEqual(exp, ans);
+
+    arg = 4.0;
+    ans = -1;
+    rslvPoly2Ret(&arg, &p3, &ans);
+    try std.testing.expectEqual(exp, ans);
+}
 
 ///Finds the roots of the order 3 polynomial provided.
 ///
@@ -1058,7 +1103,7 @@ pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
 }
 
 test "XMTX: rtsPoly3 test" {
-    prntNl();
+    prntNlStr("XMTX: rtsPoly3 test");
 
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
@@ -1089,7 +1134,26 @@ pub fn rtsPoly3Ret(polyExp: *[4]f32, factors: []f32, ret: *[3]f32) void {
     ret.* = rtsPoly3(polyExp, factors);
 }
 
-//TODO: tests
+test "XMTX: rtsPoly3Ret test" {
+    prntNlStr("XMTX: rtsPoly3Ret test");
+
+    //2x^3 + 3x^2 – 11x – 6 = 0
+    //x = 2, -1/2, and -3
+    var p1: [4]f32 = .{ 2, 3, -11, -6 };
+    var factors: [10]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    var ret: [3]f32 = .{ 0, 0, 0 };
+    rtsPoly3Ret(&p1, &factors, &ret);
+
+    prntPolyExp(&p1);
+    std.debug.print("rtsPoly3 roots found: {any}\n", .{ret});
+
+    const exp1: f32 = 2;
+    const exp2: f32 = -0.5;
+    const exp3: f32 = -3.0;
+    try std.testing.expectEqual(exp1, ret[0]);
+    try std.testing.expectEqual(exp2, ret[1]);
+    try std.testing.expectEqual(exp3, ret[2]);
+}
 
 ///Finds the roots of the order 2 polynomial provided.
 ///
@@ -1147,7 +1211,20 @@ pub fn rtsPoly2Ret(polyExp: *[3]f32, ret: *[2]f32) void {
     ret.* = rtsPoly2(polyExp);
 }
 
-//TODO: tests
+test "XMTX: rtsPoly2Ret test" {
+    prntNlStr("XMTX: rtsPoly2Ret test");
+    //x2 - 7x + 10 = 0 are x = 2 and x = 5
+    var poly2Exp: [3]f32 = .{ 1, -7, 10 };
+    var roots: [2]f32 = .{ 0, 0 };
+    rtsPoly2Ret(&poly2Exp, &roots);
+
+    prntXvec(&roots);
+    prntNl();
+    const exp1: f32 = 5;
+    const exp2: f32 = 2;
+    try std.testing.expectEqual(exp1, roots[0]);
+    try std.testing.expectEqual(exp2, roots[1]);
+}
 
 ///Returns an enumeration value describing the descriminant of the cubic polynomial.
 ///
@@ -1171,7 +1248,7 @@ pub fn dscrPoly3(polyExp: *[4]f32) POLY3_SOL_TYPE {
 }
 
 test "XMTX: dscrPoly3 test" {
-    prntNl();
+    prntNlStr("XMTX: dscrPoly3 test");
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
     var p1: [4]f32 = .{ 2, 3, -11, -6 };
@@ -1197,7 +1274,7 @@ pub fn dscrPoly2(poly2Exp: *[3]f32) POLY2_SOL_TYPE {
 }
 
 test "XMTX: dscrPoly2 test" {
-    prntNl();
+    prntNlStr("XMTX: dscrPoly2 test");
     //x2 - 7x + 10 = 0 are x = 2 and x = 5
     var poly2Exp: [3]f32 = .{ 1, -7, 10 };
     var roots: [2]f32 = rtsPoly2(&poly2Exp);
@@ -1295,7 +1372,7 @@ pub fn fndEigVal3(mtx: []f32, evs: *EigVal3, factors: []f32) bool {
 }
 
 test "XMTX: fndEigVal3 test" {
-    prntNl();
+    prntNlStr("XMTX: fndEigVal3 test");
     //A = −2, −2,  4
     //    −4,  1,  2
     //     2,  2,  5
@@ -1359,7 +1436,7 @@ pub fn fndEigVal2(mtx: []f32, evs: *EigVal2) bool {
 }
 
 test "XMTX: fndEigVal2 test" {
-    prntNl();
+    prntNlStr("XMTX: fndEigVal2 test");
     var m1: [4]f32 = .{ 5, 6, 8, 9 };
     var evs: EigVal2 = .{};
     var b: bool = false;
@@ -1406,8 +1483,7 @@ pub fn clnXmtx(mtx: []f32) void {
 }
 
 test "XMTX: clnXmtx test" {
-    prntNl();
-    std.debug.print("clnXmtx test:\n", .{});
+    prntNlStr("XMTX: clnXmtx test");
     var m1: [3]f32 = .{ 1.00000001, 2.00000001, 3.00000001 };
     var m2: [3]f32 = .{ 1, 2, 3 };
     clnXmtx(&m1);
@@ -1441,7 +1517,7 @@ pub fn isEquF32(l: f32, r: f32, compareModeExact: bool) bool {
 }
 
 test "XMTX: isEquF32 test" {
-    prntNl();
+    prntNlStr("XMTX: isEquF32 test");
     try std.testing.expectEqual(true, isEquF32(1.0, 1.00001, false));
     try std.testing.expectEqual(true, isEquF32(1.0, 1.0, true));
 }
@@ -1472,7 +1548,28 @@ pub fn isEquF32Ref(l: *f32, r: *f32, compareModeExact: *bool) bool {
     }
 }
 
-//TODO: tests
+test "XMTX: isEquF32Ref test" {
+    prntNlStr("XMTX: isEquF32Ref test");
+    var f1: f32 = 1.000;
+    var f2: f32 = 1.0001;
+    var f3: f32 = 1.100;
+    var b: bool = false;
+    var cm: bool = false;
+    b = isEquF32Ref(&f1, &f2, &cm);
+    try std.testing.expectEqual(true, b);
+
+    cm = true;
+    b = isEquF32Ref(&f1, &f2, &cm);
+    try std.testing.expectEqual(false, b);
+
+    cm = false;
+    b = isEquF32Ref(&f1, &f3, &cm);
+    try std.testing.expectEqual(false, b);
+
+    cm = true;
+    b = isEquF32Ref(&f1, &f3, &cm);
+    try std.testing.expectEqual(false, b);
+}
 
 ///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
 ///
@@ -1488,7 +1585,28 @@ pub fn isEquF32Ret(l: *f32, r: *f32, compareModeExact: *bool, ret: *bool) void {
     ret.* = isEquF32Ref(l, r, compareModeExact);
 }
 
-//TODO: tests
+test "XMTX: isEquF32Ret test" {
+    prntNlStr("XMTX: isEquF32Ret test");
+    var f1: f32 = 1.000;
+    var f2: f32 = 1.0001;
+    var f3: f32 = 1.100;
+    var b: bool = false;
+    var cm: bool = false;
+    isEquF32Ret(&f1, &f2, &cm, &b);
+    try std.testing.expectEqual(true, b);
+
+    cm = true;
+    isEquF32Ret(&f1, &f2, &cm, &b);
+    try std.testing.expectEqual(false, b);
+
+    cm = false;
+    isEquF32Ret(&f1, &f3, &cm, &b);
+    try std.testing.expectEqual(false, b);
+
+    cm = true;
+    isEquF32Ret(&f1, &f3, &cm, &b);
+    try std.testing.expectEqual(false, b);
+}
 
 ///Copies the mtx matrix into the ret matrix argument.
 ///
@@ -1501,8 +1619,7 @@ pub fn cpyXmtx(mtx: []f32, ret: []f32) void {
 }
 
 test "XMTX: cpyXmtx test" {
-    prntNl();
-    std.debug.print("cpyXmtx test:\n", .{});
+    prntNlStr("XMTX: cpyXmtx test");
     var m1: [3]f32 = .{ 1, 2, 3 };
     var m2: [3]f32 = .{ 0, 0, 0 };
     var m3: [3]f32 = .{ 1, 1, 1 };
@@ -1536,56 +1653,6 @@ pub fn cpyLessXmtx(mtx: []f32, ret: []f32, mtxCols: usize, cpyCols: usize) void 
     }
 }
 
-//TODO: docs
-pub fn cpyLessColRowXmtx(mtx: []f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
-    const mtxRows: usize = mtx.len / mtxCols;
-    _ = mtxRows;
-    var r: usize = 0;
-    var dstR: usize = 0;
-    var c: usize = 0;
-    var dstC: usize = 0;
-    while (r < endRow) : (r += 1) {
-        if (r >= strtRow) {
-            c = 0;
-            dstC = 0;
-            while (c < endCol) : (c += 1) {
-                if (c >= strtCol) {
-                    ret[((dstR * cpyCols) + dstC)] = mtx[((r * mtxCols) + c)];
-                    dstC += 1;
-                }
-            }
-            dstR += 1;
-        }
-    }
-}
-
-//TODO: tests
-
-//TODO: docs
-pub fn cpyLessColRowXmtx3(mtx: *const [9]f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
-    const mtxRows: usize = mtx.len / mtxCols;
-    _ = mtxRows;
-    var r: usize = 0;
-    var dstR: usize = 0;
-    var c: usize = 0;
-    var dstC: usize = 0;
-    while (r < endRow) : (r += 1) {
-        if (r >= strtRow) {
-            c = 0;
-            dstC = 0;
-            while (c < endCol) : (c += 1) {
-                if (c >= strtCol) {
-                    ret[((dstR * cpyCols) + dstC)] = mtx[((r * mtxCols) + c)];
-                    dstC += 1;
-                }
-            }
-            dstR += 1;
-        }
-    }
-}
-
-//TODO: tests
-
 test "XMTX: cpyLessXmtx test" {
     prntNl();
     std.debug.print("cpyLessXmtx test:\n", .{});
@@ -1594,6 +1661,120 @@ test "XMTX: cpyLessXmtx test" {
     var m3: [3]f32 = .{ 1, 2, 3 };
     cpyLessXmtx(&m1, &m2, 4, 3);
     try std.testing.expectEqual(true, equXvec(&m2, &m3));
+}
+
+///Copies data from the matrix mtx at startCol, startRow to endCol, endRow to ret 0,0 to (endCol - startCol), (endRow - strtRow).
+///
+///  mtx = The data to copy into the ret matrix.
+///
+///  ret = The matrix that holds the return data.
+///
+///  strtCol = The starting column in the mtx matrix.
+///
+///  endCol = The ending column in the mtx matrix.
+///
+///  strtRow = The starting row in the mtx matrix.
+///
+///  endRow = The ending row in the mtx matrix.
+///
+///  mtxCols = The number of colmns in the mtx matrix.
+///
+///  cpyCols = The number of columns in the ret matrix.
+///
+pub fn cpyLessColRowXmtx(mtx: []f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
+    const mtxRows: usize = mtx.len / mtxCols;
+    _ = mtxRows;
+    var r: usize = strtRow;
+    var dstR: usize = 0;
+    var c: usize = 0;
+    var dstC: usize = 0;
+    while (r < endRow) : (r += 1) {
+        if (r >= strtRow) {
+            c = strtCol;
+            dstC = 0;
+            while (c < endCol) : (c += 1) {
+                if (c >= strtCol) {
+                    ret[((dstR * cpyCols) + dstC)] = mtx[((r * mtxCols) + c)];
+                    dstC += 1;
+                }
+            }
+            dstR += 1;
+        }
+    }
+}
+
+test "XMTX: cpyLessColRowXmtx test" {
+    prntNl();
+    std.debug.print("cpyLessColRowXmtx test:\n", .{});
+    var m1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    var ret: [3]f32 = .{ 0, 0, 0 };
+    var exp1: [3]f32 = .{ 1, 2, 3 };
+    var exp2: [3]f32 = .{ 7, 8, 9 };
+    cpyLessColRowXmtx(&m1, &ret, 0, 3, 0, 1, 3, 3);
+    try std.testing.expectEqual(true, equXvec(&ret, &exp1));
+    cpyLessColRowXmtx(&m1, &ret, 0, 3, 2, 3, 3, 3);
+    try std.testing.expectEqual(true, equXvec(&ret, &exp2));
+
+    //using an aray with slice argument
+    cpyLessColRowXmtx3(m1[0..9], &ret, 0, 3, 2, 3, 3, 3);
+    try std.testing.expectEqual(true, equXvec(&ret, &exp2));
+}
+
+///Copies data from the matrix mtx at startCol, startRow to endCol, endRow to ret 0,0 to (endCol - startCol), (endRow - strtRow).
+///
+///  mtx = The data to copy into the ret matrix.
+///
+///  ret = The matrix that holds the return data.
+///
+///  strtCol = The starting column in the mtx matrix.
+///
+///  endCol = The ending column in the mtx matrix.
+///
+///  strtRow = The starting row in the mtx matrix.
+///
+///  endRow = The ending row in the mtx matrix.
+///
+///  mtxCols = The number of colmns in the mtx matrix.
+///
+///  cpyCols = The number of columns in the ret matrix.
+///
+pub fn cpyLessColRowXmtx3(mtx: *const [9]f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
+    const mtxRows: usize = mtx.len / mtxCols;
+    _ = mtxRows;
+    var r: usize = strtRow;
+    var dstR: usize = 0;
+    var c: usize = 0;
+    var dstC: usize = 0;
+    while (r < endRow) : (r += 1) {
+        if (r >= strtRow) {
+            c = strtCol;
+            dstC = 0;
+            while (c < endCol) : (c += 1) {
+                if (c >= strtCol) {
+                    ret[((dstR * cpyCols) + dstC)] = mtx[((r * mtxCols) + c)];
+                    dstC += 1;
+                }
+            }
+            dstR += 1;
+        }
+    }
+}
+
+test "XMTX: cpyLessColRowXmtx3 test" {
+    prntNl();
+    std.debug.print("cpyLessColRowXmtx3 test:\n", .{});
+    var m1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    var ret: [3]f32 = .{ 0, 0, 0 };
+    var exp1: [3]f32 = .{ 1, 2, 3 };
+    var exp2: [3]f32 = .{ 7, 8, 9 };
+    cpyLessColRowXmtx3(&m1, &ret, 0, 3, 0, 1, 3, 3);
+    try std.testing.expectEqual(true, equXvec(&ret, &exp1));
+    cpyLessColRowXmtx3(&m1, &ret, 0, 3, 2, 3, 3, 3);
+    try std.testing.expectEqual(true, equXvec(&ret, &exp2));
+
+    //using an array with slice argument
+    cpyLessColRowXmtx(m1[0..9], &ret, 0, 3, 2, 3, 3, 3);
+    try std.testing.expectEqual(true, equXvec(&ret, &exp2));
 }
 
 ///Copies the vec vector into the ret vector argument.
@@ -2085,8 +2266,7 @@ pub fn dotPrdXvec(vecL: []f32, vecR: []f32) f32 {
 }
 
 test "XMTX: dotPrdXvec test" {
-    prntNl();
-    std.debug.print("dotPrdXvec test:\n", .{});
+    prntNlStr("XMTX: dotPrdXvec test");
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 1, 0 };
     var v3: [3]f32 = .{ 0, 3, 0 };
@@ -2094,7 +2274,14 @@ test "XMTX: dotPrdXvec test" {
     try std.testing.expectEqual(true, (dotPrdXvec(&v2, &v3) > 0));
 }
 
-//TODO: docs
+///Returns the dot product of the two 3 column vectors provided, vecL and vecR.
+///
+///  vecL = The left-hand side reference to a vector 3 in the dot product calculation.
+///
+///  vecR = The right-hand side reference to a vector 3 in the dot product calculation.
+///
+///  returns = The dot product of the two vectors.
+///
 pub fn dotPrdXvec3(vecL: *const [3]f32, vecR: *const [3]f32) f32 {
     const l: usize = vecL.len;
     var i: usize = 0;
@@ -2106,7 +2293,14 @@ pub fn dotPrdXvec3(vecL: *const [3]f32, vecR: *const [3]f32) f32 {
     return val;
 }
 
-//TODO: tests
+test "XMTX: dotPrdXvec3 test" {
+    prntNlStr("XMTX: dotPrdXvec3 test");
+    var v1: [3]f32 = .{ 1, 0, 0 };
+    var v2: [3]f32 = .{ 0, 1, 0 };
+    var v3: [3]f32 = .{ 0, 3, 0 };
+    try std.testing.expectEqual(true, (dotPrdXvec3(&v1, &v2) == 0));
+    try std.testing.expectEqual(true, (dotPrdXvec3(&v2, &v3) > 0));
+}
 
 ///Returns the cross-product of the two provided 3x3 vectors, vecL and vecR.
 ///
@@ -3326,7 +3520,7 @@ pub fn prntNlStr(comptime s: []const u8) void {
 
 //TODO: tests
 
-//TODO: docs
+///Prints a new line followed by the given string formatted with the given args.
 pub fn prntNlStrArgs(comptime s: []const u8, args: anytype) void {
     const test_allocator = std.testing.allocator;
     const str = try std.fmt.allocPrint(
@@ -5408,7 +5602,7 @@ test "XMTX: getInvFromDet4 test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success.
 ///
-pub fn getCramerSupportMtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usize, ret: []f32) bool {
+pub fn getCramerSupportXmtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usize, ret: []f32) bool {
     const l: usize = mtx.len;
     const rows: usize = l / cols;
     if (rows >= cols) {
@@ -5462,7 +5656,7 @@ test "XMTX: getCramerSupportMtx test" {
 
     var dstCol: usize = 0;
     var expA1: [9]f32 = .{ 1, 2, -3, 0, 0, 1, 2, -4, 4 };
-    b = getCramerSupportMtx(&A, cols, srcCol, dstCol, &A1);
+    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
     std.debug.print("Matrix A{}:\n", .{dstCol});
     prntXmtx(&A1, 3);
     std.debug.print("Matrix Exp A{}:\n", .{dstCol});
@@ -5472,7 +5666,7 @@ test "XMTX: getCramerSupportMtx test" {
 
     dstCol = 1;
     var expA2: [9]f32 = .{ -1, 1, -3, 2, 0, 1, 3, 2, 4 };
-    b = getCramerSupportMtx(&A, cols, srcCol, dstCol, &A1);
+    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
     std.debug.print("Matrix A{}:\n", .{dstCol});
     prntXmtx(&A1, 3);
     std.debug.print("Matrix Exp A{}:\n", .{dstCol});
@@ -5482,7 +5676,7 @@ test "XMTX: getCramerSupportMtx test" {
 
     dstCol = 2;
     var expA3: [9]f32 = .{ -1, 2, 1, 2, 0, 0, 3, -4, 2 };
-    b = getCramerSupportMtx(&A, cols, srcCol, dstCol, &A1);
+    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
     std.debug.print("Matrix A{}:\n", .{dstCol});
     prntXmtx(&A1, 3);
     std.debug.print("Matrix Exp A{}:\n", .{dstCol});
@@ -5543,7 +5737,7 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
     var i: usize = 0;
     while (i < colsA) : (i += 1) {
         //create cramer support matrix Ai
-        b = getCramerSupportMtx(mtx, cols, (cols - 1), i, mtxAi);
+        b = getCramerSupportXmtx(mtx, cols, (cols - 1), i, mtxAi);
         if (!b) {
             std.debug.print("!! Warning rslvCramersRule could not populate the Cramer's rule support matrix for column {}. !!\n", .{i});
             return false;
@@ -5622,7 +5816,7 @@ test "XMTX: rslvCramersRule test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success or not.
 ///
-pub fn chgVecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis: []f32, chgCols: usize, chgIsStd: bool, idtMtx: []f32, ret: []f32, nvec: []f32, verbose: bool) bool {
+pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis: []f32, chgCols: usize, chgIsStd: bool, idtMtx: []f32, ret: []f32, nvec: []f32, verbose: bool) bool {
     _ = idtMtx;
     _ = isStd;
 
@@ -5639,7 +5833,7 @@ pub fn chgVecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis:
             std.debug.print("chgVecBasis:change basis is identity so conversion matrix = basis {}\n", .{b});
         }
     } else {
-        b = getBasisCnvMtx(basis, cols, chgBasis, chgCols, ret, verbose);
+        b = getBasisCnvXmtx(basis, cols, chgBasis, chgCols, ret, verbose);
 
         if (verbose) {
             std.debug.print("chgVecBasis:getBasisCnvMtx {}\n", .{b});
@@ -5670,7 +5864,7 @@ pub fn chgVecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis:
     return true;
 }
 
-test "XMTX: chgVecBasis test" {
+test "XMTX: chgXvecBasiss test" {
     prntNl();
     std.debug.print("chgVecBasis test:\n", .{});
 
@@ -5699,7 +5893,7 @@ test "XMTX: chgVecBasis test" {
     const vbose: bool = true;
     var ret: [4]f32 = .{ 0, 0, 0, 0 };
 
-    b = chgVecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
+    b = chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("chgVecBasis test:chgVecBasis ret {}\n", .{b});
@@ -5731,7 +5925,7 @@ test "XMTX: chgVecBasis test" {
 ///
 ///  returns = A Boolean value indicating if this function was successful or not.
 ///
-pub fn getBasisCnvMtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) bool {
+pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) bool {
     if (cols != chgCols) {
         std.debug.print("!! Warning expected column counts to match !!\n", .{});
         return false;
@@ -5770,7 +5964,7 @@ pub fn getBasisCnvMtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize
     return true;
 }
 
-test "XMTX: getBasisCnvMtx test" {
+test "XMTX: getBasisCnvXmtx test" {
     prntNl();
     std.debug.print("getBasisCnvMtx test:\n", .{});
 
@@ -5792,7 +5986,7 @@ test "XMTX: getBasisCnvMtx test" {
     const colsp: usize = 3;
 
     var b: bool = false;
-    b = getBasisCnvMtx(&B, cols, &Bp, colsp, &ret, vbose);
+    b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("getBasisCnvMtx test:getBasisCnvMtx ret {}\n", .{b});
@@ -5821,7 +6015,7 @@ test "XMTX: getBasisCnvMtx test" {
 ///
 ///  return = A Boolean value indicating if mtx is orthogonal or not.
 ///
-pub fn isOrthogonal(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []f32) bool {
+pub fn isOrthXmtx(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []f32) bool {
     //get the inverse
 
     //Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
@@ -5851,7 +6045,7 @@ pub fn isOrthogonal(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: 
     return b;
 }
 
-test "XMTX: isOrthogonal test" {
+test "XMTX: isOrthXmtx test" {
     prntNl();
     std.debug.print("isOrthogonal test:\n", .{});
 
@@ -5861,15 +6055,22 @@ test "XMTX: isOrthogonal test" {
     var idtMtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     var trnMtx: [9]f32 = std.mem.zeroes([9]f32); //.{};
     const expB: bool = true;
-    const b: bool = isOrthogonal(&mtx, cols, &ret, &idtMtx, &trnMtx);
+    const b: bool = isOrthXmtx(&mtx, cols, &ret, &idtMtx, &trnMtx);
     try std.testing.expectEqual(expB, b);
 }
 
-///An enumeration that is used to describe the type of basis of a 3D set of vectors.
-const BASIS_HAND = enum { RIGHT, LEFT, ERROR_ZERO, ERROR_INVALID_MATRIX };
-
-///Check for handedness.
-//TODO: docs
+///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
+///from Lengyel: Def: 4.1.2. If a handled error is encountered the function returns ERROR_ZERO or ERROR_INVALID_MATRIX
+///depending on the type of error.
+///
+///  vecI = The i vector 3 of the basis.
+///
+///  vecJ = The j vector 3 of the basis.
+///
+///  vecK = The k vector 3 of the basis.
+///
+///  returns = A value from the BASIS_HAND enumeration, RIGHT, LEFT, ERROR_ZERO or ERROR_INVALID_MATRIX.
+///
 pub fn getBasisHndXvec3(vecI: *const [3]f32, vecJ: *const [3]f32, vecK: *const [3]f32) BASIS_HAND {
     //note these functions should have const parameters soon and this will need to be adjusted
     const iCrossJ: [3]f32 = crsPrdXvec3(vecI, vecJ);
@@ -5907,14 +6108,59 @@ test "XMTX: getBasisHndXvec3 test" {
     try std.testing.expectEqual(expResHnd, resHnd);
 }
 
-//TODO: docs
+///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
+///from Lengyel: Def: 4.1.2. If a handled error is encountered the function returns ERROR_ZERO or ERROR_INVALID_MATRIX
+///depending on the type of error.
+///
+///  vecI = The i vector 3 of the basis.
+///
+///  vecJ = The j vector 3 of the basis.
+///
+///  vecK = The k vector 3 of the basis.
+///
+///  ret = Stores a value from the BASIS_HAND enumeration, RIGHT, LEFT, ERROR_ZERO or ERROR_INVALID_MATRIX.
+///
 pub fn getBasisHndXvec3Ret(vecI: *const [3]f32, vecJ: *const [3]f32, vecK: *const [3]f32, ret: *BASIS_HAND) void {
     ret.* = getBasisHndXvec3(vecI, vecJ, vecK);
 }
 
-//TODO: tests
+test "XMTX: getBasisHndXvec3Ret test" {
+    prntNlStr("XMTX: getBasisHndXvec3Ret test");
+    var v1: [3]f32 = .{ 1, 0, 0 };
+    var v2: [3]f32 = .{ 0, 1, 0 };
+    var v3: [3]f32 = .{ 0, 0, 1 };
+    var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
+    var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
+    getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
+    try std.testing.expectEqual(expResHnd, resHnd);
 
-//TODO: docs
+    v1 = .{ 1, 0, 0 };
+    v2 = .{ 0, 1, 0 };
+    v3 = .{ 0, 0, -1 };
+    expResHnd = BASIS_HAND.LEFT;
+    resHnd = BASIS_HAND.ERROR_ZERO;
+    getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
+    try std.testing.expectEqual(expResHnd, resHnd);
+
+    v1 = .{ 0, 0, 0 };
+    v2 = .{ 0, 0, 0 };
+    v3 = .{ 0, 0, -1 };
+    expResHnd = BASIS_HAND.ERROR_ZERO;
+    resHnd = BASIS_HAND.ERROR_ZERO;
+    getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
+    try std.testing.expectEqual(expResHnd, resHnd);
+}
+
+///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
+///from Lengyel: Def: 4.1.2. If a handled error is encountered the function returns ERROR_ZERO or ERROR_INVALID_MATRIX
+///depending on the type of error.
+///
+///  mtx = The matrix to use as the basis.
+///
+///  cols = The number of columns in mtx.
+///
+///  return = A value from the BASIS_HAND enmeration indicating the result.
+///
 pub fn getBasisHndXmtx3(mtx: *const [9]f32, cols: usize) BASIS_HAND {
     if (cols != 3 or mtx.len != 9) {
         return BASIS_HAND.ERROR_INVALID_MATRIX;
@@ -5930,14 +6176,61 @@ pub fn getBasisHndXmtx3(mtx: *const [9]f32, cols: usize) BASIS_HAND {
     return getBasisHndXvec3(&vecI, &vecJ, &vecK);
 }
 
-//TODO: tests
+test "XMTX: getBasisHndXmtx3 test" {
+    prntNlStr("XMTX: getBasisHndXmtx3 test");
+    var m1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
+    var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    try std.testing.expectEqual(expResHnd, resHnd);
 
-//TODO: docs
-pub fn getBasisHndXmtx3Ret(mtx: []f32, cols: usize, ret: *BASIS_HAND) void {
+    m1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, -1 };
+    expResHnd = BASIS_HAND.LEFT;
+    resHnd = BASIS_HAND.ERROR_ZERO;
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    try std.testing.expectEqual(expResHnd, resHnd);
+
+    m1 = .{ 0, 0, 0, 0, 0, 0, 0, 0, -1 };
+    expResHnd = BASIS_HAND.ERROR_ZERO;
+    resHnd = BASIS_HAND.LEFT;
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    try std.testing.expectEqual(expResHnd, resHnd);
+}
+
+///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
+///from Lengyel: Def: 4.1.2. If a handled error is encountered the function returns ERROR_ZERO or ERROR_INVALID_MATRIX
+///depending on the type of error.
+///
+///  mtx = The matrix to use as the basis.
+///
+///  cols = The number of columns in mtx.
+///
+///  return = Stores a value from the BASIS_HAND enmeration indicating the result.
+///
+pub fn getBasisHndXmtx3Ret(mtx: *const [9]f32, cols: usize, ret: *BASIS_HAND) void {
     ret.* = getBasisHndXmtx3(mtx, cols);
 }
 
-//TODO: tests
+test "XMTX: getBasisHndXmtx3Ret test" {
+    prntNlStr("XMTX: getBasisHndXmtx3Ret test");
+    var m1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
+    var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
+    getBasisHndXmtx3Ret(&m1, 3, &resHnd);
+    try std.testing.expectEqual(expResHnd, resHnd);
+
+    m1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, -1 };
+    expResHnd = BASIS_HAND.LEFT;
+    resHnd = BASIS_HAND.ERROR_ZERO;
+    getBasisHndXmtx3Ret(&m1, 3, &resHnd);
+    try std.testing.expectEqual(expResHnd, resHnd);
+
+    m1 = .{ 0, 0, 0, 0, 0, 0, 0, 0, -1 };
+    expResHnd = BASIS_HAND.ERROR_ZERO;
+    resHnd = BASIS_HAND.LEFT;
+    getBasisHndXmtx3Ret(&m1, 3, &resHnd);
+    try std.testing.expectEqual(expResHnd, resHnd);
+}
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
@@ -9794,7 +10087,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     var vbose: bool = true;
     var ret: [4]f32 = .{ 0, 0, 0, 0 };
 
-    b = chgVecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
+    b = chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 2 ret {}\n", .{b});
     prntXmtx(&ret, cols);
@@ -9833,7 +10126,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     vbose = false;
     var ret3: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    b = chgVecBasis(&vec3, &B3, cols3, true, &Bp3, colsp3, false, &idtMtx3, &ret3, &nvec3, vbose);
+    b = chgXvecBasis(&vec3, &B3, cols3, true, &Bp3, colsp3, false, &idtMtx3, &ret3, &nvec3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 3 ret3 {}\n", .{b});
     prntXmtx(&ret3, cols3);
@@ -9866,7 +10159,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     vbose = false;
     ret3 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    b = getBasisCnvMtx(&B3, cols3, &Bp3, colsp3, &ret3, vbose);
+    b = getBasisCnvXmtx(&B3, cols3, &Bp3, colsp3, &ret3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 4 ret3 {}\n", .{b});
     prntXmtx(&ret3, cols3);
@@ -9898,7 +10191,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     vbose = true;
     ret = .{ 0, 0, 0, 0 };
 
-    b = getBasisCnvMtx(&B, cols, &Bp, colsp, &ret, vbose);
+    b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 5 ret5 {}\n", .{b});
     prntXmtx(&ret, cols);
@@ -9930,7 +10223,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     var exp2: [2]f32 = .{ 8, -3 };
     var idtMtx2: [4]f32 = .{ 1, 0, 0, 1 };
 
-    b = chgVecBasis(&vec2, &B2, cols2, false, &Bp2, cols2, true, &idtMtx2, &ret2, &nvec2, vbose);
+    b = chgXvecBasis(&vec2, &B2, cols2, false, &Bp2, cols2, true, &idtMtx2, &ret2, &nvec2, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 1 ret2 {}\n", .{b});
     prntXmtx(&ret2, cols2);
@@ -9955,7 +10248,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     var exp3: [3]f32 = .{ 5, 4, 3 };
     var idtMtx3: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 
-    b = chgVecBasis(&vec3, &B3, cols3, false, &Bp3, cols3, true, &idtMtx3, &ret3, &nvec3, vbose);
+    b = chgXvecBasis(&vec3, &B3, cols3, false, &Bp3, cols3, true, &idtMtx3, &ret3, &nvec3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 3 ret3 {}\n", .{b});
     prntXmtx(&ret3, cols3);
@@ -9980,7 +10273,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     var exp4: [4]f32 = .{ -1, 2, 0, 1 };
     var idtMtx4: [16]f32 = .{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
-    b = chgVecBasis(&vec4, &B4, cols4, false, &Bp4, cols4, true, &idtMtx4, &ret4, &nvec4, vbose);
+    b = chgXvecBasis(&vec4, &B4, cols4, false, &Bp4, cols4, true, &idtMtx4, &ret4, &nvec4, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 5 ret4 {}\n", .{b});
     prntXmtx(&ret4, cols4);

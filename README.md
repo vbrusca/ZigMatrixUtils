@@ -58,6 +58,7 @@ zig build-lib -femit-docs ./src/XmtxUtils.zig -lc -dynamic -isystem -fstrip -fsi
 ## Guides
 
 You can look into specific use cases for the library in the "Guides" section.
+**Please note that the guides may be slightly out of sync with regard to the latest version of the library as it develops. Those gaps will be closed periodically over time and as a better way of tracking the guides associated with code changes evolves.
 
 [Guides](https://github.com/vbrusca/ZigMatrixUtils/tree/main/guides)
 
