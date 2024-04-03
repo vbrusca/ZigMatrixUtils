@@ -107,14 +107,14 @@ pub const ExecTime = struct {
     fncAvg: f64,
 };
 
-///Used to hold a series of function execution times.
-var execTimes: [1024]ExecTime = undefined;
-
 ///The current count of recorded function execution times.
 var execTimesCnt: usize = 0;
 
 ///The maximum number of function execution times that can be recorded.
 const MAX_EXEC_TIMES: usize = 1024;
+
+///Used to hold a series of function execution times.
+var execTimes: [MAX_EXEC_TIMES]ExecTime = undefined;
 
 ///A Boolean that controls verbose logging.
 var VERBOSE: bool = false;

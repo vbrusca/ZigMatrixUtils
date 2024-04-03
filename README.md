@@ -167,6 +167,7 @@ Key List:
  adjXmtx4:	Count: 1.0e+00	Avg: 0.013ms 12600.000ns
  aglBtwnXvec:	Count: 1.0e+00	Avg: 0.009ms 9400.000ns
  altXmtxRows:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ ...
 </pre>
 
-You can see the function name, the usage count, and the average execution time in ms and ns.
+You can see the function name, the usage count, and the average execution time in ms and ns. To effectively turn off this memory allocation set <b>MAX_EXEC_TIMES</b> equal to 1.
