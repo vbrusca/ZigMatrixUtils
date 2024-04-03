@@ -10,9 +10,7 @@ Victor Brusca<br>
 Carlo Bruscani
 
 ## Documentation
-I'll provide a viewable but not 100% usable link to the Zig Matrix Utils documentation here. For proper use clone or download the repo
-and view the documentation site locally.<br>
-[Zig Generated API Docs](https://htmlpreview.github.io/?https://github.com/vbrusca/ZigMatrixUtils/blob/main/docs/index.html)
+I'll provide a viewable but not 100% usable link to the Zig Matrix Utils documentation here. Links don't work but you can browse the functions and their signature. For proper use clone or download the repo and view the documentation site locally.<br> [Zig Generated API Docs](https://htmlpreview.github.io/?https://github.com/vbrusca/ZigMatrixUtils/blob/main/docs/index.html)
 
 ## Source Material
 This project was built using the following books as a basis.<br>
@@ -20,9 +18,11 @@ This project was built using the following books as a basis.<br>
 2. Mathematics for 3D Game Programming and Computer Graphics 3rd Edition by Eric Lengyel
 
 ## Project Goals
-1. Continuous development to complete the material covered in both books regarding linear algebra and matrix manipulations.<br>
-2. To keep the project up to date with new versions of Zig as the language matures.
-3. To complete and refine the code documentation.
+1. LT: Continuous development to complete the material covered in both books regarding linear algebra and matrix manipulations.<br>
+2. LT: To keep the project up to date with new versions of Zig as the language matures.
+3. LT: To complete and refine the code documentation.
+4. ST: Version 0.55: Add vector spaces, inner product spaces, basic matrix scaling functions.
+5. ST: Version 0.55: Add execution time tracking to the remaining unit tests.
 
 ## Running Unit Tests
 You can run the unit tests from inside the project with the following command.<br>
@@ -35,7 +35,7 @@ zig test ./src/XmtxUtils.zig > all_test_output.txt 2>&1
 </pre>
 
 ## Project Build Commands
-How to build an exe (not used).
+How to build an exe (NOT USED).
 <pre>
 zig build-exe -femit-docs ./src/main.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/bin/main.exe"
 </pre>
