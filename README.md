@@ -146,3 +146,27 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     try std.testing.expectEqual(true, equXmtx(&idtF2, &invF2));
 }
 </pre>
+
+## Execution Times
+
+Execution times are calculated after the last unit test that uses them.
+
+<pre>
+Key List:
+ INT_equXvec:	Count: 2.0e+00	Avg: 0.000ms 300.000ns
+ absF32:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ absF32Ref:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ absF32Ret:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ absXmtx:	Count: 2.0e+00	Avg: 0.000ms 300.000ns
+ addSclMulXmtxRows:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ addSclMulXmtxRowsInl:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ addSclXmtxRows:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ addSclXmtxRowsInl:	Count: 1.0e+00	Avg: 0.005ms 4900.000ns
+ addXvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ adjXmtx3:	Count: 1.0e+00	Avg: 0.012ms 12200.000ns
+ adjXmtx4:	Count: 1.0e+00	Avg: 0.013ms 12600.000ns
+ aglBtwnXvec:	Count: 1.0e+00	Avg: 0.009ms 9400.000ns
+ altXmtxRows:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+</pre>
+
+You can see the function name, the usage count, and the average execution time in ms and ns.
