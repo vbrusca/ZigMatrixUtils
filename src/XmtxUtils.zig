@@ -23,7 +23,9 @@
 //!
 
 const std = @import("std");
-const len = @import("std").mem.len;
+const len = std.mem.len;
+const time = std.time;
+const Instant = time.Instant;
 
 ///The percision to use when determining if a number is zero.
 const ZERO_F32: f32 = 0.001;
@@ -97,6 +99,47 @@ pub const EigVal3 = struct {
     }
 };
 
+///Used to hold a function's execution time.
+pub const ExecTime = struct {
+    fncName: []const u8,
+    fncTime: f64,
+    fncCnt: f64,
+    fncAvg: f64,
+};
+
+///Used to hold a series of function execution times.
+var execTimes: [1024]ExecTime = undefined;
+
+///The current count of recorded function execution times.
+var execTimesCnt: usize = 0;
+
+///The maximum number of function execution times that can be recorded.
+const MAX_EXEC_TIMES: usize = 1024;
+
+///A Boolean that controls verbose logging.
+var VERBOSE: bool = false;
+
+///A function to add a new key, value pair into the max execution times hashmap.
+///  key = A string representing the function name.
+///
+///  value = A f64 value representing the execution time.
+///
+pub fn addExecTime(key: []const u8, value: f64) void {
+    if (execTimesCnt < MAX_EXEC_TIMES) {
+        execTimes[execTimesCnt] = .{
+            .fncName = key,
+            .fncTime = value,
+            .fncCnt = 1.0,
+            .fncAvg = value,
+        };
+        execTimesCnt += 1;
+    }
+
+    if (VERBOSE) {
+        std.debug.print("\nmaxExecTime entry count: {}", .{execTimesCnt});
+    }
+}
+
 ///Returns the absolute value of the provided argument.
 ///
 ///  v = The floating point number to calculate the absolute value of.
@@ -111,9 +154,17 @@ pub fn absF32(v: f32) f32 {
 }
 
 test "XMTX: absF32 test" {
-    prntNlStr("XMTX: absF32 test");
     const v: f32 = 7;
-    try std.testing.expectEqual(v, absF32(-7));
+
+    const start = try Instant.now();
+    const res: f32 = absF32(-7);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nabsF32: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("absF32", elapsed1);
+
+    try std.testing.expectEqual(v, res);
+    prntNl();
 }
 
 ///Calculates and stores the absolute value of the given f32.
@@ -126,15 +177,21 @@ pub fn absF32Ref(v: *f32) void {
     }
 }
 
-test "XMTX: absF32Inl test" {
-    prntNlStr("XMTX: absF32Inl test");
+test "XMTX: absF32Ref test" {
     const exp: f32 = 7;
     var v: f32 = -7;
-    std.debug.print("\n Before Exp = {}, V = {}", .{ exp, v });
+    std.debug.print("\nBefore Exp = {}, V = {}", .{ exp, v });
 
+    const start = try Instant.now();
     absF32Ref(&v);
-    std.debug.print("\n After Exp = {}, V = {}", .{ exp, v });
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nabsF32Ref: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("absF32Ref", elapsed1);
+
+    std.debug.print("\nAfter Exp = {}, V = {}", .{ exp, v });
     try std.testing.expectEqual(exp, v);
+    prntNl();
 }
 
 ///Calculates and stores the absolute value of the given f32.
@@ -148,16 +205,22 @@ pub fn absF32Ret(v: *const f32, ret: *f32) void {
 }
 
 test "XMTX: absF32Ret test" {
-    prntNlStr("XMTX: absF32Ret test");
     const exp: f32 = 7;
     var v: f32 = -7;
     var ret: f32 = 0;
-    std.debug.print("\n Before Exp = {}, V = {}, Ret = {}", .{ exp, v, ret });
+    std.debug.print("\nBefore Exp = {}, V = {}, Ret = {}", .{ exp, v, ret });
 
+    const start = try Instant.now();
     absF32Ret(&v, &ret);
-    std.debug.print("\n After Exp = {}, V = {}, Ret = {}", .{ exp, v, ret });
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nabsF32Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("absF32Ret", elapsed1);
+
+    std.debug.print("\nAfter Exp = {}, V = {}, Ret = {}", .{ exp, v, ret });
     try std.testing.expectEqual(false, (exp == v));
     try std.testing.expectEqual(true, (exp == ret));
+    prntNl();
 }
 
 ///Returns the order of the polynomial expression represented as an f32 array.
@@ -190,19 +253,38 @@ pub fn getPolyOrder(polyExp: []f32) f32 {
 }
 
 test "XMTX: getPolyOrder test" {
-    prntNlStr("XMTX: getPolyOrder test");
     var pOdr1: [2]f32 = .{ 0, 0 };
     var pOdr2: [3]f32 = .{ 0, 0, 0 };
     var pOdr3: [4]f32 = .{ 0, 0, 0, 0 };
+
+    var start = try Instant.now();
     const ans1 = getPolyOrder(&pOdr1);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetPolyOrder #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getPolyOrder", elapsed1);
+
+    start = try Instant.now();
     const ans2 = getPolyOrder(&pOdr2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetPolyOrder #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getPolyOrder", elapsed1);
+
+    start = try Instant.now();
     const ans3 = getPolyOrder(&pOdr3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetPolyOrder #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getPolyOrder", elapsed1);
+
     const exp1: f32 = 1;
     const exp2: f32 = 2;
     const exp3: f32 = 3;
     try std.testing.expectEqual(ans1, exp1);
     try std.testing.expectEqual(ans2, exp2);
     try std.testing.expectEqual(ans3, exp3);
+    prntNl();
 }
 
 ///Sets the order of the polynomial expression, represented as an f32 array, to the return variable reference.
@@ -230,19 +312,33 @@ pub fn getPolyOrderRet(polyExp: []f32, ret: *f32) void {
 }
 
 test "XMTX: getPolyOrderRet test" {
-    prntNlStr("XMTX: getPolyOrderRet test");
     var pOdr1: [2]f32 = .{ 0, 0 };
     var pOdr2: [3]f32 = .{ 0, 0, 0 };
     var pOdr3: [4]f32 = .{ 0, 0, 0, 0 };
 
     var ans1: f32 = -1;
+    var start = try Instant.now();
     getPolyOrderRet(&pOdr1, &ans1);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetPolyOrderRet #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getPolyOrderRet", elapsed1);
 
     var ans2: f32 = -1;
+    start = try Instant.now();
     getPolyOrderRet(&pOdr2, &ans2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetPolyOrderRet #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getPolyOrderRet", elapsed1);
 
     var ans3: f32 = -1;
+    start = try Instant.now();
     getPolyOrderRet(&pOdr3, &ans3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetPolyOrderRet #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getPolyOrderRet", elapsed1);
 
     const exp1: f32 = 1;
     const exp2: f32 = 2;
@@ -250,6 +346,7 @@ test "XMTX: getPolyOrderRet test" {
     try std.testing.expectEqual(ans1, exp1);
     try std.testing.expectEqual(ans2, exp2);
     try std.testing.expectEqual(ans3, exp3);
+    prntNl();
 }
 
 ///Returns the first Z factors of the number x where Z = ret.len.
@@ -267,24 +364,30 @@ pub fn fndFactorsOf(x: f32, ret: []f32) f32 {
 }
 
 test "XMTX: fndFactorsOf test" {
-    prntNlStr("XMTX: fndFactorsOf test");
     const a: f32 = 6;
     var ret: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
     const exp: [6]f32 = .{ 1, 2, 3, 0, 0, 6 };
-    const fnd: f32 = fndFactorsOf(a, &ret);
-    std.debug.print("Given X = {} we have found {} factors.\n", .{ a, fnd });
 
+    const start = try Instant.now();
+    const fnd: f32 = fndFactorsOf(a, &ret);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndFactorsOf: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndFactorsOf", elapsed1);
+
+    std.debug.print("\nGiven X = {} we have found {} factors.", .{ a, fnd });
     const l: usize = ret.len;
     var i: usize = 0;
     var cnt: usize = 0;
     while (i < l) : (i += 1) {
         if (ret[i] != 0) {
             cnt += 1;
-            std.debug.print("{} is a factor of {}\n", .{ ret[i], a });
+            std.debug.print("\n{} is a factor of {}", .{ ret[i], a });
             try std.testing.expectEqual(exp[i], ret[i]);
         }
     }
     try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+    prntNl();
 }
 
 ///Returns the first Z factors of the number x where Z = ret.len.
@@ -321,24 +424,30 @@ pub fn fndFactorsOfRef(x: *const f32, ret: []f32) f32 {
 }
 
 test "XMTX: fndFactorsOfRef test" {
-    prntNlStr("XMTX: fndFactorsOfRef test");
     const a: f32 = 6;
     var ret: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
     const exp: [6]f32 = .{ 1, 2, 3, 0, 0, 6 };
-    const fnd: f32 = fndFactorsOfRef(&a, &ret);
-    std.debug.print("Given X = {} we have found {} factors.\n", .{ a, fnd });
 
+    const start = try Instant.now();
+    const fnd: f32 = fndFactorsOfRef(&a, &ret);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndFactorsOfRef: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndFactorsOfRef", elapsed1);
+
+    std.debug.print("\nGiven X = {} we have found {} factors.", .{ a, fnd });
     const l: usize = ret.len;
     var i: usize = 0;
     var cnt: usize = 0;
     while (i < l) : (i += 1) {
         if (ret[i] != 0) {
             cnt += 1;
-            std.debug.print("{} is a factor of {}\n", .{ ret[i], a });
+            std.debug.print("\n{} is a factor of {}", .{ ret[i], a });
             try std.testing.expectEqual(exp[i], ret[i]);
         }
     }
     try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+    prntNl();
 }
 
 ///Returns the first Z factors of the number x where Z = ret.len.
@@ -356,25 +465,31 @@ pub fn fndFactorsOfRet(x: *const f32, ret: []f32, retc: *f32) void {
 }
 
 test "XMTX: fndFactorsOfRet test" {
-    prntNlStr("XMTX: fndFactorsOfRet test");
     const a: f32 = 6;
     var ret: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
     const exp: [6]f32 = .{ 1, 2, 3, 0, 0, 6 };
     var fnd: f32 = -1;
-    fndFactorsOfRet(&a, &ret, &fnd);
-    std.debug.print("Given X = {} we have found {} factors.\n", .{ a, fnd });
 
+    const start = try Instant.now();
+    fndFactorsOfRet(&a, &ret, &fnd);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndFactorsOfRet: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndFactorsOfRet", elapsed1);
+
+    std.debug.print("\nGiven X = {} we have found {} factors.", .{ a, fnd });
     const l: usize = ret.len;
     var i: usize = 0;
     var cnt: usize = 0;
     while (i < l) : (i += 1) {
         if (ret[i] != 0) {
             cnt += 1;
-            std.debug.print("{} is a factor of {}\n", .{ ret[i], a });
+            std.debug.print("\n{} is a factor of {}", .{ ret[i], a });
             try std.testing.expectEqual(exp[i], ret[i]);
         }
     }
     try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+    prntNl();
 }
 
 ///Returns the order 1 polynomial and remainder of a polyinomial order 1 division of an order 2 polynomial.
@@ -417,13 +532,19 @@ pub fn synthDivPoly1IntoPoly2(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f32)
 }
 
 test "XMTX: synthDivPoly1IntoPoly2 test" {
-    prntNlStr("XMTX: synthDivPoly1IntoPoly2 test");
     var poly2Exp: [3]f32 = .{ 1, 5, 6 };
     var poly1Exp: [2]f32 = .{ 1, -1 };
     var retPoly1Exp: [2]f32 = .{ 0, 0 };
     var exp: f32 = 12.0;
+
+    var start = try Instant.now();
     var rmnd: f32 = synthDivPoly1IntoPoly2(&poly1Exp, &poly2Exp, &retPoly1Exp);
-    std.debug.print("AAA Found remainder: {}\n", .{rmnd});
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsynthDivPoly1IntoPoly2 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("synthDivPoly1IntoPoly2", elapsed1);
+
+    std.debug.print("\nAAA Found remainder: {}", .{rmnd});
     prntXvec(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
@@ -432,11 +553,19 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
     poly1Exp = .{ 1, 2 };
     retPoly1Exp = .{ 0, 0 };
     exp = 0.0;
+
+    start = try Instant.now();
     rmnd = synthDivPoly1IntoPoly2(&poly1Exp, &poly2Exp, &retPoly1Exp);
-    std.debug.print("BBB Found remainder: {}\n", .{rmnd});
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nsynthDivPoly1IntoPoly2 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("synthDivPoly1IntoPoly2", elapsed1);
+
+    std.debug.print("\nBBB Found remainder: {}", .{rmnd});
     prntXvec(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
+    prntNl();
 }
 
 ///Returns the order 1 polynomial and remainder of a polyinomial order 1 division of an order 2 polynomial.
@@ -454,14 +583,20 @@ pub fn synthDivPoly1IntoPoly2Ret(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f
 }
 
 test "XMTX: synthDivPoly1IntoPoly2Ret test" {
-    prntNlStr("XMTX: synthDivPoly1IntoPoly2Ret test");
     var poly2Exp: [3]f32 = .{ 1, 5, 6 };
     var poly1Exp: [2]f32 = .{ 1, -1 };
     var retPoly1Exp: [2]f32 = .{ 0, 0 };
     var exp: f32 = 12.0;
     var rmnd: f32 = -1;
+
+    var start = try Instant.now();
     synthDivPoly1IntoPoly2Ret(&poly1Exp, &poly2Exp, &retPoly1Exp, &rmnd);
-    std.debug.print("AAA Found remainder: {}\n", .{rmnd});
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsynthDivPoly1IntoPoly2Ret #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("synthDivPoly1IntoPoly2Ret", elapsed1);
+
+    std.debug.print("\nAAA Found remainder: {}", .{rmnd});
     prntXvec(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
@@ -470,11 +605,20 @@ test "XMTX: synthDivPoly1IntoPoly2Ret test" {
     poly1Exp = .{ 1, 2 };
     retPoly1Exp = .{ 0, 0 };
     exp = 0.0;
-    synthDivPoly1IntoPoly2Ret(&poly1Exp, &poly2Exp, &retPoly1Exp, @constCast(&rmnd));
-    std.debug.print("BBB Found remainder: {}\n", .{rmnd});
+    rmnd = -1;
+
+    start = try Instant.now();
+    synthDivPoly1IntoPoly2Ret(&poly1Exp, &poly2Exp, &retPoly1Exp, &rmnd);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nsynthDivPoly1IntoPoly2Ret #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("synthDivPoly1IntoPoly2Ret", elapsed1);
+
+    std.debug.print("\nBBB Found remainder: {}", .{rmnd});
     prntXvec(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
+    prntNl();
 }
 
 ///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
@@ -522,16 +666,21 @@ pub fn synthDivPoly1IntoPoly3(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f32)
 }
 
 test "XMTX: synthDivPoly1IntoPoly3 test" {
-    prntNlStr("XMTX: synthDivPoly1IntoPoly3 test");
     var poly3Exp: [4]f32 = .{ 2, -3, 4, -1 };
     var poly1Exp: [2]f32 = .{ 1, 1 };
     var retPoly2Exp: [3]f32 = .{ 0, 0, 0 };
     const exp: f32 = -10.0;
+
+    const start = try Instant.now();
     const rmnd: f32 = synthDivPoly1IntoPoly3(&poly1Exp, &poly3Exp, &retPoly2Exp);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsynthDivPoly1IntoPoly3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("synthDivPoly1IntoPoly3", elapsed1);
 
     prntNl();
-    std.debug.print("AAA Found remainder: {}\n", .{rmnd});
-    std.debug.print("synthDivPoly1IntoPoly3 Answers: {any}\n", .{retPoly2Exp});
+    std.debug.print("\nAAA Found remainder: {}", .{rmnd});
+    std.debug.print("\nsynthDivPoly1IntoPoly3 Answers: {any}", .{retPoly2Exp});
 
     const pexp: [3]f32 = .{ 2.0, -5.0, 9.0 };
     prntXvec(&retPoly2Exp);
@@ -544,6 +693,8 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     //TODO
     //Possible second test
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
+
+    prntNl();
 }
 
 ///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
@@ -561,17 +712,22 @@ pub fn synthDivPoly1IntoPoly3Ret(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f
 }
 
 test "XMTX: synthDivPoly1IntoPoly3Ret test" {
-    prntNlStr("XMTX: synthDivPoly1IntoPoly3Ret test");
     var poly3Exp: [4]f32 = .{ 2, -3, 4, -1 };
     var poly1Exp: [2]f32 = .{ 1, 1 };
     var retPoly2Exp: [3]f32 = .{ 0, 0, 0 };
     const exp: f32 = -10.0;
     var rmnd: f32 = -1;
+
+    const start = try Instant.now();
     synthDivPoly1IntoPoly3Ret(&poly1Exp, &poly3Exp, &retPoly2Exp, &rmnd);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsynthDivPoly1IntoPoly3Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("synthDivPoly1IntoPoly3Ret", elapsed1);
 
     prntNl();
-    std.debug.print("AAA Found remainder: {}\n", .{rmnd});
-    std.debug.print("synthDivPoly1IntoPoly3 Answers: {any}\n", .{retPoly2Exp});
+    std.debug.print("\nAAA Found remainder: {}", .{rmnd});
+    std.debug.print("\nsynthDivPoly1IntoPoly3 Answers: {any}", .{retPoly2Exp});
 
     const pexp: [3]f32 = .{ 2.0, -5.0, 9.0 };
     prntXvec(&retPoly2Exp);
@@ -584,6 +740,8 @@ test "XMTX: synthDivPoly1IntoPoly3Ret test" {
     //TODO
     //Possible second test
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
+
+    prntNl();
 }
 
 ///A function used to print out polynomials.
@@ -593,20 +751,19 @@ test "XMTX: synthDivPoly1IntoPoly3Ret test" {
 pub fn prntPolyExp(polyExp: []f32) void {
     const l: usize = polyExp.len;
     if (l == 4) {
-        std.debug.print("{}x^3 + {}x^2 + {}x + {}\n", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
+        std.debug.print("\n{}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
     } else if (l == 3) {
-        std.debug.print("{}x^2 + {}x + {}\n", .{ polyExp[0], polyExp[1], polyExp[2] });
+        std.debug.print("\n{}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2] });
     } else if (l == 2) {
-        std.debug.print("{}x + {}\n", .{ polyExp[0], polyExp[1] });
+        std.debug.print("\n{}x + {}", .{ polyExp[0], polyExp[1] });
     } else if (l == 1) {
-        std.debug.print("{}\n", .{polyExp[0]});
+        std.debug.print("\n{}", .{polyExp[0]});
     } else {
-        std.debug.print("{any}\n", .{polyExp});
+        std.debug.print("\n{any}", .{polyExp});
     }
 }
 
 test "XMTX: prntPolyExp test" {
-    prntNlStr("XMTX: prntPolyExp test");
     var p4: [4]f32 = .{ 4, 3, 2, 1 };
     var p3: [3]f32 = .{ 3, 2, 1 };
     var p2: [2]f32 = .{ 2, 1 };
@@ -615,6 +772,7 @@ test "XMTX: prntPolyExp test" {
     prntPolyExp(&p3);
     prntPolyExp(&p2);
     prntPolyExp(&p1);
+    prntNl();
 }
 
 ///Returns the value of the order 3 polynomial resolved with the provided value of x.
@@ -631,61 +789,124 @@ pub fn rslvPoly3(x: f32, polyExp3: *[4]f32) f32 {
 }
 
 test "XMTX: rslvPoly3 test" {
-    prntNlStr("XMTX: rslvPoly3 test");
-
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
     var p1: [4]f32 = .{ 2, 3, -11, -6 };
     var exp: f32 = 0.0;
     var arg: f32 = 2.0;
-    var ans: f32 = rslvPoly3(arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    var ans: f32 = -1.0;
 
+    var start = try Instant.now();
+    ans = rslvPoly3(arg, &p1);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -0.5;
-    ans = rslvPoly3(arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3(arg, &p1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -3.0;
-    ans = rslvPoly3(arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3(arg, &p1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x^3 – 2x^2 – x + 2 = 0
     //x = 1, -1, and 2
     var p2: [4]f32 = .{ 1, -2, -1, 2 };
     exp = 0.0;
     arg = 1.0;
-    ans = rslvPoly3(arg, &p2);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3(arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -1.0;
-    ans = rslvPoly3(arg, &p2);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3(arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 2.0;
-    ans = rslvPoly3(arg, &p2);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3(arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x^3 − 6x^2 + 11x – 6 = 0
     //x = 1, x = 2 and x = 3
     var p3: [4]f32 = .{ 1, -6, 11, -6 };
     exp = 0.0;
     arg = 1.0;
-    ans = rslvPoly3(arg, &p3);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3(arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 2.0;
-    ans = rslvPoly3(arg, &p3);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3(arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 3.0;
+    ans = -1.0;
+
+    start = try Instant.now();
     ans = rslvPoly3(arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3 #7: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3", elapsed1);
+
     try std.testing.expectEqual(exp, ans);
+    prntNl();
 }
 
 ///Returns the value of the order 3 polynomial resolved with the provided value of x.
@@ -702,61 +923,124 @@ pub fn rslvPoly3Ref(x: *const f32, polyExp3: *[4]f32) f32 {
 }
 
 test "XMTX: rslvPoly3Ref test" {
-    prntNlStr("XMTX: rslvPoly3Ref test");
-
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
     var p1: [4]f32 = .{ 2, 3, -11, -6 };
     var exp: f32 = 0.0;
     var arg: f32 = 2.0;
-    var ans: f32 = rslvPoly3Ref(&arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    var ans: f32 = -1.0;
 
+    var start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p1);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -0.5;
-    ans = rslvPoly3Ref(&arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -3.0;
-    ans = rslvPoly3Ref(&arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x^3 – 2x^2 – x + 2 = 0
     //x = 1, -1, and 2
     var p2: [4]f32 = .{ 1, -2, -1, 2 };
     exp = 0.0;
     arg = 1.0;
-    ans = rslvPoly3Ref(&arg, &p2);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -1.0;
-    ans = rslvPoly3Ref(&arg, &p2);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 2.0;
-    ans = rslvPoly3Ref(&arg, &p2);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x^3 − 6x^2 + 11x – 6 = 0
     //x = 1, x = 2 and x = 3
     var p3: [4]f32 = .{ 1, -6, 11, -6 };
     exp = 0.0;
     arg = 1.0;
-    ans = rslvPoly3Ref(&arg, &p3);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #7: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 2.0;
-    ans = rslvPoly3Ref(&arg, &p3);
-    try std.testing.expectEqual(exp, ans);
+    ans = -1.0;
 
+    start = try Instant.now();
+    ans = rslvPoly3Ref(&arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #8: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 3.0;
+    ans = -1.0;
+
+    start = try Instant.now();
     ans = rslvPoly3Ref(&arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ref #9: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ref", elapsed1);
+
     try std.testing.expectEqual(exp, ans);
+    prntNl();
 }
 
 ///Returns the value of the order 3 polynomial resolved with the provided value of x.
@@ -772,70 +1056,124 @@ pub fn rslvPoly3Ret(x: *const f32, polyExp3: *[4]f32, ret: *f32) void {
 }
 
 test "XMTX: rslvPoly3Ret test" {
-    prntNlStr("XMTX: rslvPoly3Ret test");
-
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
     var p1: [4]f32 = .{ 2, 3, -11, -6 };
     var exp: f32 = 0.0;
     var arg: f32 = 2.0;
     var ans: f32 = -1;
-    rslvPoly3Ret(&arg, &p1, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    var start = try Instant.now();
+    rslvPoly3Ret(&arg, &p1, &ans);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -0.5;
     ans = -1.0;
-    rslvPoly3Ret(&arg, &p1, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly3Ret(&arg, &p1, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -3.0;
     ans = -1.0;
-    rslvPoly3Ret(&arg, &p1, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly3Ret(&arg, &p1, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x^3 – 2x^2 – x + 2 = 0
     //x = 1, -1, and 2
     var p2: [4]f32 = .{ 1, -2, -1, 2 };
     exp = 0.0;
     arg = 1.0;
     ans = -1.0;
-    rslvPoly3Ret(&arg, &p2, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly3Ret(&arg, &p2, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = -1.0;
     ans = -1.0;
-    rslvPoly3Ret(&arg, &p2, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly3Ret(&arg, &p2, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 2.0;
     ans = -1.0;
-    rslvPoly3Ret(&arg, &p2, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly3Ret(&arg, &p2, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x^3 − 6x^2 + 11x – 6 = 0
     //x = 1, x = 2 and x = 3
     var p3: [4]f32 = .{ 1, -6, 11, -6 };
     exp = 0.0;
     arg = 1.0;
     ans = -1.0;
-    rslvPoly3Ret(&arg, &p3, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly3Ret(&arg, &p3, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #7: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 2.0;
     ans = -1.0;
-    rslvPoly3Ret(&arg, &p3, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly3Ret(&arg, &p3, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #8: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     exp = 0.0;
     arg = 3.0;
     ans = -1.0;
+
+    start = try Instant.now();
     rslvPoly3Ret(&arg, &p3, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly3Ret #9: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly3Ret", elapsed1);
+
     try std.testing.expectEqual(exp, ans);
+    prntNl();
 }
 
 ///Returns the value of the order 2 polynomial resolved with the provided value of x.
@@ -852,41 +1190,78 @@ pub fn rslvPoly2(x: f32, polyExp2: *[3]f32) f32 {
 }
 
 test "XMTX: rslvPoly2 test" {
-    prntNlStr("XMTX: rslvPoly2 test");
-
     //x 2 – 6 x - 16 = 0
     //( x – 8)( x + 2) = 0
     var p1: [3]f32 = .{ 1, -6, -16 };
     const exp: f32 = 0.0;
     var arg: f32 = 8.0;
-    var ans: f32 = rslvPoly2(arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    var ans: f32 = -1.0;
 
-    arg = -2.0;
+    var start = try Instant.now();
     ans = rslvPoly2(arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2", elapsed1);
 
+    try std.testing.expectEqual(exp, ans);
+    arg = -2.0;
+
+    start = try Instant.now();
+    ans = rslvPoly2(arg, &p1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x 2 + 6 x + 5 = 0
     //( x + 5)( x + 1) = 0
     var p2: [3]f32 = .{ 1, 6, 5 };
     arg = -5.0;
-    ans = rslvPoly2(arg, &p2);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    ans = rslvPoly2(arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2 #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     arg = -1.0;
-    ans = rslvPoly2(arg, &p2);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    ans = rslvPoly2(arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2 #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x 2 – 16 = 0
     //( x + 4)( x - 4) = 0
     var p3: [3]f32 = .{ 1, 0, -16 };
     arg = -4.0;
-    ans = rslvPoly2(arg, &p3);
-    try std.testing.expectEqual(exp, ans);
 
-    arg = 4.0;
+    start = try Instant.now();
     ans = rslvPoly2(arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2 #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2", elapsed1);
+
     try std.testing.expectEqual(exp, ans);
+    arg = 4.0;
+
+    start = try Instant.now();
+    ans = rslvPoly2(arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2 #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
+    prntNl();
 }
 
 ///Returns the value of the order 2 polynomial resolved with the provided value of x.
@@ -903,41 +1278,78 @@ pub fn rslvPoly2Ref(x: *const f32, polyExp2: *[3]f32) f32 {
 }
 
 test "XMTX: rslvPoly2Ref test" {
-    prntNlStr("XMTX: rslvPoly2Ref test");
-
     //x 2 – 6 x - 16 = 0
     //( x – 8)( x + 2) = 0
     var p1: [3]f32 = .{ 1, -6, -16 };
     const exp: f32 = 0.0;
     var arg: f32 = 8.0;
-    var ans: f32 = rslvPoly2Ref(&arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    var ans: f32 = -1.0;
 
-    arg = -2.0;
+    var start = try Instant.now();
     ans = rslvPoly2Ref(&arg, &p1);
-    try std.testing.expectEqual(exp, ans);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ref #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ref", elapsed1);
 
+    try std.testing.expectEqual(exp, ans);
+    arg = -2.0;
+
+    start = try Instant.now();
+    ans = rslvPoly2Ref(&arg, &p1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ref #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x 2 + 6 x + 5 = 0
     //( x + 5)( x + 1) = 0
     var p2: [3]f32 = .{ 1, 6, 5 };
     arg = -5.0;
-    ans = rslvPoly2Ref(&arg, &p2);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    ans = rslvPoly2Ref(&arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ref #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     arg = -1.0;
-    ans = rslvPoly2Ref(&arg, &p2);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    ans = rslvPoly2Ref(&arg, &p2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ref #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x 2 – 16 = 0
     //( x + 4)( x - 4) = 0
     var p3: [3]f32 = .{ 1, 0, -16 };
     arg = -4.0;
-    ans = rslvPoly2Ref(&arg, &p3);
-    try std.testing.expectEqual(exp, ans);
 
-    arg = 4.0;
+    start = try Instant.now();
     ans = rslvPoly2Ref(&arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ref #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ref", elapsed1);
+
     try std.testing.expectEqual(exp, ans);
+    arg = 4.0;
+
+    start = try Instant.now();
+    ans = rslvPoly2Ref(&arg, &p3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ref #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ref", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
+    prntNl();
 }
 
 ///Returns the value of the order 2 polynomial resolved with the provided value of x.
@@ -953,47 +1365,83 @@ pub fn rslvPoly2Ret(x: *f32, polyExp2: *[3]f32, ret: *f32) void {
 }
 
 test "XMTX: rslvPoly2Ret test" {
-    prntNlStr("XMTX: rslvPoly2Ret test");
-
     //x 2 – 6 x - 16 = 0
     //( x – 8)( x + 2) = 0
     var p1: [3]f32 = .{ 1, -6, -16 };
     const exp: f32 = 0.0;
     var arg: f32 = 8.0;
     var ans: f32 = -1;
-    rslvPoly2Ret(&arg, &p1, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    var start = try Instant.now();
+    rslvPoly2Ret(&arg, &p1, &ans);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ret #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     arg = -2.0;
     ans = -1;
-    rslvPoly2Ret(&arg, &p1, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly2Ret(&arg, &p1, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ret #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x 2 + 6 x + 5 = 0
     //( x + 5)( x + 1) = 0
     var p2: [3]f32 = .{ 1, 6, 5 };
     arg = -5.0;
     ans = -1;
-    rslvPoly2Ret(&arg, &p2, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly2Ret(&arg, &p2, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ret #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     arg = -1.0;
     ans = -1;
-    rslvPoly2Ret(&arg, &p2, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly2Ret(&arg, &p2, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ret #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     //x 2 – 16 = 0
     //( x + 4)( x - 4) = 0
     var p3: [3]f32 = .{ 1, 0, -16 };
     arg = -4.0;
     ans = -1;
-    rslvPoly2Ret(&arg, &p3, &ans);
-    try std.testing.expectEqual(exp, ans);
 
+    start = try Instant.now();
+    rslvPoly2Ret(&arg, &p3, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ret #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ret", elapsed1);
+
+    try std.testing.expectEqual(exp, ans);
     arg = 4.0;
     ans = -1;
+
+    start = try Instant.now();
     rslvPoly2Ret(&arg, &p3, &ans);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvPoly2Ret #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvPoly2Ret", elapsed1);
+
     try std.testing.expectEqual(exp, ans);
+    prntNl();
 }
 
 ///Finds the roots of the order 3 polynomial provided.
@@ -1103,16 +1551,20 @@ pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
 }
 
 test "XMTX: rtsPoly3 test" {
-    prntNlStr("XMTX: rtsPoly3 test");
-
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
     var p1: [4]f32 = .{ 2, 3, -11, -6 };
     var factors: [10]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    const start = try Instant.now();
     const ret: [3]f32 = rtsPoly3(&p1, &factors);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrtsPoly3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rtsPoly3", elapsed1);
 
     prntPolyExp(&p1);
-    std.debug.print("rtsPoly3 roots found: {any}\n", .{ret});
+    std.debug.print("\nrtsPoly3 roots found: {any}", .{ret});
 
     const exp1: f32 = 2;
     const exp2: f32 = -0.5;
@@ -1120,6 +1572,7 @@ test "XMTX: rtsPoly3 test" {
     try std.testing.expectEqual(exp1, ret[0]);
     try std.testing.expectEqual(exp2, ret[1]);
     try std.testing.expectEqual(exp3, ret[2]);
+    prntNl();
 }
 
 ///Finds the roots of the order 3 polynomial provided.
@@ -1135,17 +1588,21 @@ pub fn rtsPoly3Ret(polyExp: *[4]f32, factors: []f32, ret: *[3]f32) void {
 }
 
 test "XMTX: rtsPoly3Ret test" {
-    prntNlStr("XMTX: rtsPoly3Ret test");
-
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
     var p1: [4]f32 = .{ 2, 3, -11, -6 };
     var factors: [10]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var ret: [3]f32 = .{ 0, 0, 0 };
+
+    const start = try Instant.now();
     rtsPoly3Ret(&p1, &factors, &ret);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrtsPoly3Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rtsPoly3Ret", elapsed1);
 
     prntPolyExp(&p1);
-    std.debug.print("rtsPoly3 roots found: {any}\n", .{ret});
+    std.debug.print("\nrtsPoly3 roots found: {any}", .{ret});
 
     const exp1: f32 = 2;
     const exp2: f32 = -0.5;
@@ -1153,6 +1610,8 @@ test "XMTX: rtsPoly3Ret test" {
     try std.testing.expectEqual(exp1, ret[0]);
     try std.testing.expectEqual(exp2, ret[1]);
     try std.testing.expectEqual(exp3, ret[2]);
+
+    prntNl();
 }
 
 ///Finds the roots of the order 2 polynomial provided.
@@ -1188,17 +1647,24 @@ pub fn rtsPoly2(polyExp: *[3]f32) [2]f32 {
 }
 
 test "XMTX: rtsPoly2 test" {
-    prntNl();
     //x2 - 7x + 10 = 0 are x = 2 and x = 5
     var poly2Exp: [3]f32 = .{ 1, -7, 10 };
-    var roots: [2]f32 = rtsPoly2(&poly2Exp);
 
-    prntXvec(&roots);
+    const start = try Instant.now();
+    var roots: [2]f32 = rtsPoly2(&poly2Exp);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrtsPoly2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rtsPoly2", elapsed1);
+
     prntNl();
+    prntXvec(&roots);
+
     const exp1: f32 = 5;
     const exp2: f32 = 2;
     try std.testing.expectEqual(exp1, roots[0]);
     try std.testing.expectEqual(exp2, roots[1]);
+    prntNl();
 }
 
 ///Finds the roots of the order 2 polynomial provided.
@@ -1212,18 +1678,26 @@ pub fn rtsPoly2Ret(polyExp: *[3]f32, ret: *[2]f32) void {
 }
 
 test "XMTX: rtsPoly2Ret test" {
-    prntNlStr("XMTX: rtsPoly2Ret test");
     //x2 - 7x + 10 = 0 are x = 2 and x = 5
     var poly2Exp: [3]f32 = .{ 1, -7, 10 };
     var roots: [2]f32 = .{ 0, 0 };
+
+    const start = try Instant.now();
     rtsPoly2Ret(&poly2Exp, &roots);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrtsPoly2Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rtsPoly2Ret", elapsed1);
 
     prntXvec(&roots);
     prntNl();
+
     const exp1: f32 = 5;
     const exp2: f32 = 2;
     try std.testing.expectEqual(exp1, roots[0]);
     try std.testing.expectEqual(exp2, roots[1]);
+
+    prntNl();
 }
 
 ///Returns an enumeration value describing the descriminant of the cubic polynomial.
@@ -1248,12 +1722,19 @@ pub fn dscrPoly3(polyExp: *[4]f32) POLY3_SOL_TYPE {
 }
 
 test "XMTX: dscrPoly3 test" {
-    prntNlStr("XMTX: dscrPoly3 test");
     //2x^3 + 3x^2 – 11x – 6 = 0
     //x = 2, -1/2, and -3
     var p1: [4]f32 = .{ 2, 3, -11, -6 };
+
+    const start = try Instant.now();
     const solt: POLY3_SOL_TYPE = dscrPoly3(&p1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndscrPoly3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("dscrPoly3", elapsed1);
+
     try std.testing.expectEqual(POLY3_SOL_TYPE.THREE_DISTINCT_REALS, solt);
+    prntNl();
 }
 
 ///Returns an enumeration value indicating the nature of the solutions for the given second order polynomial expression.
@@ -1274,19 +1755,27 @@ pub fn dscrPoly2(poly2Exp: *[3]f32) POLY2_SOL_TYPE {
 }
 
 test "XMTX: dscrPoly2 test" {
-    prntNlStr("XMTX: dscrPoly2 test");
     //x2 - 7x + 10 = 0 are x = 2 and x = 5
     var poly2Exp: [3]f32 = .{ 1, -7, 10 };
     var roots: [2]f32 = rtsPoly2(&poly2Exp);
-    const solt: POLY2_SOL_TYPE = dscrPoly2(&poly2Exp);
-    try std.testing.expectEqual(POLY2_SOL_TYPE.TWO_REAL, solt);
 
+    const start = try Instant.now();
+    const solt: POLY2_SOL_TYPE = dscrPoly2(&poly2Exp);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndscrPoly2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("dscrPoly2", elapsed1);
+
+    try std.testing.expectEqual(POLY2_SOL_TYPE.TWO_REAL, solt);
     prntXvec(&roots);
     prntNl();
+
     const exp1: f32 = 5;
     const exp2: f32 = 2;
     try std.testing.expectEqual(exp1, roots[0]);
     try std.testing.expectEqual(exp2, roots[1]);
+
+    prntNl();
 }
 
 ///Find the eigen values for a 3x3 dimensional matrix.
@@ -1372,7 +1861,6 @@ pub fn fndEigVal3(mtx: []f32, evs: *EigVal3, factors: []f32) bool {
 }
 
 test "XMTX: fndEigVal3 test" {
-    prntNlStr("XMTX: fndEigVal3 test");
     //A = −2, −2,  4
     //    −4,  1,  2
     //     2,  2,  5
@@ -1386,10 +1874,19 @@ test "XMTX: fndEigVal3 test" {
 
     var evs: EigVal3 = .{};
     var b: bool = false;
+
+    const start = try Instant.now();
     b = fndEigVal3(&A, &evs, &factors);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndEigVal3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndEigVal3", elapsed1);
+
     try std.testing.expectEqual(true, b);
-    std.debug.print("AAA Eigen Values Found:\n", .{});
+    std.debug.print("\nAAA Eigen Values Found:", .{});
     evs.prnt();
+
+    prntNl();
 }
 
 ///Find the eigen values for a 2x2 dimensional matrix.
@@ -1436,13 +1933,19 @@ pub fn fndEigVal2(mtx: []f32, evs: *EigVal2) bool {
 }
 
 test "XMTX: fndEigVal2 test" {
-    prntNlStr("XMTX: fndEigVal2 test");
     var m1: [4]f32 = .{ 5, 6, 8, 9 };
     var evs: EigVal2 = .{};
     var b: bool = false;
+
+    var start = try Instant.now();
     b = fndEigVal2(&m1, &evs);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndEigVal2 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndEigVal2", elapsed1);
+
     try std.testing.expectEqual(true, b);
-    std.debug.print("AAA Eigen Values Found:\n", .{});
+    std.debug.print("\nAAA Eigen Values Found:", .{});
     evs.prnt();
     try std.testing.expectEqual(@as(f32, 1.42111024e+01), evs.eignVals[0]);
     try std.testing.expectEqual(@as(f32, -2.11102485e-01), evs.eignVals[1]);
@@ -1450,12 +1953,21 @@ test "XMTX: fndEigVal2 test" {
     m1 = .{ 1, 4, 2, 3 };
     evs = .{};
     b = false;
+
+    start = try Instant.now();
     b = fndEigVal2(&m1, &evs);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndEigVal2 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndEigVal2", elapsed1);
+
     try std.testing.expectEqual(true, b);
-    std.debug.print("BBB Eigen Values Found:\n", .{});
+    std.debug.print("\nBBB Eigen Values Found:", .{});
     evs.prnt();
     try std.testing.expectEqual(@as(f32, 5.0), evs.eignVals[0]);
     try std.testing.expectEqual(@as(f32, -1.0), evs.eignVals[1]);
+
+    prntNl();
 }
 
 ///Cleans the given matrix by rounding float values to the nearest significance, ZERO_F32, resulting in clean 0.0, 1.0, etc, values.
@@ -1483,11 +1995,18 @@ pub fn clnXmtx(mtx: []f32) void {
 }
 
 test "XMTX: clnXmtx test" {
-    prntNlStr("XMTX: clnXmtx test");
     var m1: [3]f32 = .{ 1.00000001, 2.00000001, 3.00000001 };
     var m2: [3]f32 = .{ 1, 2, 3 };
+
+    const start = try Instant.now();
     clnXmtx(&m1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nclnXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("clnXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&m1, &m2));
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
@@ -1517,9 +2036,27 @@ pub fn isEquF32(l: f32, r: f32, compareModeExact: bool) bool {
 }
 
 test "XMTX: isEquF32 test" {
-    prntNlStr("XMTX: isEquF32 test");
-    try std.testing.expectEqual(true, isEquF32(1.0, 1.00001, false));
-    try std.testing.expectEqual(true, isEquF32(1.0, 1.0, true));
+    var b: bool = false;
+
+    var start = try Instant.now();
+    b = isEquF32(1.0, 1.00001, false);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+
+    start = try Instant.now();
+    b = isEquF32(1.0, 1.0, true);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
@@ -1549,26 +2086,51 @@ pub fn isEquF32Ref(l: *f32, r: *f32, compareModeExact: *bool) bool {
 }
 
 test "XMTX: isEquF32Ref test" {
-    prntNlStr("XMTX: isEquF32Ref test");
     var f1: f32 = 1.000;
     var f2: f32 = 1.0001;
     var f3: f32 = 1.100;
     var b: bool = false;
     var cm: bool = false;
+
+    var start = try Instant.now();
     b = isEquF32Ref(&f1, &f2, &cm);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ref #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ref", elapsed1);
+
     try std.testing.expectEqual(true, b);
-
     cm = true;
+
+    start = try Instant.now();
     b = isEquF32Ref(&f1, &f2, &cm);
-    try std.testing.expectEqual(false, b);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ref #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ref", elapsed1);
 
+    try std.testing.expectEqual(false, b);
     cm = false;
-    b = isEquF32Ref(&f1, &f3, &cm);
-    try std.testing.expectEqual(false, b);
 
-    cm = true;
+    start = try Instant.now();
     b = isEquF32Ref(&f1, &f3, &cm);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ref #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ref", elapsed1);
+
     try std.testing.expectEqual(false, b);
+    cm = true;
+
+    start = try Instant.now();
+    b = isEquF32Ref(&f1, &f3, &cm);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ref #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ref", elapsed1);
+
+    try std.testing.expectEqual(false, b);
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
@@ -1586,26 +2148,51 @@ pub fn isEquF32Ret(l: *f32, r: *f32, compareModeExact: *bool, ret: *bool) void {
 }
 
 test "XMTX: isEquF32Ret test" {
-    prntNlStr("XMTX: isEquF32Ret test");
     var f1: f32 = 1.000;
     var f2: f32 = 1.0001;
     var f3: f32 = 1.100;
     var b: bool = false;
     var cm: bool = false;
+
+    var start = try Instant.now();
     isEquF32Ret(&f1, &f2, &cm, &b);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ret #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ret", elapsed1);
+
     try std.testing.expectEqual(true, b);
-
     cm = true;
+
+    start = try Instant.now();
     isEquF32Ret(&f1, &f2, &cm, &b);
-    try std.testing.expectEqual(false, b);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ret #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ret", elapsed1);
 
+    try std.testing.expectEqual(false, b);
     cm = false;
-    isEquF32Ret(&f1, &f3, &cm, &b);
-    try std.testing.expectEqual(false, b);
 
-    cm = true;
+    start = try Instant.now();
     isEquF32Ret(&f1, &f3, &cm, &b);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ret #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ret", elapsed1);
+
     try std.testing.expectEqual(false, b);
+    cm = true;
+
+    start = try Instant.now();
+    isEquF32Ret(&f1, &f3, &cm, &b);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisEquF32Ret #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isEquF32Ret", elapsed1);
+
+    try std.testing.expectEqual(false, b);
+    prntNl();
 }
 
 ///Copies the mtx matrix into the ret matrix argument.
@@ -1619,14 +2206,28 @@ pub fn cpyXmtx(mtx: []f32, ret: []f32) void {
 }
 
 test "XMTX: cpyXmtx test" {
-    prntNlStr("XMTX: cpyXmtx test");
     var m1: [3]f32 = .{ 1, 2, 3 };
     var m2: [3]f32 = .{ 0, 0, 0 };
     var m3: [3]f32 = .{ 1, 1, 1 };
+
+    var start = try Instant.now();
     cpyXmtx(&m1, &m2);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyXmtx", elapsed1);
+
+    start = try Instant.now();
     cpyXmtx(&m1, &m3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&m1, &m2));
     try std.testing.expectEqual(true, equXvec(&m1, &m3));
+
+    prntNl();
 }
 
 ///Copies the mtx matrix into the ret matrix argument if the column is < cpyCols.
@@ -1654,13 +2255,19 @@ pub fn cpyLessXmtx(mtx: []f32, ret: []f32, mtxCols: usize, cpyCols: usize) void 
 }
 
 test "XMTX: cpyLessXmtx test" {
-    prntNl();
-    std.debug.print("cpyLessXmtx test:\n", .{});
     var m1: [4]f32 = .{ 1, 2, 3, 4 };
     var m2: [3]f32 = .{ 0, 0, 0 };
     var m3: [3]f32 = .{ 1, 2, 3 };
+
+    const start = try Instant.now();
     cpyLessXmtx(&m1, &m2, 4, 3);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyLessXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyLessXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&m2, &m3));
+    prntNl();
 }
 
 ///Copies data from the matrix mtx at startCol, startRow to endCol, endRow to ret 0,0 to (endCol - startCol), (endRow - strtRow).
@@ -1704,20 +2311,39 @@ pub fn cpyLessColRowXmtx(mtx: []f32, ret: []f32, strtCol: usize, endCol: usize, 
 }
 
 test "XMTX: cpyLessColRowXmtx test" {
-    prntNl();
-    std.debug.print("cpyLessColRowXmtx test:\n", .{});
     var m1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var ret: [3]f32 = .{ 0, 0, 0 };
     var exp1: [3]f32 = .{ 1, 2, 3 };
     var exp2: [3]f32 = .{ 7, 8, 9 };
+
+    var start = try Instant.now();
     cpyLessColRowXmtx(&m1, &ret, 0, 3, 0, 1, 3, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyLessColRowXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyLessColRowXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&ret, &exp1));
+
+    start = try Instant.now();
     cpyLessColRowXmtx(&m1, &ret, 0, 3, 2, 3, 3, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyLessColRowXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyLessColRowXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&ret, &exp2));
 
-    //using an aray with slice argument
+    //using an array with slice argument
+    start = try Instant.now();
     cpyLessColRowXmtx3(m1[0..9], &ret, 0, 3, 2, 3, 3, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyLessColRowXmtx #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyLessColRowXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&ret, &exp2));
+    prntNl();
 }
 
 ///Copies data from the matrix mtx at startCol, startRow to endCol, endRow to ret 0,0 to (endCol - startCol), (endRow - strtRow).
@@ -1761,20 +2387,39 @@ pub fn cpyLessColRowXmtx3(mtx: *const [9]f32, ret: []f32, strtCol: usize, endCol
 }
 
 test "XMTX: cpyLessColRowXmtx3 test" {
-    prntNl();
-    std.debug.print("cpyLessColRowXmtx3 test:\n", .{});
     var m1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var ret: [3]f32 = .{ 0, 0, 0 };
     var exp1: [3]f32 = .{ 1, 2, 3 };
     var exp2: [3]f32 = .{ 7, 8, 9 };
+
+    var start = try Instant.now();
     cpyLessColRowXmtx3(&m1, &ret, 0, 3, 0, 1, 3, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyLessColRowXmtx3 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyLessColRowXmtx3", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&ret, &exp1));
+
+    start = try Instant.now();
     cpyLessColRowXmtx3(&m1, &ret, 0, 3, 2, 3, 3, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyLessColRowXmtx3 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyLessColRowXmtx3", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&ret, &exp2));
 
     //using an array with slice argument
+    start = try Instant.now();
     cpyLessColRowXmtx(m1[0..9], &ret, 0, 3, 2, 3, 3, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyLessColRowXmtx3 #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyLessColRowXmtx3", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&ret, &exp2));
+    prntNl();
 }
 
 ///Copies the vec vector into the ret vector argument.
@@ -1793,15 +2438,28 @@ pub fn cpyXvec(vec: []f32, ret: []f32) void {
 }
 
 test "XMTX: cpyXvec test" {
-    prntNl();
-    std.debug.print("cpyXvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 2, 3 };
     var v2: [3]f32 = .{ 0, 0, 0 };
     var v3: [3]f32 = .{ 1, 1, 1 };
+
+    var start = try Instant.now();
     cpyXvec(&v1, &v2);
-    cpyXvec(&v1, &v3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyXvec", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
+
+    start = try Instant.now();
+    cpyXvec(&v1, &v3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyXvec", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
+    prntNl();
 }
 
 ///Returns a newly allocated matrix of the specified length.
@@ -1817,17 +2475,30 @@ pub fn crtXmtxEz(length: usize, alloc: *const std.mem.Allocator) ![]f32 {
 }
 
 test "XMTX: crtXmtxEz test" {
-    prntNl();
-    std.debug.print("crtXmtxEz test:\n", .{});
     const alloc: std.mem.Allocator = std.testing.allocator;
     const l: usize = 9;
     const cols: usize = 3;
+
+    var start = try Instant.now();
     const m1: []f32 = try crtXmtxEz(l, &alloc);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrtXmtxEz #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crtXmtxEz", elapsed1);
+
+    start = try Instant.now();
     const m2: []f32 = try crtXmtxEz(l, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrtXmtxEz #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crtXmtxEz", elapsed1);
+
     try std.testing.expectEqual(true, isSqrXmtx(m1, cols));
     try std.testing.expectEqual(false, isIdtXmtx(m2, cols));
     alloc.free(m1);
     alloc.free(m2);
+
+    prntNl();
 }
 
 ///Returns a newly created matrix of the specified length, using the provided allocator, with the provided number of columns. Optionaly filled with the identity matrix.
@@ -1861,17 +2532,30 @@ pub fn crtXmtx(length: usize, cols: usize, alloc: *const std.mem.Allocator, iden
 }
 
 test "XMTX: crtXmtx test" {
-    prntNl();
-    std.debug.print("crtXmtx test:\n", .{});
     const alloc: std.mem.Allocator = std.testing.allocator;
     const l: usize = 9;
     const cols: usize = 3;
+
+    var start = try Instant.now();
     const m1: []f32 = try crtXmtx(l, cols, &alloc, false);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrtXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crtXmtx", elapsed1);
+
+    start = try Instant.now();
     const m2: []f32 = try crtXmtx(l, cols, &alloc, true);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrtXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crtXmtx", elapsed1);
+
     try std.testing.expectEqual(true, isSqrXmtx(m1, cols));
     try std.testing.expectEqual(true, isIdtXmtx(m2, cols));
     alloc.free(m1);
     alloc.free(m2);
+
+    prntNl();
 }
 
 ///Returns a newly created vector of the specified length using the provided allocator.
@@ -1887,15 +2571,28 @@ pub fn crtXvec(length: usize, alloc: *const std.mem.Allocator) ![]f32 {
 }
 
 test "XMTX: crtXvec test" {
-    prntNl();
-    std.debug.print("crtXvec test:\n", .{});
     const alloc: std.mem.Allocator = std.testing.allocator;
+
+    var start = try Instant.now();
     const v1: []f32 = try crtXmtx(9, 3, &alloc, true);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrtXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crtXmtx", elapsed1);
+
+    start = try Instant.now();
     const v2: []f32 = try crtXvec(9, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrtXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crtXvec", elapsed1);
+
     try std.testing.expectEqual(true, isIdtXmtx(v1, 3));
     try std.testing.expectEqual(false, isIdtXmtx(v2, 3));
     alloc.free(v1);
     alloc.free(v2);
+
+    prntNl();
 }
 
 ///Clears the values of the given matrix.
@@ -1911,13 +2608,20 @@ pub fn clrXmtx(mtx: []f32) void {
 }
 
 test "XMTX: clrXmtx test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     prntXmtx(&mtx, 3);
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     clrXmtx(&mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nclrXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("clrXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&mtx, &exp));
+    prntNl();
 }
 
 ///Copies the provided matrix to a newly created matrix and returns it.
@@ -1933,13 +2637,19 @@ pub fn cpyXmtxNew(mtx: []f32, alloc: *const std.mem.Allocator) ![]f32 {
 }
 
 test "XMTX: cpyXmtxNew test" {
-    prntNl();
-    std.debug.print("cpyXmtxNew test:\n", .{});
     const alloc: std.mem.Allocator = std.testing.allocator;
     var m1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+    const start = try Instant.now();
     const m2: []f32 = try cpyXmtxNew(&m1, &alloc);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyXmtxNew: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyXmtxNew", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&m1, m2));
     alloc.free(m2);
+    prntNl();
 }
 
 ///Copies the provided vector to a newly created vector and returns it.
@@ -1962,13 +2672,20 @@ pub fn cpyXvecNew(vec: []f32, alloc: *const std.mem.Allocator) ![]f32 {
 }
 
 test "XMTX: cpyXvecNew test" {
-    prntNl();
-    std.debug.print("cpyXvecNew test:\n", .{});
     const alloc: std.mem.Allocator = std.testing.allocator;
     var v1: [3]f32 = .{ 1, 2, 3 };
+
+    const start = try Instant.now();
     const v2: []f32 = try cpyXvecNew(&v1, &alloc);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncpyXvecNew: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cpyXvecNew", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&v1, v2));
     alloc.free(v2);
+
+    prntNl();
 }
 
 ///Returns the magnitude of the provided vector.
@@ -1989,12 +2706,18 @@ pub fn magXvec(vec: []f32) f32 {
 }
 
 test "XMTX: magXvec test" {
-    prntNl();
-    std.debug.print("magXvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 2, 3 };
     const exp: f32 = 3.74165749e+00;
+
+    const start = try Instant.now();
     const val: f32 = magXvec(&v1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmagXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("magXvec", elapsed1);
+
     try std.testing.expectEqual(exp, val);
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the matrix has an inverse.
@@ -2043,22 +2766,16 @@ pub fn hasInvXmtx(mtx: []f32, cols: usize, trnMtx: []f32) bool {
 }
 
 test "XMTX: hasInvXmtx test" {
-    prntNl();
-
     var m1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
-
     var m2: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     var idtM1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-
     var ret: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     var origM1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
 
     const cols: f32 = 3;
     var b: bool = false;
 
-    std.debug.print("hasInvXmtx test: initial matrix\n", .{});
+    std.debug.print("\nhasInvXmtx test: initial matrix", .{});
     prntXmtx(&m1, 4);
 
     var sclr: f32 = 0.0;
@@ -2071,7 +2788,7 @@ test "XMTX: hasInvXmtx test" {
     try std.testing.expectEqual(true, isDiagXmtx(&m2, 3));
     try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 
-    std.debug.print("Clean Short Answer:\n", .{});
+    std.debug.print("\nClean Short Answer:", .{});
     prntXmtx(&m2, 3);
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
@@ -2086,15 +2803,23 @@ test "XMTX: hasInvXmtx test" {
     var trnM1: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     trnXmtx(&m1, cols, &trnM1);
 
-    std.debug.print("Orig M1:\n", .{});
+    std.debug.print("\nOrig M1:", .{});
     prntXmtx(&origM1, 3);
     prntNl();
 
-    std.debug.print("Trn M1:\n", .{});
+    std.debug.print("\nTrn M1:", .{});
     prntXmtx(&trnM1, 3);
     prntNl();
 
-    try std.testing.expectEqual(true, hasInvXmtx(&origM1, cols, &trnM1));
+    const start = try Instant.now();
+    const b1: bool = hasInvXmtx(&origM1, cols, &trnM1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nhasInvXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("hasInvXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b1);
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the provided matrix, with specified column count, is a symmetrical matrix.
@@ -2128,11 +2853,18 @@ pub fn isSymXmtx(mtx: []f32, cols: usize) bool {
 }
 
 test "XMTX: isSymXmtx test" {
-    prntNl();
     var m1: [4]f32 = .{ 1, 0, 0, 1 };
     const cols: usize = 2;
+
+    const start = try Instant.now();
     const b: bool = isSymXmtx(&m1, cols);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisSymXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isSymXmtx", elapsed1);
+
     try std.testing.expectEqual(true, b);
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the provided matrix is a zero matrix.
@@ -2185,12 +2917,28 @@ pub fn isZeroXmtx(mtx: []f32, cols: usize) bool {
 }
 
 test "XMTX: isZeroXmtx test" {
-    prntNl();
-    std.debug.print("isZeroXmtx test:\n", .{});
     var m1: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var m2: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    try std.testing.expectEqual(true, isZeroXmtx(&m1, 3));
-    try std.testing.expectEqual(false, isZeroXmtx(&m2, 3));
+    var b: bool = false;
+
+    var start = try Instant.now();
+    b = isZeroXmtx(&m1, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisZeroXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isZeroXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+
+    start = try Instant.now();
+    b = isZeroXmtx(&m2, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisZeroXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isZeroXmtx", elapsed1);
+
+    try std.testing.expectEqual(false, b);
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the provided vector is a zero vector.
@@ -2212,12 +2960,28 @@ pub fn isZeroXvec(vec: []f32) bool {
 }
 
 test "XMTX: isZeroXvec test" {
-    prntNl();
-    std.debug.print("isZeroXvec test:\n", .{});
     var v1: [3]f32 = .{ 0, 0, 0 };
     var v2: [3]f32 = .{ 1, 2, 3 };
-    try std.testing.expectEqual(true, isZeroXvec(&v1));
-    try std.testing.expectEqual(false, isZeroXvec(&v2));
+    var b: bool = false;
+
+    var start = try Instant.now();
+    b = isZeroXvec(&v1);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisZeroXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isZeroXvec", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+
+    start = try Instant.now();
+    b = isZeroXvec(&v2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisZeroXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isZeroXvec", elapsed1);
+
+    try std.testing.expectEqual(false, b);
+    prntNl();
 }
 
 ///Returns a Boolean indicating if the provided vectors are linearly independent or not.
@@ -2237,13 +3001,29 @@ pub fn isLinIndXvec(vecL: []f32, vecR: []f32) bool {
 }
 
 test "XMTX: isLinIndXvec test" {
-    prntNl();
-    std.debug.print("isLinIndXvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 1, 0 };
     var v3: [3]f32 = .{ 0, 3, 0 };
-    try std.testing.expectEqual(true, isLinIndXvec(&v1, &v2));
-    try std.testing.expectEqual(false, isLinIndXvec(&v2, &v3));
+    var b: bool = false;
+
+    var start = try Instant.now();
+    b = isLinIndXvec(&v1, &v2);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXvec", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+
+    start = try Instant.now();
+    b = isLinIndXvec(&v2, &v3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXvec", elapsed1);
+
+    try std.testing.expectEqual(false, b);
+    prntNl();
 }
 
 ///Returns the dot product of the two provided vectors, vecL and vecR.
@@ -2266,12 +3046,29 @@ pub fn dotPrdXvec(vecL: []f32, vecR: []f32) f32 {
 }
 
 test "XMTX: dotPrdXvec test" {
-    prntNlStr("XMTX: dotPrdXvec test");
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 1, 0 };
     var v3: [3]f32 = .{ 0, 3, 0 };
-    try std.testing.expectEqual(true, (dotPrdXvec(&v1, &v2) == 0));
-    try std.testing.expectEqual(true, (dotPrdXvec(&v2, &v3) > 0));
+    var v4: f32 = -1.0;
+
+    var start = try Instant.now();
+    v4 = dotPrdXvec(&v1, &v2);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndotPrdXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("dotPrdXvec", elapsed1);
+
+    try std.testing.expectEqual(true, (v4 == 0));
+
+    start = try Instant.now();
+    v4 = dotPrdXvec(&v2, &v3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ndotPrdXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("dotPrdXvec", elapsed1);
+
+    try std.testing.expectEqual(true, (v4 > 0));
+    prntNl();
 }
 
 ///Returns the dot product of the two 3 column vectors provided, vecL and vecR.
@@ -2294,12 +3091,29 @@ pub fn dotPrdXvec3(vecL: *const [3]f32, vecR: *const [3]f32) f32 {
 }
 
 test "XMTX: dotPrdXvec3 test" {
-    prntNlStr("XMTX: dotPrdXvec3 test");
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 1, 0 };
     var v3: [3]f32 = .{ 0, 3, 0 };
-    try std.testing.expectEqual(true, (dotPrdXvec3(&v1, &v2) == 0));
-    try std.testing.expectEqual(true, (dotPrdXvec3(&v2, &v3) > 0));
+    var v4: f32 = -1.0;
+
+    var start = try Instant.now();
+    v4 = dotPrdXvec3(&v1, &v2);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndotPrdXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("dotPrdXvec", elapsed1);
+
+    try std.testing.expectEqual(true, (v4 == 0));
+
+    start = try Instant.now();
+    v4 = dotPrdXvec3(&v2, &v3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ndotPrdXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("dotPrdXvec", elapsed1);
+
+    try std.testing.expectEqual(true, (v4 > 0));
+    prntNl();
 }
 
 ///Returns the cross-product of the two provided 3x3 vectors, vecL and vecR.
@@ -2314,24 +3128,70 @@ pub fn crsPrdXvec3(vecL: *const [3]f32, vecR: *const [3]f32) [3]f32 {
     return [3]f32{ (vecL[1] * vecR[2]) - (vecL[2] * vecR[1]), (vecL[2] * vecR[0]) - (vecL[0] * vecR[2]), (vecL[0] * vecR[1]) - (vecL[1] * vecR[0]) };
 }
 
-test "XMTX: crsPrdXvec test" {
-    prntNl();
-    std.debug.print("crsPrdXvec test:\n", .{});
+test "XMTX: crsPrdXvec3 test" {
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 1, 0 };
     var v3: [3]f32 = .{ 0, 0, 1 };
-    var v4: [3]f32 = crsPrdXvec(&v1, &v3);
-    var v5: [3]f32 = crsPrdXvec(&v1, &v2);
+    var v4: [3]f32 = .{ 0, 0, 0 };
+    var v5: [3]f32 = .{ 0, 0, 0 };
+
+    var start = try Instant.now();
+    v4 = crsPrdXvec3(&v1, &v3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrsPrdXvec3 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crsPrdXvec3", elapsed1);
+
+    start = try Instant.now();
+    v5 = crsPrdXvec3(&v1, &v2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrsPrdXvec3 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crsPrdXvec3", elapsed1);
+
     var exp1: [3]f32 = .{ 0, -1, 0 };
     var exp2: [3]f32 = .{ 0, 0, 1 };
     prntXvec(&v4);
     prntXvec(&v5);
+
     try std.testing.expectEqual(true, equXvec(&exp1, &v4));
     try std.testing.expectEqual(true, equXvec(&exp2, &v5));
+    prntNl();
 }
 
 pub fn crsPrdXvec(vecL: []f32, vecR: []f32) [3]f32 {
     return [3]f32{ (vecL[1] * vecR[2]) - (vecL[2] * vecR[1]), (vecL[2] * vecR[0]) - (vecL[0] * vecR[2]), (vecL[0] * vecR[1]) - (vecL[1] * vecR[0]) };
+}
+
+test "XMTX: crsPrdXvec test" {
+    var v1: [3]f32 = .{ 1, 0, 0 };
+    var v2: [3]f32 = .{ 0, 1, 0 };
+    var v3: [3]f32 = .{ 0, 0, 1 };
+    var v4: [3]f32 = .{ 0, 0, 0 };
+    var v5: [3]f32 = .{ 0, 0, 0 };
+
+    var start = try Instant.now();
+    v4 = crsPrdXvec(&v1, &v3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrsPrdXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crsPrdXvec", elapsed1);
+
+    start = try Instant.now();
+    v5 = crsPrdXvec(&v1, &v2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncrsPrdXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("crsPrdXvec", elapsed1);
+
+    var exp1: [3]f32 = .{ 0, -1, 0 };
+    var exp2: [3]f32 = .{ 0, 0, 1 };
+    prntXvec(&v4);
+    prntXvec(&v5);
+
+    try std.testing.expectEqual(true, equXvec(&exp1, &v4));
+    try std.testing.expectEqual(true, equXvec(&exp2, &v5));
+    prntNl();
 }
 
 ///Multiplies each entry in the vec vector by the provided scalar value.
@@ -2350,14 +3210,20 @@ pub fn mulXvec(vec: []f32, val: f32) void {
 }
 
 test "XMTX: mulXvec test" {
-    prntNl();
-    std.debug.print("mulXvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 1, 1 };
     var v2: [3]f32 = .{ 21, 21, 21 };
     const a: f32 = 21;
+
+    const start = try Instant.now();
     mulXvec(&v1, a);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmulXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mulXvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
+    prntNl();
 }
 
 ///Divides each entry in the vec vector by the provided value.
@@ -2376,14 +3242,20 @@ pub fn divXvec(vec: []f32, val: f32) void {
 }
 
 test "XMTX: divXvec test" {
-    prntNl();
-    std.debug.print("divXvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 1, 1 };
     var v2: [3]f32 = .{ 4.76190485e-02, 4.76190485e-02, 4.76190485e-02 };
     const a: f32 = 21;
+
+    const start = try Instant.now();
     divXvec(&v1, a);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndivXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("divXvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
+    prntNl();
 }
 
 ///Adds the value, val, to the data in the vector, vec.
@@ -2402,14 +3274,20 @@ pub fn addXvec(vec: []f32, val: f32) void {
 }
 
 test "XMTX: addXvec test" {
-    prntNl();
-    std.debug.print("addXvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 1, 1 };
     var v2: [3]f32 = .{ 3, 3, 3 };
     const a: f32 = 2;
+
+    const start = try Instant.now();
     addXvec(&v1, a);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naddXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("addXvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
+    prntNl();
 }
 
 ///Subtracts each entry in the vec vector by the provided value.
@@ -2428,14 +3306,20 @@ pub fn subXvec(vec: []f32, val: f32) void {
 }
 
 test "XMTX: subXvec test" {
-    prntNl();
-    std.debug.print("subXvec test:\n", .{});
     var v1: [3]f32 = .{ 3, 3, 3 };
     var v2: [3]f32 = .{ 1, 1, 1 };
     const a: f32 = 2;
+
+    const start = try Instant.now();
     subXvec(&v1, a);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsubXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("subXvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
+    prntNl();
 }
 
 ///Performs vector multiplication on the provided vectors storing the result in the ret vector.
@@ -2469,17 +3353,23 @@ pub fn tmsXvec(vecL: []f32, vecR: []f32, ret: []f32) bool {
 }
 
 test "XMTX: tmsXvec test" {
-    prntNl();
-    std.debug.print("tmsXvec test:\n", .{});
     var v1: [3]f32 = .{ 3, 3, 3 };
     var v2: [3]f32 = .{ 2, 2, 2 };
     var v3: [1]f32 = .{0};
     var exp: [1]f32 = .{18};
+
+    const start = try Instant.now();
     _ = tmsXvec(&v1, &v2, &v3);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntmsXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tmsXvec", elapsed1);
+
     prntXvec(&v1);
     prntXvec(&v2);
     prntXvec(&v3);
     try std.testing.expectEqual(true, equXvec(&exp, &v3));
+    prntNl();
 }
 
 ///Performs matrix multiplication on the provided matrices with results being stored in the ret matrix.
@@ -2562,18 +3452,11 @@ pub fn tmsXmtx(mtxL: []f32, colsL: usize, mtxR: []f32, colsR: usize, ret: []f32,
 }
 
 test "XMTX: tmsXmtx test" {
-    prntNl();
-
     var m1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
-
     var m2: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     var idtM1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-
     var ret: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     var origM1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
-
     const cols: f32 = 3;
     var b: bool = false;
 
@@ -2595,9 +3478,16 @@ test "XMTX: tmsXmtx test" {
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
 
+    const start = try Instant.now();
     b = tmsXmtx(&m2, cols, &m1, cols, &ret, cols);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntmsXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tmsXmtx", elapsed1);
+
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&m1, &ret));
+    prntNl();
 }
 
 ///Adds the two provided vectors together storing the adjustment in the vecL argument.
@@ -2616,14 +3506,20 @@ pub fn sum1Xvec(vecL: []f32, vecR: []f32) void {
 }
 
 test "XMTX: sum1Xvec test" {
-    prntNl();
-    std.debug.print("sum1Xvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 1, 1 };
     var v2: [3]f32 = .{ 2, 2, 2 };
     var v3: [3]f32 = .{ 3, 3, 3 };
+
+    const start = try Instant.now();
     sum1Xvec(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsum1Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("sum1Xvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
+    prntNl();
 }
 
 ///Adds the three provided vectors together storing the adjustment in the vecL argument.
@@ -2644,14 +3540,20 @@ pub fn sum2Xvec(vecL: []f32, vec1: []f32, vec2: []f32) void {
 }
 
 test "XMTX: sum2Xvec test" {
-    prntNl();
-    std.debug.print("sum2Xvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 1, 1 };
     var v2: [3]f32 = .{ 2, 2, 2 };
     var v3: [3]f32 = .{ 5, 5, 5 };
+
+    const start = try Instant.now();
     sum2Xvec(&v1, &v2, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsum2Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("sum2Xvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
+    prntNl();
 }
 
 ///Subtracts the two provided vectors from each other storing the adjustment in the vecL argument.
@@ -2669,14 +3571,20 @@ pub fn diff1Xvec(vecL: []f32, vecR: []f32) void {
 }
 
 test "XMTX: diff1Xvec test" {
-    prntNl();
-    std.debug.print("diff1Xvec test:\n", .{});
     var v1: [3]f32 = .{ 3, 3, 3 };
     var v2: [3]f32 = .{ 1, 1, 1 };
     var v3: [3]f32 = .{ 2, 2, 2 };
+
+    const start = try Instant.now();
     diff1Xvec(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndiff1Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("diff1Xvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
+    prntNl();
 }
 
 ///Subtracts the three provided vectors from eachother storing the adjustment in the vecL argument.
@@ -2697,14 +3605,20 @@ pub fn diff2Xvec(vecL: []f32, vec1: []f32, vec2: []f32) void {
 }
 
 test "XMTX: diff2Xvec test" {
-    prntNl();
-    std.debug.print("diff2Xvec test:\n", .{});
     var v1: [3]f32 = .{ 3, 3, 3 };
     var v2: [3]f32 = .{ 1, 1, 1 };
     var v3: [3]f32 = .{ 3, 3, 3 };
+
+    const start = try Instant.now();
     diff2Xvec(&v1, &v2, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndiff2Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("diff2Xvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
+    prntNl();
 }
 
 ///Prints the matrix with the specified number of columns.
@@ -2714,6 +3628,7 @@ test "XMTX: diff2Xvec test" {
 ///  cols = The number of columns in the matrix.
 ///
 pub fn prntXmtx(mtx: []f32, cols: usize) void {
+    std.debug.print("\n", .{});
     const l: usize = mtx.len / cols;
     var i: usize = 0;
     while (i < l) {
@@ -2722,6 +3637,12 @@ pub fn prntXmtx(mtx: []f32, cols: usize) void {
         prntXvec(vec);
         i += 1;
     }
+    std.debug.print("\n", .{});
+}
+
+test "XMTX: prntXmtx test" {
+    var v1: [9]f32 = .{ 3, 3, 3, 0, 0, 0, 1, 1, 1 };
+    prntXmtx(&v1, 3);
 }
 
 ///Prints the specified vector.
@@ -2729,6 +3650,7 @@ pub fn prntXmtx(mtx: []f32, cols: usize) void {
 ///  vec = The vector to print.
 ///
 pub fn prntXvec(vec: []f32) void {
+    std.debug.print("", .{});
     const l: usize = vec.len;
     var i: usize = 0;
     var c: u8 = '-';
@@ -2746,6 +3668,41 @@ pub fn prntXvec(vec: []f32) void {
         i += 1;
     }
     std.debug.print("\n", .{});
+}
+
+test "XMTX: prntXvec test" {
+    var v1: [3]f32 = .{ 3, 3, 3 };
+    prntXvec(&v1);
+}
+
+///Prints the specified vector starting on a new line.
+///
+///  vec = The vector to print.
+///
+pub fn prntXvecNl(vec: []f32) void {
+    std.debug.print("\n", .{});
+    const l: usize = vec.len;
+    var i: usize = 0;
+    var c: u8 = '-';
+    while (i < l) {
+        if (i == 0) {
+            c = 'x';
+        } else if (i == 1) {
+            c = 'y';
+        } else if (i == 2) {
+            c = 'z';
+        } else {
+            c = 'w';
+        }
+        std.debug.print("{c}: {} ", .{ c, vec[i] });
+        i += 1;
+    }
+    std.debug.print("\n", .{});
+}
+
+test "XMTX: prntXvecNl test" {
+    var v1: [3]f32 = .{ 3, 3, 3 };
+    prntXvecNl(&v1);
 }
 
 ///Calculates the angle between the two provided vectors.
@@ -2766,16 +3723,22 @@ pub fn aglBtwnXvec(vecL: []f32, vecR: []f32) f32 {
 }
 
 test "XMTX: aglBtwnXvec test" {
-    prntNl();
-    std.debug.print("aglBtwnXvec test:\n", .{});
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 0, 1 };
+
+    const start = try Instant.now();
     const angle: f32 = aglBtwnXvec(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naglBtwnXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("aglBtwnXvec", elapsed1);
+
     const exp: f32 = 1.57079625e+00;
     prntXvec(&v1);
     std.debug.print("Angle RAD: {}\n", .{angle});
     std.debug.print("Angle DEG: {}\n", .{rad2Deg(angle)});
     try std.testing.expectEqual(exp, angle);
+    prntNl();
 }
 
 ///A function for converting radians to degrees.
@@ -2789,19 +3752,26 @@ pub fn rad2Deg(rad: f32) f32 {
 }
 
 test "XMTX: rad2Deg test" {
-    prntNl();
-    std.debug.print("rad2Deg test:\n", .{});
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 0, 1 };
+
+    const start = try Instant.now();
     const angleRad: f32 = aglBtwnXvec(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrad2Deg: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rad2Deg", elapsed1);
+
     const exp1: f32 = 1.57079625e+00;
     const exp2: f32 = 90;
     const angleDeg: f32 = rad2Deg(angleRad);
+
     prntXvec(&v1);
-    std.debug.print("Angle RAD: {}\n", .{angleRad});
-    std.debug.print("Angle DEG: {}\n", .{angleDeg});
+    std.debug.print("\nAngle RAD: {}", .{angleRad});
+    std.debug.print("\nAngle DEG: {}", .{angleDeg});
     try std.testing.expectEqual(exp1, angleRad);
     try std.testing.expectEqual(exp2, angleDeg);
+    prntNl();
 }
 
 ///A function for converting degrees to radians.
@@ -2815,25 +3785,32 @@ pub fn deg2Rad(deg: f32) f32 {
 }
 
 test "XMTX: deg2Rad test" {
-    prntNl();
-    std.debug.print("deg2Rad test:\n", .{});
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 0, 1 };
+
     const angleRad: f32 = aglBtwnXvec(&v1, &v2);
     const exp1: f32 = 1.57079625e+00;
     const exp2: f32 = 90;
     const angleDeg: f32 = rad2Deg(angleRad);
+
     prntXvec(&v1);
-    std.debug.print("Angle RAD: {}\n", .{angleRad});
-    std.debug.print("Angle DEG: {}\n", .{angleDeg});
+    std.debug.print("\nAngle RAD: {}", .{angleRad});
+    std.debug.print("\nAngle DEG: {}", .{angleDeg});
     try std.testing.expectEqual(exp1, angleRad);
     try std.testing.expectEqual(exp2, angleDeg);
 
+    const start = try Instant.now();
     const angleRad2: f32 = deg2Rad(angleDeg);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndeg2Rad: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("deg2Rad", elapsed1);
+
     std.debug.print("Angle RAD: {}\n", .{angleRad});
     std.debug.print("Angle RAD 2: {}\n", .{angleRad2});
 
     try std.testing.expectEqual(true, isEquF32(angleRad2, angleRad, false));
+    prntNl();
 }
 
 ///Determines if the two provided matrices are equal.
@@ -2849,12 +3826,20 @@ pub fn equXmtx(mtxL: []f32, mtxR: []f32) bool {
 }
 
 test "XMTX: equXmtx test" {
-    prntNl();
-    std.debug.print("equXmtx test:\n", .{});
     var m1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var m2: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = equXmtx(&m1, &m2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nequXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("equXmtx", elapsed1);
+
     prntXmtx(&m1, 3);
-    try std.testing.expectEqual(true, equXmtx(&m1, &m2));
+    try std.testing.expectEqual(true, b);
+    prntNl();
 }
 
 ///Determines if the two provided vectors are equal.
@@ -2866,16 +3851,24 @@ test "XMTX: equXmtx test" {
 ///  returns = A Boolean value indicating if the vectors are equal.
 ///
 pub fn equXvec(vecL: []f32, vecR: []f32) bool {
-    return INT_equXvec(vecL, vecR, COMPARE_MODE_EXACT);
+    return equXvecWrkr(vecL, vecR, COMPARE_MODE_EXACT);
 }
 
 test "XMTX: equXvec test" {
-    prntNl();
-    std.debug.print("equXvec test:\n", .{});
     var v1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var v2: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = equXvec(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nequXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("equXvec", elapsed1);
+
     prntXvec(&v1);
-    try std.testing.expectEqual(true, equXvec(&v1, &v2));
+    try std.testing.expectEqual(true, b);
+    prntNl();
 }
 
 ///A private function that handles matrix and vector value comparison supporting two modes, direct compare and precision compare.
@@ -2888,7 +3881,7 @@ test "XMTX: equXvec test" {
 ///
 ///  returns = A Boolean value indicating if the vectors are equal.
 ///
-fn INT_equXvec(vecL: []f32, vecR: []f32, compareModeExact: bool) bool {
+pub fn equXvecWrkr(vecL: []f32, vecR: []f32, compareModeExact: bool) bool {
     const l: usize = vecL.len;
     var i: usize = 0;
     while (i < l) {
@@ -2906,14 +3899,31 @@ fn INT_equXvec(vecL: []f32, vecR: []f32, compareModeExact: bool) bool {
     return true;
 }
 
-test "XMTX: INT_equXvec test" {
-    prntNl();
-    std.debug.print("INT_equXvec test:\n", .{});
+test "XMTX: equXvecWrkr test" {
     var v1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var v2: [9]f32 = .{ 1.0001, 2.0001, 3.0001, 4, 5, 6, 7, 8, 9 };
+    var b: bool = false;
+
+    var start = try Instant.now();
+    b = equXvecWrkr(&v1, &v2, true);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nequXvecWrkr: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("equXvecWrkr", elapsed1);
+
     prntXvec(&v1);
-    try std.testing.expectEqual(false, INT_equXvec(&v1, &v2, true));
-    try std.testing.expectEqual(true, INT_equXvec(&v1, &v2, false));
+    try std.testing.expectEqual(false, b);
+
+    start = try Instant.now();
+    b = equXvecWrkr(&v1, &v2, false);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nequXvecWrkr: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("equXvecWrkr", elapsed1);
+
+    prntXvec(&v1);
+    try std.testing.expectEqual(true, b);
+    prntNl();
 }
 
 ///Converts the provided matrix data into absolute values.
@@ -2925,12 +3935,18 @@ pub fn absXmtx(mtx: []f32) void {
 }
 
 test "XMTX: absXmtx test" {
-    prntNl();
-    std.debug.print("absXmtx test:\n", .{});
     var v1: [9]f32 = .{ -1, -2, -3, 4, 5, 6, -7, -8, -9 };
     var v2: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+    const start = try Instant.now();
     absXmtx(&v1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nabsXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("absXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
+    prntNl();
 }
 
 ///Converts the provided vector data into absolute values.
@@ -2947,12 +3963,18 @@ pub fn absXvec(vec: []f32) void {
 }
 
 test "XMTX: absXvec test" {
-    prntNl();
-    std.debug.print("absXvec test:\n", .{});
     var v1: [9]f32 = .{ -1, -2, -3, 4, 5, 6, -7, -8, -9 };
     var v2: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+    const start = try Instant.now();
     absXvec(&v1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nabsXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("absXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
+    prntNl();
 }
 
 ///Normalizes the provided vector based on a calculated magnitude.
@@ -2966,13 +3988,20 @@ pub fn nrmXvec(vec: []f32) void {
 }
 
 test "XMTX: nrmXvec test" {
-    prntNl();
     var v1: [3]f32 = .{ 5, 10, 15 };
+
+    const start = try Instant.now();
     nrmXvec(&v1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nnrmXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("nrmXvec", elapsed1);
+
     prntXvec(&v1);
     try std.testing.expectEqual(@as(f32, 2.67261236e-01), v1[0]);
     try std.testing.expectEqual(@as(f32, 5.34522473e-01), v1[1]);
     try std.testing.expectEqual(@as(f32, 8.01783740e-01), v1[2]);
+    prntNl();
 }
 
 ///Projects vector P onto vector Q.
@@ -2993,13 +4022,18 @@ pub fn projXvec_VecP_Onto_VecQ(vecP: []f32, vecQ: []f32) []f32 {
 }
 
 test "XMTX: projXvec_VecP_Onto_VecQ test" {
-    prntNl();
     //Q = 2 2 1
     //P = 1 -2 0
     var Q: [3]f32 = .{ 2, 2, 1 };
     var P: [3]f32 = .{ 1, -2, 0 };
     var exp: [3]f32 = .{ (-4.0 / 9.0), (-4.0 / 9.0), (-2.0 / 9.0) };
+
+    const start = try Instant.now();
     const ret: []f32 = projXvec_VecP_Onto_VecQ(&P, &Q);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprojXvec_VecP_Onto_VecQ: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("projXvec_VecP_Onto_VecQ", elapsed1);
 
     clnXmtx(ret);
     clnXmtx(&exp);
@@ -3010,6 +4044,7 @@ test "XMTX: projXvec_VecP_Onto_VecQ test" {
     prntXvec(&exp);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(ret, &exp));
+    prntNl();
 }
 
 ///Finds the vector perpendicular to vectors P and Q.
@@ -3026,13 +4061,18 @@ pub fn perpXvec_VecP_To_VecQ(vecP: []f32, vecQ: []f32) []f32 {
 }
 
 test "XMTX: perpXvec_VecP_To_VecQ test" {
-    prntNl();
     //Q = 2 2 1
     //P = 1 -2 0
     var Q: [3]f32 = .{ 2, 2, 1 };
     var P: [3]f32 = .{ 1, -2, 0 };
     var exp: [3]f32 = .{ 1.44444441e+00, -1.55555558e+00, 2.22222223e-01 };
+
+    const start = try Instant.now();
     const ret: []f32 = perpXvec_VecP_To_VecQ(&P, &Q);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nperpXvec_VecP_To_VecQ: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("perpXvec_VecP_To_VecQ", elapsed1);
 
     clnXmtx(ret);
     clnXmtx(&exp);
@@ -3043,6 +4083,7 @@ test "XMTX: perpXvec_VecP_To_VecQ test" {
     prntXvec(&exp);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(ret, &exp));
+    prntNl();
 }
 
 ///A function that handles multiple operations on a provided matrix. This function returns information about the matrix.
@@ -3051,7 +4092,7 @@ test "XMTX: perpXvec_VecP_To_VecQ test" {
 ///
 ///  cols = The numbers of columns in the matrix.
 ///
-///  op = The MTX_OPS operation to perform.
+///  op = The MTX_OPS operation to perform MTX_IS_LIN_INDP or MTX_IS_INVERTIBLE.
 ///
 ///  returns = A Boolean indicating the result of the information operation.
 ///
@@ -3095,17 +4136,28 @@ pub fn idnfXmtx(mtx: []f32, cols: usize, op: MTX_OPS) bool {
 }
 
 test "XMTX: idnfXmtx tests" {
-    prntNl();
-
     var mtx: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
-
     std.debug.print("\n", .{});
-    var b = idnfXmtx(&mtx, 3.0, MTX_OPS.MTX_IS_ZERO);
-    try std.testing.expectEqual(true, b);
 
-    mtx = .{ 1, 0, 0, 0, 1, 0 };
-    b = idnfXmtx(&mtx, 3.0, MTX_OPS.MTX_IS_LIN_INDP);
+    var start = try Instant.now();
+    var b = idnfXmtx(&mtx, 3.0, MTX_OPS.MTX_IS_ZERO);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nidnfXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("idnfXmtx", elapsed1);
+
     try std.testing.expectEqual(true, b);
+    mtx = .{ 1, 0, 0, 0, 1, 0 };
+
+    start = try Instant.now();
+    b = idnfXmtx(&mtx, 3.0, MTX_OPS.MTX_IS_LIN_INDP);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nidnfXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("idnfXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+    prntNl();
 }
 
 ///A function that handles multiple operations on a provided matrix. This function returns an adjusted version of the matrix.
@@ -3116,7 +4168,7 @@ test "XMTX: idnfXmtx tests" {
 ///
 ///  cols = The numbers of columns in the matrix.
 ///
-///  op = The MTX_OPS operation to perform.
+///  op = The MTX_OPS operation to perform, MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS.
 ///
 pub fn procXmtx(mtx: []f32, val: f32, cols: usize, op: MTX_OPS) void {
     const l: usize = mtx.len / cols;
@@ -3148,44 +4200,119 @@ pub fn procXmtx(mtx: []f32, val: f32, cols: usize, op: MTX_OPS) void {
 }
 
 test "XMTX: procXmtx tests" {
-    prntNl();
-
     var mtx: [6]f32 = .{ 1, 3, 5, 10, 3, 6 };
     var exp: [6]f32 = .{ 2, 6, 10, 20, 6, 12 };
+    prntNl();
 
-    std.debug.print("\n", .{});
+    var start = try Instant.now();
     procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
 
+    start = try Instant.now();
     procXmtx(&mtx, 2.0, 3.0, MTX_OPS.MTX_MUL);
-    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
-    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
 
+    start = try Instant.now();
+    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     exp = .{ 1, 3, 5, 10, 3, 6 };
+
+    start = try Instant.now();
     procXmtx(&mtx, 2.0, 3.0, MTX_OPS.MTX_DIV);
-    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
-    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
 
+    start = try Instant.now();
+    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     exp = .{ 2, 4, 6, 11, 4, 7 };
+
+    start = try Instant.now();
     procXmtx(&mtx, 1.0, 3.0, MTX_OPS.MTX_ADD);
-    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
-    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
 
+    start = try Instant.now();
+    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #7: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     exp = .{ 1, 3, 5, 10, 3, 6 };
+
+    start = try Instant.now();
     procXmtx(&mtx, 1.0, 3.0, MTX_OPS.MTX_SUB);
-    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
-    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #8: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
 
+    start = try Instant.now();
+    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #9: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     mtx = .{ -1, -3, -5, -10, -3, -6 };
-
     exp = .{ 1, 3, 5, 10, 3, 6 };
-    procXmtx(&mtx, 2.0, 3.0, MTX_OPS.MTX_ABS);
-    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
-    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
 
-    exp = .{ 1.69030845e-01, 5.07092535e-01, 8.45154225e-01, 8.30454826e-01, 2.49136447e-01, 4.98272895e-01 };
-    procXmtx(&mtx, 2.0, 3.0, MTX_OPS.MTX_NRM);
+    start = try Instant.now();
+    procXmtx(&mtx, 2.0, 3.0, MTX_OPS.MTX_ABS);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #10: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
+    start = try Instant.now();
     procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #11: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    exp = .{ 1.69030845e-01, 5.07092535e-01, 8.45154225e-01, 8.30454826e-01, 2.49136447e-01, 4.98272895e-01 };
+
+    start = try Instant.now();
+    procXmtx(&mtx, 2.0, 3.0, MTX_OPS.MTX_NRM);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #12: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
+    start = try Instant.now();
+    procXmtx(&mtx, 0, 3.0, MTX_OPS.MTX_PRNT);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprocXmtx #13: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("procXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    prntNl();
 }
 
 ///Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
@@ -3376,76 +4503,81 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
 }
 
 test "XMTX: rdcXmtxInl test" {
-    prntNl();
-
     const origM1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
     _ = origM1;
 
     var m1: [12]f32 = .{ 3, 2, -3, -13, 4, -3, 6, 7, 1, 0, -1, -5 };
-
     var m2: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     var m3: [9]f32 = .{ 2, 3, 8, 6, 0, -3, -1, 3, 2 };
-
     var origM3: [9]f32 = .{ 2, 3, 8, 6, 0, -3, -1, 3, 2 };
 
     var m4: [9]f32 = .{ 1, -1, 0, 1, 0, -1, -6, 2, 3 };
-
     var origM4: [9]f32 = .{ 1, -1, 0, 1, 0, -1, -6, 2, 3 };
-
     var idtM1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-
     var idtM3: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 
     var idtM4: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-
     var ret: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     var retVal: bool = false;
 
-    std.debug.print("rdcXmtxInl test: initial matrix\n", .{});
+    std.debug.print("\nrdcXmtxInl test: initial matrix", .{});
     prntXmtx(&m1, 4);
-
     var sclr: f32 = 0.0;
-    _ = rdcXmtxInl(&m1, 4, true, true, &idtM1, 3, false, &sclr);
-    cpyLessXmtx(&m1, &m2, 4, 3);
 
+    var start = try Instant.now();
+    _ = rdcXmtxInl(&m1, 4, true, true, &idtM1, 3, false, &sclr);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrdcXmtxInl #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rdcXmtxInl", elapsed1);
+
+    cpyLessXmtx(&m1, &m2, 4, 3);
     clnXmtx(&m2);
     try std.testing.expectEqual(true, isDiagXmtx(&m2, 3));
     try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 
-    std.debug.print("Full Answer:\n", .{});
+    std.debug.print("\nFull Answer:", .{});
     prntXmtx(&m1, 4);
-
-    std.debug.print("Clean Short Answer:\n", .{});
+    std.debug.print("\nClean Short Answer:", .{});
     prntXmtx(&m2, 3);
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
-
     sclr = 0.0;
+
+    start = try Instant.now();
     _ = rdcXmtxInl(&m3, 3, false, true, &idtM3, 3, false, &sclr);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrdcXmtxInl #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rdcXmtxInl", elapsed1);
+
     clnXmtx(&m3);
     clnXmtx(&idtM3);
     cpyXmtx(&m3, &m2);
-
-    std.debug.print("Inverse:\n", .{});
+    std.debug.print("\nInverse:", .{});
     prntXmtx(&idtM3, 3);
     prntNl();
 
-    std.debug.print("Test:\n", .{});
+    std.debug.print("\nTest:", .{});
     retVal = tmsXmtx(&origM3, 3, &idtM3, 3, &ret, 3);
     clnXmtx(&ret);
     prntXmtx(&ret, 3);
     prntNl();
-
     sclr = 0.0;
+
+    start = try Instant.now();
     _ = rdcXmtxInl(&m4, 3, false, true, &idtM4, 3, false, &sclr);
-    std.debug.print("Inverse 2:\n", .{});
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nrdcXmtxInl #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rdcXmtxInl", elapsed1);
+
+    std.debug.print("\nInverse 2:", .{});
     prntXmtx(&idtM4, 3);
     prntNl();
 
     ret = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    std.debug.print("Test 2:\n", .{});
+    std.debug.print("\nTest 2:", .{});
     retVal = tmsXmtx(&origM4, 3, &idtM4, 3, &ret, 3);
     clnXmtx(&ret);
     prntXmtx(&ret, 3);
@@ -3480,25 +4612,25 @@ pub fn rdcXmtx(mtx: []f32, cols: usize, hasAug: bool, ret: []f32, hasIdtMtx: boo
 }
 
 test "XMTX: rdcXmtx test" {
-    prntNl();
-
     var m1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
-
     var m2: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
     var idtM1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-
     var origM1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
 
     const cols: f32 = 3;
     _ = cols;
     var b: bool = false;
-
-    std.debug.print("rdcXmtx test: initial matrix\n", .{});
+    std.debug.print("\nrdcXmtx test: initial matrix", .{});
     prntXmtx(&m1, 4);
-
     var sclr: f32 = 0.0;
+
+    const start = try Instant.now();
     b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrdcXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rdcXmtx", elapsed1);
+
     try std.testing.expectEqual(true, b);
     cpyXmtx(&m1, &m2);
     cpyXmtx(&origM1, &m1);
@@ -3507,32 +4639,45 @@ test "XMTX: rdcXmtx test" {
     try std.testing.expectEqual(true, isDiagXmtx(&m2, 3));
     try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 
-    std.debug.print("Clean Short Answer:\n", .{});
+    std.debug.print("\nClean Short Answer:", .{});
     prntXmtx(&m2, 3);
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
+    prntNl();
 }
 
-///Prints a new line followed by the given string.
+///Prints a new line followed by the given string and an ending new line.
 pub fn prntNlStr(comptime s: []const u8) void {
     std.debug.print("\n {s}\n", .{s});
 }
 
-//TODO: tests
+test "XMTX: prntNlStr test" {
+    const start = try Instant.now();
+    prntNlStr("prntNlStr");
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprntNlStr: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("prntNlStr", elapsed1);
+    prntNl();
+}
 
 ///Prints a new line followed by the given string formatted with the given args.
-pub fn prntNlStrArgs(comptime s: []const u8, args: anytype) void {
+pub fn prntNlStrArgs(comptime s: []const u8, args: anytype) !void {
     const test_allocator = std.testing.allocator;
-    const str = try std.fmt.allocPrint(
-        test_allocator,
-        s,
-        args,
-    );
-    std.debug.print("\n {}", .{str});
+    const str = try std.fmt.allocPrint(test_allocator, s, args);
+    std.debug.print("\n {s}", .{str});
     test_allocator.free(str);
 }
 
-//TODO: tests
+test "XMTX: prntNlStrArgs test" {
+    const start = try Instant.now();
+    try prntNlStrArgs("prntNlStrArgs: {}", .{0});
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprntNlStrArgs: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("prntNlStrArgs", elapsed1);
+    prntNl();
+}
 
 ///Prints a newline.
 pub fn prntNl() void {
@@ -3540,7 +4685,12 @@ pub fn prntNl() void {
 }
 
 test "XMTX: prntNl test" {
+    const start = try Instant.now();
     prntNl();
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprntNl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("prntNl", elapsed1);
 }
 
 ///Finds the largest row, by absolute value, in the given matrix, at the specified column, starting on the given row.
@@ -3576,57 +4726,109 @@ pub fn fndLgstRowAbsXmtx(mtx: []f32, cols: usize, targetCol: usize, startingRow:
 }
 
 test "XMTX: fndLgstRowAbsXmtx test" {
-    prntNl();
-
     var mtx: [12]f32 = .{ 1, -3, 21, -10, 3, 6, 7, -13, 5, 0, 0, 0 };
     const exp: [9]usize = .{ 1, 1, 2, 2, 0, 1, 12, 12, 12 };
 
+    var start = try Instant.now();
     const v0: usize = fndLgstRowAbsXmtx(&mtx, 3, 0, 0);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v0 >= mtx.len) {
         std.debug.print("No matching row found, v0\n", .{});
     }
 
+    start = try Instant.now();
     const v1: usize = fndLgstRowAbsXmtx(&mtx, 3, 0, 1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v1 >= mtx.len) {
         std.debug.print("No matching row found, v1\n", .{});
     }
 
+    start = try Instant.now();
     const v2: usize = fndLgstRowAbsXmtx(&mtx, 3, 1, 0);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v2 >= mtx.len) {
         std.debug.print("No matching row found, v2\n", .{});
     }
 
+    start = try Instant.now();
     const v3: usize = fndLgstRowAbsXmtx(&mtx, 3, 1, 1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v3 >= mtx.len) {
         std.debug.print("No matching row found, v3\n", .{});
     }
 
+    start = try Instant.now();
     const v4: usize = fndLgstRowAbsXmtx(&mtx, 3, 2, 0);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #5: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v4 >= mtx.len) {
         std.debug.print("No matching row found, v4\n", .{});
     }
 
+    start = try Instant.now();
     const v5: usize = fndLgstRowAbsXmtx(&mtx, 3, 2, 1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #6: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v5 >= mtx.len) {
         std.debug.print("No matching row found, v5\n", .{});
     }
 
+    start = try Instant.now();
     const v6: usize = fndLgstRowAbsXmtx(&mtx, 3, 3, 0);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #7: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v6 >= mtx.len) {
         std.debug.print("No matching row found, v6\n", .{});
     }
 
+    start = try Instant.now();
     const v7: usize = fndLgstRowAbsXmtx(&mtx, 3, 3, 1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #8: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v7 >= mtx.len) {
         std.debug.print("No matching row found, v7\n", .{});
     }
 
+    start = try Instant.now();
     const v8: usize = fndLgstRowAbsXmtx(&mtx, 3, 3, 2);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nfndLgstRowAbsXmtx #9: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("fndLgstRowAbsXmtx", elapsed1);
+
     if (v8 >= mtx.len) {
         std.debug.print("No matching row found, v8\n", .{});
     }
 
-    std.debug.print("v0: {} v1: {} v2: {} v3: {} v4: {} v5: {} v6: {} v7: {} v8: {}\n", .{ v0, v1, v2, v3, v4, v5, v6, v7, v8 });
+    std.debug.print("\nv0: {} v1: {} v2: {} v3: {} v4: {} v5: {} v6: {} v7: {} v8: {}", .{ v0, v1, v2, v3, v4, v5, v6, v7, v8 });
     try std.testing.expectEqual(exp[0], v0);
     try std.testing.expectEqual(exp[1], v1);
     try std.testing.expectEqual(exp[2], v2);
@@ -3636,6 +4838,8 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     try std.testing.expectEqual(exp[6], v6);
     try std.testing.expectEqual(exp[7], v7);
     try std.testing.expectEqual(exp[8], v8);
+
+    prntNl();
 }
 
 ///Returns a Boolean indicating if the provided matrix is reduced.
@@ -3677,22 +4881,41 @@ pub fn isRdcFrmXmtx(mtx: []f32, cols: usize) bool {
 }
 
 test "XMTX: isRdcFrmXmtx test" {
-    prntNl();
-
     var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var b: bool = false;
     prntXmtx(&mtx, 3);
-    var b: bool = isRdcFrmXmtx(&mtx, 3);
-    try std.testing.expectEqual(true, b);
 
+    var start = try Instant.now();
+    b = isRdcFrmXmtx(&mtx, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisRdcFrmXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isRdcFrmXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
     mtx = .{ 1, 0, 0, 0, 1, 0, 0, 0, 0 };
     prntXmtx(&mtx, 3);
-    b = isRdcFrmXmtx(&mtx, 3);
-    try std.testing.expectEqual(true, b);
 
+    start = try Instant.now();
+    b = isRdcFrmXmtx(&mtx, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisRdcFrmXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isRdcFrmXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
     mtx = .{ 1, 0, 0, 0, 0, 0, 0, 0, 1 };
     prntXmtx(&mtx, 3);
+
+    start = try Instant.now();
     b = isRdcFrmXmtx(&mtx, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisRdcFrmXmtx #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isRdcFrmXmtx", elapsed1);
+
     try std.testing.expectEqual(false, b);
+    prntNl();
 }
 
 ///Adds a scalar multiple of one matrix row to another.
@@ -3727,13 +4950,20 @@ pub fn addSclMulXmtxRowsInl(srcRow: usize, dstRow: usize, mul: f32, cols: usize,
 }
 
 test "XMTX: addSclMulXmtxRowsInl test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 3, 3, 3 };
     var exp: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 7, 7, 7 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     addSclMulXmtxRowsInl(1, 2, 2, 3, &mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naddSclMulXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("addSclMulXmtxRowsInl", elapsed1);
+
     prntXmtx(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    prntNl();
 }
 
 ///Adds a scalar multiple of one matrix row to another.
@@ -3756,14 +4986,21 @@ pub fn addSclMulXmtxRows(srcRow: usize, dstRow: usize, mul: f32, cols: usize, mt
 }
 
 test "XMTX: addSclMulXmtxRows test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 3, 3, 3 };
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var exp: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 7, 7, 7 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     addSclMulXmtxRows(1, 2, 2, 3, &mtx, &res);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naddSclMulXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("addSclMulXmtxRows", elapsed1);
+
     prntXmtx(&res, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &res));
+    prntNl();
 }
 
 ///Multiplies a matrix row by a scalar. Performs the operation inline in the provided matrix.
@@ -3792,13 +5029,20 @@ pub fn sclMulXmtxRowsInl(srcRow: usize, mul: f32, cols: usize, mtx: []f32) void 
 }
 
 test "XMTX: sclMulXmtxRowsInl test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var exp: [9]f32 = .{ 3, 3, 3, 1, 1, 1, 1, 1, 1 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     sclMulXmtxRowsInl(0, 3, 3, &mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsclMulXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("sclMulXmtxRowsInl", elapsed1);
+
     prntXmtx(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    prntNl();
 }
 
 ///Multiplies a matrix row by a scalar.
@@ -3819,14 +5063,21 @@ pub fn sclMulXmtxRows(srcRow: usize, mul: f32, cols: usize, mtx: []f32, ret: []f
 }
 
 test "XMTX: sclMulXmtxRows test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var exp: [9]f32 = .{ 3, 3, 3, 1, 1, 1, 1, 1, 1 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     sclMulXmtxRows(0, 3, 3, &mtx, &res);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nsclMulXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("sclMulXmtxRows", elapsed1);
+
     prntXmtx(&res, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &res));
+    prntNl();
 }
 
 ///Adds a scalar to a matrix row. Performs the operation inline in the provided matrix.
@@ -3855,13 +5106,20 @@ pub fn addSclXmtxRowsInl(srcRow: usize, amt: f32, cols: usize, mtx: []f32) void 
 }
 
 test "XMTX: addSclXmtxRowsInl test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var exp: [9]f32 = .{ 4, 4, 4, 1, 1, 1, 1, 1, 1 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     addSclXmtxRowsInl(0, 3, 3, &mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naddSclXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("addSclXmtxRowsInl", elapsed1);
+
     prntXmtx(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    prntNl();
 }
 
 ///Adds a scalar to a matrix row.
@@ -3882,14 +5140,21 @@ pub fn addSclXmtxRows(srcRow: usize, amt: f32, cols: usize, mtx: []f32, ret: []f
 }
 
 test "XMTX: addSclXmtxRows test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var exp: [9]f32 = .{ 4, 4, 4, 1, 1, 1, 1, 1, 1 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     addSclXmtxRows(0, 3, 3, &mtx, &res);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naddSclXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("addSclXmtxRows", elapsed1);
+
     prntXmtx(&res, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &res));
+    prntNl();
 }
 
 ///Alternate two rows of a the given matrix, mtx. Performs the operation inline.
@@ -3922,13 +5187,20 @@ pub fn altXmtxRowsInl(srcRow: usize, dstRow: usize, cols: usize, mtx: []f32) voi
 }
 
 test "XMTX: altXmtxRowsInl test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 7, 8, 9, 4, 5, 6, 1, 2, 3 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     altXmtxRowsInl(0, 2, 3, &mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naltXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("altXmtxRowsInl", elapsed1);
+
     prntXmtx(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    prntNl();
 }
 
 ///Alternate two rows of a matrix.
@@ -3949,14 +5221,21 @@ pub fn altXmtxRows(srcRow: usize, dstRow: usize, cols: usize, mtx: []f32, ret: [
 }
 
 test "XMTX: altXmtxRows test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 7, 8, 9, 4, 5, 6, 1, 2, 3 };
     var alt: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     prntXmtx(&mtx, 3);
+
+    const start = try Instant.now();
     altXmtxRows(0, 2, 3, &mtx, &alt);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naltXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("altXmtxRows", elapsed1);
+
     prntXmtx(&alt, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &alt));
+    prntNl();
 }
 
 ///Transposes the provided matrix into the return matrix. Operation is performed inline. Doesn't work with rectangular matrices, square matrices only.
@@ -3975,14 +5254,21 @@ pub fn trnXmtxInl(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !voi
 }
 
 test "XMTX: trnXmtxInl test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 1, 4, 7, 2, 5, 8, 3, 6, 9 };
     prntXmtx(&mtx, 3);
     const alloc: std.mem.Allocator = std.testing.allocator;
+
+    const start = try Instant.now();
     try trnXmtxInl(&mtx, 3, &alloc);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntrnXmtxInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("trnXmtxInl", elapsed1);
+
     prntXmtx(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
+    prntNl();
 }
 
 ///Transposes the provided matrix into the return matrix.
@@ -3998,16 +5284,21 @@ pub fn trnXmtx(mtx: []f32, cols: usize, ret: []f32) void {
 }
 
 test "XMTX: trnXmtx test" {
-    prntNl();
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 1, 4, 7, 2, 5, 8, 3, 6, 9 };
     var trn: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     prntXmtx(&mtx, 3);
-    //const alloc: std.mem.Allocator = std.testing.allocator;
+
+    const start = try Instant.now();
     trnXmtx(&mtx, 3, &trn);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntrnXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("trnXmtx", elapsed1);
+
     prntXmtx(&trn, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &trn));
-    //alloc.free(trn);
+    prntNl();
 }
 
 ///Transposes the provided matrix into the return matrix. Supports rectangular transposition using the return column argument.
@@ -4036,7 +5327,6 @@ pub fn trnXmtxRect(mtx: []f32, cols: usize, ret: []f32, retCols: usize) void {
 }
 
 test "XMTX: trnXmtxRect test" {
-    prntNl();
     var a: [9]f32 = .{ 2, 1, -2, -1, 0, 3, 0, -2, 1 };
     var b: [6]f32 = .{ 3, 1, 2, -1, 3, 0 };
     var aT: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -4055,10 +5345,17 @@ test "XMTX: trnXmtxRect test" {
     prntXmtx(&b, 2);
     prntNl();
 
+    const start = try Instant.now();
     trnXmtxRect(&b, 2, &bT, 3);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntrnXmtxRect: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("trnXmtxRect", elapsed1);
+
     prntXmtx(&bT, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&bT, &expBt));
+    prntNl();
 }
 
 ///Indicates if the provided matrix is square.
@@ -4076,15 +5373,28 @@ pub fn isSqrXmtx(mtx: []f32, cols: usize) bool {
 }
 
 test "XMTX: isSqrXmtx test" {
-    prntNl();
     var mtx1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var mtx2: [12]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1 };
     prntXmtx(&mtx1, 3);
     prntXmtx(&mtx2, 3);
+
+    var start = try Instant.now();
     const b1: bool = isSqrXmtx(&mtx1, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisSqrXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isSqrXmtx", elapsed1);
+
+    start = try Instant.now();
     const b2: bool = isSqrXmtx(&mtx2, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisSqrXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isSqrXmtx", elapsed1);
+
     try std.testing.expectEqual(true, b1);
     try std.testing.expectEqual(false, b2);
+    prntNl();
 }
 
 ///Indicates if the provided matrix is diagonal.
@@ -4111,15 +5421,28 @@ pub fn isDiagXmtx(mtx: []f32, cols: usize) bool {
 }
 
 test "XMTX: isDiagXmtx test" {
-    prntNl();
     var mtx1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var mtx2: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     prntXmtx(&mtx1, 3);
     prntXmtx(&mtx2, 3);
+
+    var start = try Instant.now();
     const b1: bool = isDiagXmtx(&mtx1, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisDiagXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isDiagXmtx", elapsed1);
+
+    start = try Instant.now();
     const b2: bool = isDiagXmtx(&mtx2, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisDiagXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isDiagXmtx", elapsed1);
+
     try std.testing.expectEqual(false, b1);
     try std.testing.expectEqual(true, b2);
+    prntNl();
 }
 
 ///Indicates if the provided matrix is an identity matrix.
@@ -4150,15 +5473,28 @@ pub fn isIdtXmtx(mtx: []f32, cols: usize) bool {
 }
 
 test "XMTX: isIdtXmtx test" {
-    prntNl();
     var mtx1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var mtx2: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     prntXmtx(&mtx1, 3);
     prntXmtx(&mtx2, 3);
+
+    var start = try Instant.now();
     const b1: bool = isIdtXmtx(&mtx1, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisIdtXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isIdtXmtx", elapsed1);
+
+    start = try Instant.now();
     const b2: bool = isIdtXmtx(&mtx2, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisIdtXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isIdtXmtx", elapsed1);
+
     try std.testing.expectEqual(false, b1);
     try std.testing.expectEqual(true, b2);
+    prntNl();
 }
 
 ///Creates a smaller matrix for cofactor calculations based on the provided, larger, initial matrix mtx.
@@ -4213,7 +5549,6 @@ pub fn cofXmtx(mtx: []f32, cols: usize, cofR: usize, cofC: usize, ret: []f32, co
 }
 
 test "XMTX: cofXmtx test" {
-    prntNl();
     //A = 1 2 3
     //    4 5 6
     //    7 2 9
@@ -4235,18 +5570,32 @@ test "XMTX: cofXmtx test" {
     var res: [4]f32 = .{ 0, 0, 0, 0 };
     const resCols: f32 = 2;
     const cols: f32 = 3;
+    var b: bool = false;
 
-    var b: bool = cofXmtx(&A, cols, 0, 0, &res, resCols);
+    var start = try Instant.now();
+    b = cofXmtx(&A, cols, 0, 0, &res, resCols);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx", elapsed1);
+
     prntXmtx(&res, resCols);
     prntNl();
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(cofA[0], (detXmtx2(&res) * cofXmtxSign(0, 0, true)));
 
+    start = try Instant.now();
     b = cofXmtx(&A, cols, 0, 1, &res, resCols);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx", elapsed1);
+
     prntXmtx(&res, resCols);
     prntNl();
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(cofA[1], (detXmtx2(&res) * cofXmtxSign(0, 1, true)));
+    prntNl();
 }
 
 ///Returns a 1 or -1 depending on the cofactor's row and column. An offset if automatically added for zero based row and column indices.
@@ -4270,14 +5619,30 @@ pub fn cofXmtxSign(cofR: usize, cofC: usize, zeroBased: bool) f32 {
 }
 
 test "XMTX: cofXmtxSign test" {
-    prntNl();
     var c: usize = 0;
     var r: usize = 0;
-    try std.testing.expectEqual(@as(f32, 1.0), cofXmtxSign(r, c, true));
+    var ret: f32 = -1.0;
 
+    var start = try Instant.now();
+    ret = cofXmtxSign(r, c, true);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, 1.0), ret);
     c = 1;
     r = 0;
-    try std.testing.expectEqual(@as(f32, -1.0), cofXmtxSign(r, c, true));
+
+    start = try Instant.now();
+    ret = cofXmtxSign(r, c, true);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, -1.0), ret);
+    prntNl();
 }
 
 ///Returns a new matrix based on the 4x4 matrix, mtx, with the specified row and column data removed.
@@ -4322,7 +5687,6 @@ pub fn rmvRowColXmtx4(mtx: *[16]f32, row: f32, col: f32) [9]f32 {
 }
 
 test "XMTX: rmvRowColXmtx4 test" {
-    prntNl();
     var A: [16]f32 = .{ 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4 };
     //A = 1  1  1  1
     //    2  2  2  2
@@ -4332,12 +5696,18 @@ test "XMTX: rmvRowColXmtx4 test" {
     const r: f32 = 0.0;
     const c: f32 = 0.0;
     var res: [9]f32 = std.mem.zeroes([9]f32); //.{};
+
+    const start = try Instant.now();
     res = rmvRowColXmtx4(&A, r, c);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrmvRowColXmtx4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rmvRowColXmtx4", elapsed1);
 
     std.debug.print("rmvRowColXmtx4:\n", .{});
     prntXmtx(&res, 2);
-
     try std.testing.expectEqual(true, equXmtx(&expA, &res));
+    prntNl();
 }
 
 ///Returns a new matrix based on the 3x3 matrix, mtx, with the specified row and column data removed.
@@ -4382,7 +5752,6 @@ pub fn rmvRowColXmtx3(mtx: *[9]f32, row: f32, col: f32) [4]f32 {
 }
 
 test "XMTX: rmvRowColXmtx3 test" {
-    prntNl();
     var A: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 3, 3, 3 };
     //A = 1  1  1
     //    2  2  2
@@ -4391,12 +5760,18 @@ test "XMTX: rmvRowColXmtx3 test" {
     const r: f32 = 0.0;
     const c: f32 = 0.0;
     var res: [4]f32 = std.mem.zeroes([4]f32); //.{};
+
+    const start = try Instant.now();
     res = rmvRowColXmtx3(&A, r, c);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrmvRowColXmtx3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rmvRowColXmtx3", elapsed1);
 
     std.debug.print("rmvRowColXmtx3:\n", .{});
     prntXmtx(&res, 2);
-
     try std.testing.expectEqual(true, equXmtx(&expA, &res));
+    prntNl();
 }
 
 ///Returns the adjoint matrix for a given 4x4 matrix, mtx.
@@ -4413,12 +5788,19 @@ pub fn adjXmtx4(mtx: *[16]f32) [16]f32 {
 }
 
 test "XMTX: adjXmtx4 test" {
-    prntNl();
     var A: [16]f32 = .{ 1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1 };
     var retA: [16]f32 = std.mem.zeroes([16]f32); //.{};
+
+    const start = try Instant.now();
     retA = adjXmtx4(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nadjXmtx4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("adjXmtx4", elapsed1);
+
     var expA: [16]f32 = .{ -4, -4, -4, 4, -4, -4, 4, -4, -4, 4, -4, -4, 4, -4, -4, -4 };
     try std.testing.expectEqual(true, equXmtx(&expA, &retA));
+    prntNl();
 }
 
 ///Returns the adjoint of the given 3x3 matrix, mtx.
@@ -4435,12 +5817,19 @@ pub fn adjXmtx3(mtx: *[9]f32) [9]f32 {
 }
 
 test "XMTX: adjXmtx3 test" {
-    prntNl();
     var A: [9]f32 = .{ -1, 3, 2, 0, -2, 1, 1, 0, -2 };
     var retA: [9]f32 = std.mem.zeroes([9]f32); //.{};
+
+    const start = try Instant.now();
     retA = adjXmtx3(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nadjXmtx3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("adjXmtx3", elapsed1);
+
     var expA: [9]f32 = .{ 4, 6, 7, 1, 0, 1, 2, 3, 2 };
     try std.testing.expectEqual(true, equXmtx(&expA, &retA));
+    prntNl();
 }
 
 ///Returns a matrix of full co-factors, sign * minor for the given 4x4 matrix.
@@ -4477,23 +5866,29 @@ test "XMTX: cofXmtx4 test" {
     //    1  1  1  1
     var A: [16]f32 = .{ 1, 3, -2, 1, 5, 1, 0, -1, 0, 1, 0, -2, 2, -1, 0, 3 };
     var exp: [16]f32 = .{ 0, 0, 3, 0, -2, 8, 13, 4, 4, -34, -56, -14, 2, -20, -34, -10 };
-    var cof: [16]f32 = cofXmtx4(&A);
+    var cof: [16]f32 = undefined;
 
-    //std.debug.print("AAA cofXmtx4 test\n", .{});
+    const start = try Instant.now();
+    cof = cofXmtx4(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx4", elapsed1);
+
+    std.debug.print("\nAAA cofXmtx4 test", .{});
     clnXmtx(&cof);
-    //prntXmtx(&cof, 4);
+    prntXmtx(&cof, 4);
 
-    //std.debug.print("BBB cofXmtx4 test\n", .{});
-    //prntXmtx(&exp, 4);
-
+    std.debug.print("\nBBB cofXmtx4 test", .{});
+    prntXmtx(&exp, 4);
     const b: bool = equXmtx(&cof, &exp);
-    //b = INT_equXvec(&cof, &exp, false);
-    //std.debug.print("CCC cofXmtx4: {}\n", .{b});
 
-    //std.debug.print("DDD cofXmtx4 test\n", .{});
-    //prntXmtx(&A, 4);
+    std.debug.print("\nCCC cofXmtx4: {}", .{b});
+    std.debug.print("\nDDD cofXmtx4 test", .{});
+    prntXmtx(&A, 4);
 
     try std.testing.expectEqual(true, b);
+    prntNl();
 }
 
 ///Returns a matrix of full cofactors, sign * minor, for the given 3x3 matrix.
@@ -4516,24 +5911,37 @@ pub fn cofXmtx3(mtx: *[9]f32) [9]f32 {
 }
 
 test "XMTX: cofXmtx3 test" {
-    prntNl();
     //A = 0  2  1
     //    3  -1 2
     //    4  0  1
     var A: [9]f32 = .{ 0, 2, 1, 3, -1, 2, 4, 0, 1 };
     var exp: [9]f32 = .{ -1, 5, 4, -2, -4, 8, 5, 3, -6 };
-    var cof: [9]f32 = cofXmtx3(&A);
+    var cof: [9]f32 = undefined;
 
-    //std.debug.print("AAA cofXmtx3 test\n", .{});
-    //prntXmtx(&cof, 3);
-    //std.debug.print("BBB cofXmtx3 test\n", .{});
-    //prntXmtx(&exp, 3);
+    const start = try Instant.now();
+    cof = cofXmtx3(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx3", elapsed1);
+
+    std.debug.print("\nAAA cofXmtx3 test", .{});
+    prntXmtx(&cof, 3);
+    std.debug.print("\nBBB cofXmtx3 test", .{});
+    prntXmtx(&exp, 3);
+
     const b: bool = equXmtx(&cof, &exp);
-    //std.debug.print("CCC cofXmtx3: {}\n", .{b});
+    std.debug.print("\nCCC cofXmtx3: {}", .{b});
     try std.testing.expectEqual(true, b);
+    prntNl();
 }
 
-//TODO Add documentation
+///Calculates a matrix of minors for the given 4x4 matrix.
+///
+///  mtx = The 4x4 matrix to find minors for.
+///
+///  ret = Stores a new 4x4 matrix of the calculated minors for the provided matrix, mtx.
+///
 pub fn mnrXmtx4Ret(mtx: *[16]f32, ret: *[16]f32) void {
     var T1: [9]f32 = .{ mtx[5], mtx[6], mtx[7], mtx[9], mtx[10], mtx[11], mtx[13], mtx[14], mtx[15] };
     var T2: [9]f32 = .{ mtx[4], mtx[6], mtx[7], mtx[8], mtx[10], mtx[11], mtx[12], mtx[14], mtx[15] };
@@ -4576,7 +5984,21 @@ pub fn mnrXmtx4Ret(mtx: *[16]f32, ret: *[16]f32) void {
     ret[15] = detXmtx3(&T16);
 }
 
-//TODO Add tests
+test "XMTX: mnrXmtx4Ret test" {
+    var A: [16]f32 = .{ 1, 0, 3, 5, 2, 1, 4, 6, 1, 2, 3, 4, 4, 3, 2, 1 };
+    var mnrA: [16]f32 = std.mem.zeroes([16]f32); //.{};
+    var exp: [16]f32 = .{ 5, -10, -35, -20, 5, -10, -35, -20, 1, -2, -7, -4, -1, 2, 7, 4 };
+
+    const start = try Instant.now();
+    mnrXmtx4Ret(&A, &mnrA);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx4Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx4Ret", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
+}
 
 ///Returns a matrix of minors for the given 4x4 matrix.
 ///
@@ -4694,15 +6116,27 @@ pub fn mnrXmtx4(mtx: *[16]f32) [16]f32 {
 }
 
 test "XMTX: mnrXmtx4 test" {
-    prntNl();
     var A: [16]f32 = .{ 1, 0, 3, 5, 2, 1, 4, 6, 1, 2, 3, 4, 4, 3, 2, 1 };
     var mnrA: [16]f32 = std.mem.zeroes([16]f32); //.{};
     var exp: [16]f32 = .{ 5, -10, -35, -20, 5, -10, -35, -20, 1, -2, -7, -4, -1, 2, 7, 4 };
+
+    const start = try Instant.now();
     mnrA = mnrXmtx4(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx4", elapsed1);
+
     try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
 }
 
-//TODO documentation
+///Calculates a matrix of minors for the given 3x3 matrix.
+///
+///  mtx = The 3x3 matrix to find minors for.
+///
+///  ret = Stores a new 3x3 matrix of the calculated minors for the provided matrix, mtx.
+///
 pub fn mnrXmtx3Ret(mtx: *[9]f32, ret: *[9]f32) void {
     var T1: [4]f32 = .{ mtx[4], mtx[5], mtx[7], mtx[8] };
     var T2: [4]f32 = .{ mtx[3], mtx[5], mtx[6], mtx[8] };
@@ -4729,7 +6163,21 @@ pub fn mnrXmtx3Ret(mtx: *[9]f32, ret: *[9]f32) void {
     ret[8] = detXmtx2(&T9);
 }
 
-//TODO add tests
+test "XMTX: mnrXmtx3Ret test" {
+    var A: [9]f32 = .{ 1, 0, 3, 2, 1, 4, 1, 2, 3 };
+    var mnrA: [9]f32 = std.mem.zeroes([9]f32); //.{};
+    var exp: [9]f32 = .{ -5, 2, 3, -6, 0, 2, -3, -2, 1 };
+
+    const start = try Instant.now();
+    mnrXmtx3Ret(&A, &mnrA);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx3Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx3Ret", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
+}
 
 ///Returns a matrix of minors for the given 3x3 matrix.
 ///
@@ -4758,15 +6206,27 @@ pub fn mnrXmtx3(mtx: *[9]f32) [9]f32 {
 }
 
 test "XMTX: mnrXmtx3 test" {
-    prntNl();
     var A: [9]f32 = .{ 1, 0, 3, 2, 1, 4, 1, 2, 3 };
     var mnrA: [9]f32 = std.mem.zeroes([9]f32); //.{};
     var exp: [9]f32 = .{ -5, 2, 3, -6, 0, 2, -3, -2, 1 };
+
+    const start = try Instant.now();
     mnrA = mnrXmtx3(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx3", elapsed1);
+
     try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
 }
 
-//TODO: docs
+///Calculates a matrix of minors for the given 2x2 matrix.
+///
+///  mtx = The 2x2 matrix to find minors for.
+///
+///  ret = Stores a new 2x2 matrix of the calculated minors for the provided matrix, mtx.
+///
 pub fn mnrXmtx2Ret(mtx: *[4]f32, ret: *[4]f32) void {
     //Given 2x2 matrix A
     //A = a b     0 1
@@ -4782,9 +6242,28 @@ pub fn mnrXmtx2Ret(mtx: *[4]f32, ret: *[4]f32) void {
     ret[3] = detXmtx1(&T4);
 }
 
-//TODO: tests
+test "XMTX: mnrXmtx2Ret test" {
+    var A: [4]f32 = .{ 1, -8, 5, 4 };
+    var mnrA: [4]f32 = std.mem.zeroes([4]f32);
+    var exp: [4]f32 = .{ 4, 5, -8, 1 };
 
-//TODO: docs
+    const start = try Instant.now();
+    mnrXmtx2Ret(&A, &mnrA);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx2Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx2Ret", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
+}
+
+///Returns a matrix of minors for the given 2x2 matrix.
+///
+///  mtx = The 2x2 matrix to find minors for.
+///
+///  returns = A new 2x2 matrix of the calculated minors for the provided matrix, mtx.
+///
 pub fn mnrXmtx2(mtx: *[4]f32) [4]f32 {
     //Given 2x2 matrix A
     //A = a b     0 1
@@ -4797,7 +6276,21 @@ pub fn mnrXmtx2(mtx: *[4]f32) [4]f32 {
     return .{ detXmtx1(&T1), detXmtx1(&T2), detXmtx1(&T3), detXmtx1(&T4) };
 }
 
-//TODO: tests
+test "XMTX: mnrXmtx2 test" {
+    var A: [4]f32 = .{ 1, -8, 5, 4 };
+    var mnrA: [4]f32 = std.mem.zeroes([4]f32);
+    var exp: [4]f32 = .{ 4, 5, -8, 1 };
+
+    const start = try Instant.now();
+    mnrA = mnrXmtx2(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx2", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
+}
 
 ///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 4x4 matrix.
 pub fn cofXmtxSign4() [16]f32 {
@@ -4805,8 +6298,15 @@ pub fn cofXmtxSign4() [16]f32 {
 }
 
 test "XMTX: cofXmtxSign4 test" {
-    prntNl();
-    const cofSgn: [16]f32 = cofXmtxSign4();
+    var cofSgn: [16]f32 = undefined;
+
+    const start = try Instant.now();
+    cofSgn = cofXmtxSign4();
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign4", elapsed1);
+
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[2]);
@@ -4826,9 +6326,10 @@ test "XMTX: cofXmtxSign4 test" {
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[13]);
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[14]);
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[15]);
+    prntNl();
 }
 
-//TODO: docs
+///Calculates and stores, in ret, a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 4x4 matrix.
 pub fn cofXmtxSign4Ret(ret: *[16]f32) void {
     ret[0] = 1;
     ret[1] = -1;
@@ -4848,7 +6349,7 @@ pub fn cofXmtxSign4Ret(ret: *[16]f32) void {
     ret[12] = -1;
     ret[13] = 1;
     ret[14] = -1;
-    ret[5] = 1;
+    ret[15] = 1;
 
     //return .{ 1,-1, 1,-1,
     //         -1, 1,-1, 1,
@@ -4857,7 +6358,37 @@ pub fn cofXmtxSign4Ret(ret: *[16]f32) void {
     //};
 }
 
-//TODO: tests
+test "XMTX: cofXmtxSign4Ret test" {
+    var cofSgn: [16]f32 = undefined;
+
+    const start = try Instant.now();
+    cofXmtxSign4Ret(&cofSgn);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign4Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign4Ret", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[2]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[3]);
+
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[4]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[5]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[6]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[7]);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[8]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[9]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[10]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[11]);
+
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[12]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[13]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[14]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[15]);
+    prntNl();
+}
 
 ///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 3x3 matrix.
 pub fn cofXmtxSign3() [9]f32 {
@@ -4865,8 +6396,15 @@ pub fn cofXmtxSign3() [9]f32 {
 }
 
 test "XMTX: cofXmtxSign3 test" {
-    prntNl();
-    const cofSgn: [9]f32 = cofXmtxSign3();
+    var cofSgn: [9]f32 = undefined;
+
+    const start = try Instant.now();
+    cofSgn = cofXmtxSign3();
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign3", elapsed1);
+
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[2]);
@@ -4878,9 +6416,10 @@ test "XMTX: cofXmtxSign3 test" {
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[6]);
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[7]);
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[8]);
+    prntNl();
 }
 
-//TODO: docs
+///Calculates and stores, in ret, a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 3x3 matrix.
 pub fn cofXmtxSign3Ret(ret: *[9]f32) void {
     ret[0] = 1;
     ret[1] = -1;
@@ -4899,14 +6438,54 @@ pub fn cofXmtxSign3Ret(ret: *[9]f32) void {
     //            1,-1, 1 };
 }
 
-//TODO: docs
+test "XMTX: cofXmtxSign3Ret test" {
+    var cofSgn: [9]f32 = undefined;
+
+    const start = try Instant.now();
+    cofXmtxSign3Ret(&cofSgn);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign3Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign3Ret", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[2]);
+
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[3]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[4]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[5]);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[6]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[7]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[8]);
+    prntNl();
+}
+
+///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 2x2 matrix.
 pub fn cofXmtxSign2() [4]f32 {
     return .{ 1, -1, -1, 1 };
 }
 
-//TODO: tests
+test "XMTX: cofXmtxSign2 test" {
+    var cofSgn: [4]f32 = undefined;
 
-//TODO: docs
+    const start = try Instant.now();
+    cofSgn = cofXmtxSign2();
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign2", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[2]);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[3]);
+    prntNl();
+}
+
+///Calculates and stores, in ret, a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 2x2 matrix.
 pub fn cofXmtxSign2Ret(ret: *[4]f32) void {
     ret[0] = 1;
     ret[1] = -1;
@@ -4916,7 +6495,22 @@ pub fn cofXmtxSign2Ret(ret: *[4]f32) void {
     //         -1, 1 };
 }
 
-//TODO: tests
+test "XMTX: cofXmtxSign2Ret test" {
+    var cofSgn: [4]f32 = undefined;
+
+    const start = try Instant.now();
+    cofXmtxSign2Ret(&cofSgn);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign2Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign2Ret", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[2]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[3]);
+    prntNl();
+}
 
 ///Returns the determinant of a 1x1 matrix.
 ///
@@ -4929,10 +6523,18 @@ pub fn detXmtx1(mtx: *[1]f32) f32 {
 }
 
 test "XMTX: detXmtx1 test" {
-    prntNl();
     var m1: [1]f32 = .{2};
-    const detM1: f32 = detXmtx1(&m1);
+    var detM1: f32 = undefined;
+
+    const start = try Instant.now();
+    detM1 = detXmtx1(&m1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetXmtx1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detXmtx1", elapsed1);
+
     try std.testing.expectEqual(m1[0], detM1);
+    prntNl();
 }
 
 ///Returns the determinant of a 2x2 matrix.
@@ -4946,10 +6548,18 @@ pub fn detXmtx2(mtx: *[4]f32) f32 {
 }
 
 test "XMTX: detXmtx2 test" {
-    prntNl();
     var m1: [4]f32 = .{ 2, 1, 7, 4 };
-    const detM1: f32 = detXmtx2(&m1);
+    var detM1: f32 = undefined;
+
+    const start = try Instant.now();
+    detM1 = detXmtx2(&m1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetXmtx2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detXmtx2", elapsed1);
+
     try std.testing.expectEqual(((m1[0] * m1[3]) - (m1[1] * m1[2])), detM1);
+    prntNl();
 }
 
 ///Returns the determinant of a 3x3 matrix.
@@ -4977,8 +6587,17 @@ test "XMTX: detXmtx3 test" {
     prntNl();
     var A: [9]f32 = .{ 6, 1, 1, 4, -2, 5, 2, 8, 7 };
     const exp: f32 = -306;
-    const detA: f32 = detXmtx3(&A);
+    var detA: f32 = undefined;
+
+    const start = try Instant.now();
+    detA = detXmtx3(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetXmtx3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detXmtx3", elapsed1);
+
     try std.testing.expectEqual(exp, detA);
+    prntNl();
 }
 
 ///Returns the determinant of a 4x4 matrix.
@@ -5000,11 +6619,19 @@ pub fn detXmtx4(mtx: *[16]f32) f32 {
 }
 
 test "XMTX: detXmtx4 test" {
-    prntNl();
     var A: [16]f32 = .{ 4, 3, 2, 2, 0, 1, -3, 3, 0, -1, 3, 3, 0, 3, 1, 1 };
     const expA: f32 = -240.0;
-    const detA: f32 = detXmtx4(&A);
+    var detA: f32 = undefined;
+
+    const start = try Instant.now();
+    detA = detXmtx4(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetXmtx4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detXmtx4", elapsed1);
+
     try std.testing.expectEqual(true, isEquF32(expA, detA, true));
+    prntNl();
 }
 
 ///Returns the determinant of a diagonal or triangular matrix.
@@ -5020,16 +6647,29 @@ pub fn detTriangXmtx(mtx: []f32, cols: usize) f32 {
 }
 
 test "XMTX: detTriangXmtx test" {
-    prntNl();
     var A: [9]f32 = .{ 2, 0, 0, 0, 2, 0, 0, 0, 2 };
     var B: [16]f32 = .{ 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3 };
     var detA: f32 = 0;
     var detB: f32 = 0;
+
+    var start = try Instant.now();
     detA = detTriangXmtx(&A, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetTriangXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detTriangXmtx", elapsed1);
+
+    start = try Instant.now();
     detB = detTriangXmtx(&B, 4);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetTriangXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detTriangXmtx", elapsed1);
+
     std.debug.print("detA: {} detB: {}\n", .{ detA, detB });
     try std.testing.expectEqual(true, isEquF32(detA, 8.0, true));
     try std.testing.expectEqual(true, isEquF32(detB, 81.0, true));
+    prntNl();
 }
 
 ///Returns the determinant of a diagonal or triangular matrix.
@@ -5057,16 +6697,29 @@ pub fn detDiagXmtx(mtx: []f32, cols: usize) f32 {
 }
 
 test "XMTX: detDiagXmtx test" {
-    prntNl();
     var A: [9]f32 = .{ 2, 0, 0, 0, 2, 0, 0, 0, 2 };
     var B: [16]f32 = .{ 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3 };
     var detA: f32 = 0;
     var detB: f32 = 0;
+
+    var start = try Instant.now();
     detA = detDiagXmtx(&A, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetTriangXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detTriangXmtx", elapsed1);
+
+    start = try Instant.now();
     detB = detDiagXmtx(&B, 4);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetTriangXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detTriangXmtx", elapsed1);
+
     std.debug.print("detA: {} detB: {}\n", .{ detA, detB });
     try std.testing.expectEqual(true, isEquF32(detA, 8.0, true));
     try std.testing.expectEqual(true, isEquF32(detB, 81.0, true));
+    prntNl();
 }
 
 ///Returns the determinant of the specified matrix for the given matrix row.
@@ -5128,34 +6781,107 @@ pub fn detXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator, cofR: u
 }
 
 test "XMTX: detXmtx test" {
-    prntNl();
     const detRow: usize = 0;
     var m2: [4]f32 = .{ 5, 6, 8, 9 };
     var cols: usize = 2;
+
     //a b
     //c d
     //ad - bc
     //5(9) - 6(8) = -3
-
     const alloc: std.mem.Allocator = std.testing.allocator;
-    var v: f32 = try detXmtx(&m2, cols, &alloc, detRow);
+    var v: f32 = -1.0;
+
+    var start = try Instant.now();
+    v = try detXmtx(&m2, cols, &alloc, detRow);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detXmtx", elapsed1);
+
     var exp: f32 = -3.0;
     std.debug.print("Found detXmtx 2x2 value: {}\n", .{v});
     try std.testing.expectEqual(exp, v);
-
     var m3: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     cols = 3;
+
+    start = try Instant.now();
     v = try detXmtx(&m3, cols, &alloc, detRow);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detXmtx", elapsed1);
+
     exp = 0;
     std.debug.print("Found detXmtx 3x3 value: {}\n", .{v});
     try std.testing.expectEqual(exp, v);
-
     var m4: [16]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
     cols = 4;
+
+    start = try Instant.now();
     v = try detXmtx(&m4, cols, &alloc, detRow);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ndetXmtx #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("detXmtx", elapsed1);
+
     exp = 0;
     std.debug.print("Found detXmtx 4x4 value: {}\n", .{v});
     try std.testing.expectEqual(exp, v);
+    prntNl();
+}
+
+///Calculates the inverse of the provided 2x2 matrix using the determinant and stores the result in the return matrix.
+///
+///  mtx = The 2x2 matrix to calculate the inverse for.
+///
+///  det = The determinant of the provided matrix.
+///
+///  ret = The return 2x2 matrix to hold the inverted matrix values.
+///
+///  returns = A Boolean value indicating the operation was a success.
+///
+pub fn getInvFromDet1(mtx: []f32, det: f32, ret: []f32) bool {
+    if (mtx.len != 1) {
+        std.debug.print("!! Warning getInvFromDet2 requires 1x1 matrices !!\n", .{});
+        return false;
+    } else if (ret.len != 1) {
+        std.debug.print("!! Warning getInvFromDet2 requires 1x1 matrices !!\n", .{});
+        return false;
+    }
+
+    ret[0] = (1.0 / det);
+    return true;
+}
+
+test "XMTX: getInvFromDet1 test" {
+    var m1: [1]f32 = .{7.0};
+    var invM1: [1]f32 = .{(1.0 / 7.0)};
+    var res: [1]f32 = std.mem.zeroes([1]f32);
+    const detM1: f32 = detXmtx1(&m1);
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = getInvFromDet1(&m1, detM1, &res);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetInvFromDet1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getInvFromDet1", elapsed1);
+
+    clnXmtx(&res);
+    clnXmtx(&invM1);
+
+    prntNlStr("Res:");
+    prntXmtx(&res, 1);
+    prntNl();
+
+    prntNlStr("invM1:");
+    prntXmtx(&invM1, 1);
+    prntNl();
+
+    try std.testing.expectEqual(true, b);
+    try std.testing.expectEqual(true, equXmtx(&res, &invM1));
+    prntNl();
 }
 
 ///Calculates the inverse of the provided 2x2 matrix using the determinant and stores the result in the return matrix.
@@ -5178,23 +6904,31 @@ pub fn getInvFromDet2(mtx: []f32, det: f32, ret: []f32) bool {
     }
 
     const cols: usize = 2;
-    ret[(0 * cols) + 0] = mtx[(1 * cols) + 1]; //set 0x0 from 1x1
-    ret[(1 * cols) + 1] = mtx[(0 * cols) + 0]; //set 1x1 from 0x0
-    ret[(0 * cols) + 1] = -1.0 * mtx[(0 * cols) + 1]; //set 0x1
-    ret[(1 * cols) + 0] = -1.0 * mtx[(1 * cols) + 0]; //set 1x0
-    mulXvec(ret, (1.0 / det));
+    ret[(0 * cols) + 0] = mtx[(1 * cols) + 1] / det; //set 0x0 from 1x1
+    ret[(1 * cols) + 1] = mtx[(0 * cols) + 0] / det; //set 1x1 from 0x0
+    ret[(0 * cols) + 1] = -1.0 * mtx[(0 * cols) + 1] / det; //set 0x1
+    ret[(1 * cols) + 0] = -1.0 * mtx[(1 * cols) + 0] / det; //set 1x0
+    //mulXvec(ret, (1.0 / det));
     return true;
 }
 
 test "XMTX: getInvFromDet2 test" {
-    prntNl();
     var m1: [4]f32 = .{ 2, 1, 7, 4 };
     var invM1: [4]f32 = .{ 4, -1, -7, 2 };
     var res: [4]f32 = std.mem.zeroes([4]f32); //.{};
     const detM1: f32 = detXmtx2(&m1);
-    const b: bool = getInvFromDet2(&m1, detM1, &res);
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = getInvFromDet2(&m1, detM1, &res);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetInvFromDet2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getInvFromDet2", elapsed1);
+
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&res, &invM1));
+    prntNl();
 }
 
 ///Calculates the inverse of the provided 3x3 matrix using the determinant and stores the result in the return matrix.
@@ -5252,7 +6986,6 @@ pub fn getInvFromDet3(mtx: []f32, det: f32, ret: []f32) bool {
 }
 
 test "XMTX: getInvFromDet3 test" {
-    prntNl();
     //A = 1 2 3
     //    4 5 6
     //    7 2 9
@@ -5269,9 +7002,18 @@ test "XMTX: getInvFromDet3 test" {
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     const detA: f32 = -36;
     var invA: [9]f32 = .{ (-11.0 / 12.0), (1.0 / 3.0), (1.0 / 12.0), (-1.0 / 6.0), (1.0 / 3.0), (-1.0 / 6.0), (3.0 / 4.0), (-1.0 / 3.0), (1.0 / 12.0) };
-    const b: bool = getInvFromDet3(&A, detA, &res);
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = getInvFromDet3(&A, detA, &res);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetInvFromDet3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getInvFromDet3", elapsed1);
+
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&res, &invA));
+    prntNl();
 }
 
 ///Calculates the inverse of the provided 4x4 matrix using the determinant and stores the result in the return matrix.
@@ -5563,16 +7305,21 @@ pub fn getInvFromDet4(mtx: []f32, det: f32, ret: []f32) bool {
 }
 
 test "XMTX: getInvFromDet4 test" {
-    prntNl();
-
     var ret: [16]f32 = std.mem.zeroes([16]f32); //.{};
     var mtx: [16]f32 = .{ 1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, 1, 1, 1 };
     var expMtx: [16]f32 = .{ (1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0) };
     const det: f32 = detXmtx4(&mtx);
     const expDet: f32 = -16;
-    const b: bool = getInvFromDet4(&mtx, det, &ret);
-    const cols: usize = 4;
+    var b: bool = false;
 
+    const start = try Instant.now();
+    b = getInvFromDet4(&mtx, det, &ret);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetInvFromDet4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getInvFromDet4", elapsed1);
+
+    const cols: usize = 4;
     std.debug.print("getInvFromDet4 det: {} expDet: {}\n", .{ det, expDet });
     prntXmtx(&ret, cols);
     prntNl();
@@ -5584,6 +7331,7 @@ test "XMTX: getInvFromDet4 test" {
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, isEquF32(expDet, det, true));
     try std.testing.expectEqual(true, equXmtx(&expMtx, &ret));
+    prntNl();
 
     //TODO ADD MORE TESTS
 }
@@ -5643,47 +7391,66 @@ pub fn getCramerSupportXmtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usiz
 }
 
 test "XMTX: getCramerSupportMtx test" {
-    prntNl();
     //A = -1  2 -3  1
     //     2  0  1  0
     //     3 -4  4  2
-
     var A: [12]f32 = .{ -1, 2, -3, 1, 2, 0, 1, 0, 3, -4, 4, 2 };
     var A1: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var b: bool = false;
     const cols: usize = 4;
     const srcCol: usize = 3;
-
     var dstCol: usize = 0;
     var expA1: [9]f32 = .{ 1, 2, -3, 0, 0, 1, 2, -4, 4 };
+
+    var start = try Instant.now();
     b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
-    std.debug.print("Matrix A{}:\n", .{dstCol});
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetCramerSupportMtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getCramerSupportMtx", elapsed1);
+
+    std.debug.print("\nMatrix A{}:", .{dstCol});
     prntXmtx(&A1, 3);
-    std.debug.print("Matrix Exp A{}:\n", .{dstCol});
+    std.debug.print("\nMatrix Exp A{}:", .{dstCol});
     prntXmtx(&expA1, 3);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&A1, &expA1));
-
     dstCol = 1;
     var expA2: [9]f32 = .{ -1, 1, -3, 2, 0, 1, 3, 2, 4 };
+
+    start = try Instant.now();
     b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
-    std.debug.print("Matrix A{}:\n", .{dstCol});
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetCramerSupportMtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getCramerSupportMtx", elapsed1);
+
+    std.debug.print("\nMatrix A{}:", .{dstCol});
     prntXmtx(&A1, 3);
-    std.debug.print("Matrix Exp A{}:\n", .{dstCol});
+    std.debug.print("\nMatrix Exp A{}:", .{dstCol});
     prntXmtx(&expA1, 3);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&A1, &expA2));
-
     dstCol = 2;
     var expA3: [9]f32 = .{ -1, 2, 1, 2, 0, 0, 3, -4, 2 };
+
+    start = try Instant.now();
     b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
-    std.debug.print("Matrix A{}:\n", .{dstCol});
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetCramerSupportMtx #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getCramerSupportMtx", elapsed1);
+
+    std.debug.print("\nMatrix A{}:", .{dstCol});
     prntXmtx(&A1, 3);
-    std.debug.print("Matrix Exp A{}:\n", .{dstCol});
+    std.debug.print("\nMatrix Exp A{}:", .{dstCol});
     prntXmtx(&expA1, 3);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&A1, &expA3));
+    prntNl();
 }
+
+//current page here
 
 ///Applies Cramer's rule to the given matrix, mtx, with mtxA represented the unaugmented version of matrix mtx, and mtxAi representing Cramer's rule's supporting matrix.
 ///
@@ -5764,11 +7531,9 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
 }
 
 test "XMTX: rslvCramersRule test" {
-    prntNl();
     //A = -1  2 -3  1
     //     2  0  1  0
     //     3 -4  4  2
-
     var mtx: [12]f32 = .{ -1, 2, -3, 1, 2, 0, 1, 0, 3, -4, 4, 2 };
     var A: [9]f32 = .{ -1, 2, -3, 2, 0, 1, 3, -4, 4 };
     var Ai: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -5776,9 +7541,15 @@ test "XMTX: rslvCramersRule test" {
     var b: bool = false;
     const cols: usize = 4;
     const colsA: usize = 3;
-    b = rslvCramersRule(&mtx, cols, &A, colsA, &Ai, &ret);
-    try std.testing.expectEqual(true, b);
 
+    const start = try Instant.now();
+    b = rslvCramersRule(&mtx, cols, &A, colsA, &Ai, &ret);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrslvCramersRule: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rslvCramersRule", elapsed1);
+
+    try std.testing.expectEqual(true, b);
     const expX: f32 = 4.0 / 5.0;
     const expY: f32 = -3.0 / 2.0;
     const expZ: f32 = -8.0 / 5.0;
@@ -5790,6 +7561,7 @@ test "XMTX: rslvCramersRule test" {
     try std.testing.expectEqual(true, isEquF32(ret[0], expX, true));
     try std.testing.expectEqual(true, isEquF32(ret[1], expY, true));
     try std.testing.expectEqual(true, isEquF32(ret[2], expZ, true));
+    prntNl();
 }
 
 ///This function is responsible for changing the basis of the provided vector, vec, from the basis, basis, to chgBasis.
@@ -5864,10 +7636,7 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
     return true;
 }
 
-test "XMTX: chgXvecBasiss test" {
-    prntNl();
-    std.debug.print("chgVecBasis test:\n", .{});
-
+test "XMTX: chgXvecBasis test" {
     //B = {(1,0), (1,2)}
     //Bp = {(1,0), (0,1)}
 
@@ -5893,22 +7662,28 @@ test "XMTX: chgXvecBasiss test" {
     const vbose: bool = true;
     var ret: [4]f32 = .{ 0, 0, 0, 0 };
 
+    const start = try Instant.now();
     b = chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
-    try std.testing.expectEqual(true, b);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nchgXvecBasis: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("chgXvecBasis", elapsed1);
 
-    std.debug.print("chgVecBasis test:chgVecBasis ret {}\n", .{b});
+    try std.testing.expectEqual(true, b);
+    std.debug.print("\nchgXvecBasis ret {}", .{b});
     prntXmtx(&ret, cols);
     prntNl();
 
-    std.debug.print("chgVecBasis test:chgVecBasis B\n", .{});
+    std.debug.print("\nchgXvecBasis B", .{});
     prntXmtx(&B, cols);
     prntNl();
 
-    std.debug.print("chgVecBasis test:chgVecBasis nvec\n", .{});
+    std.debug.print("\nchgXvecBasis nvec", .{});
     prntXmtx(&nvec, 1);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&exp, &nvec));
+    prntNl();
 }
 
 ///Returns the basis conversion, tranformation, matrix for the given current basis and change of basis.
@@ -5965,9 +7740,6 @@ pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usiz
 }
 
 test "XMTX: getBasisCnvXmtx test" {
-    prntNl();
-    std.debug.print("getBasisCnvMtx test:\n", .{});
-
     //B = {(1,0,0), (0, 1, 0), (0, 0, 1)};
     //B' = {(1,0,1), (0, -1, 2), (2, 3, -5)};
 
@@ -5984,11 +7756,16 @@ test "XMTX: getBasisCnvXmtx test" {
     //     | 1  2 -5|
     var Bp: [9]f32 = .{ 1, 0, 2, 0, -1, 3, 1, 2, -5 };
     const colsp: usize = 3;
-
     var b: bool = false;
-    b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
-    try std.testing.expectEqual(true, b);
 
+    const start = try Instant.now();
+    b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisCnvXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisCnvXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
     std.debug.print("getBasisCnvMtx test:getBasisCnvMtx ret {}\n", .{b});
     prntXmtx(&ret, cols);
     prntNl();
@@ -5999,6 +7776,7 @@ test "XMTX: getBasisCnvXmtx test" {
 
     var exp: [9]f32 = .{ -1, 4, 2, 3, -7, -3, 1, -2, -1 };
     try std.testing.expectEqual(true, equXmtx(&exp, &B));
+    prntNl();
 }
 
 ///Returns a Boolean value indicating if the mtx argument is an orthogonal matrix.
@@ -6046,17 +7824,23 @@ pub fn isOrthXmtx(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []
 }
 
 test "XMTX: isOrthXmtx test" {
-    prntNl();
-    std.debug.print("isOrthogonal test:\n", .{});
-
     var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     const cols: usize = 3;
     var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
     var idtMtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     var trnMtx: [9]f32 = std.mem.zeroes([9]f32); //.{};
     const expB: bool = true;
-    const b: bool = isOrthXmtx(&mtx, cols, &ret, &idtMtx, &trnMtx);
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = isOrthXmtx(&mtx, cols, &ret, &idtMtx, &trnMtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthXmtx", elapsed1);
+
     try std.testing.expectEqual(expB, b);
+    prntNl();
 }
 
 ///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
@@ -6085,27 +7869,47 @@ pub fn getBasisHndXvec3(vecI: *const [3]f32, vecJ: *const [3]f32, vecK: *const [
 }
 
 test "XMTX: getBasisHndXvec3 test" {
-    prntNlStr("XMTX: getBasisHndXvec3 test");
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 1, 0 };
     var v3: [3]f32 = .{ 0, 0, 1 };
     var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
-    var resHnd: BASIS_HAND = getBasisHndXvec3(&v1, &v2, &v3);
-    try std.testing.expectEqual(expResHnd, resHnd);
+    var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
 
+    var start = try Instant.now();
+    resHnd = getBasisHndXvec3(&v1, &v2, &v3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXvec3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXvec3", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     v1 = .{ 1, 0, 0 };
     v2 = .{ 0, 1, 0 };
     v3 = .{ 0, 0, -1 };
     expResHnd = BASIS_HAND.LEFT;
-    resHnd = getBasisHndXvec3(&v1, &v2, &v3);
-    try std.testing.expectEqual(expResHnd, resHnd);
 
+    start = try Instant.now();
+    resHnd = getBasisHndXvec3(&v1, &v2, &v3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXvec3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXvec3", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     v1 = .{ 0, 0, 0 };
     v2 = .{ 0, 0, 0 };
     v3 = .{ 0, 0, -1 };
     expResHnd = BASIS_HAND.ERROR_ZERO;
+
+    start = try Instant.now();
     resHnd = getBasisHndXvec3(&v1, &v2, &v3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXvec3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXvec3", elapsed1);
+
     try std.testing.expectEqual(expResHnd, resHnd);
+    prntNl();
 }
 
 ///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
@@ -6125,30 +7929,49 @@ pub fn getBasisHndXvec3Ret(vecI: *const [3]f32, vecJ: *const [3]f32, vecK: *cons
 }
 
 test "XMTX: getBasisHndXvec3Ret test" {
-    prntNlStr("XMTX: getBasisHndXvec3Ret test");
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 1, 0 };
     var v3: [3]f32 = .{ 0, 0, 1 };
     var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
     var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
-    getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
-    try std.testing.expectEqual(expResHnd, resHnd);
 
+    var start = try Instant.now();
+    getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXvec3Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXvec3Ret", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     v1 = .{ 1, 0, 0 };
     v2 = .{ 0, 1, 0 };
     v3 = .{ 0, 0, -1 };
     expResHnd = BASIS_HAND.LEFT;
     resHnd = BASIS_HAND.ERROR_ZERO;
-    getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
-    try std.testing.expectEqual(expResHnd, resHnd);
 
+    start = try Instant.now();
+    getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXvec3Ret #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXvec3Ret", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     v1 = .{ 0, 0, 0 };
     v2 = .{ 0, 0, 0 };
     v3 = .{ 0, 0, -1 };
     expResHnd = BASIS_HAND.ERROR_ZERO;
     resHnd = BASIS_HAND.ERROR_ZERO;
+
+    start = try Instant.now();
     getBasisHndXvec3Ret(&v1, &v2, &v3, &resHnd);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXvec3Ret #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXvec3Ret", elapsed1);
+
     try std.testing.expectEqual(expResHnd, resHnd);
+    prntNl();
 }
 
 ///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
@@ -6181,20 +8004,40 @@ test "XMTX: getBasisHndXmtx3 test" {
     var m1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
     var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
-    resHnd = getBasisHndXmtx3(&m1, 3);
-    try std.testing.expectEqual(expResHnd, resHnd);
 
+    var start = try Instant.now();
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXmtx3 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXmtx3", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     m1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, -1 };
     expResHnd = BASIS_HAND.LEFT;
     resHnd = BASIS_HAND.ERROR_ZERO;
-    resHnd = getBasisHndXmtx3(&m1, 3);
-    try std.testing.expectEqual(expResHnd, resHnd);
 
+    start = try Instant.now();
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXmtx3 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXmtx3", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     m1 = .{ 0, 0, 0, 0, 0, 0, 0, 0, -1 };
     expResHnd = BASIS_HAND.ERROR_ZERO;
     resHnd = BASIS_HAND.LEFT;
+
+    start = try Instant.now();
     resHnd = getBasisHndXmtx3(&m1, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXmtx3 #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXmtx3", elapsed1);
+
     try std.testing.expectEqual(expResHnd, resHnd);
+    prntNl();
 }
 
 ///Returns an enumeration value indicating the handedness of the 3 vector arguments assuming they form a basis,
@@ -6212,26 +8055,190 @@ pub fn getBasisHndXmtx3Ret(mtx: *const [9]f32, cols: usize, ret: *BASIS_HAND) vo
 }
 
 test "XMTX: getBasisHndXmtx3Ret test" {
-    prntNlStr("XMTX: getBasisHndXmtx3Ret test");
     var m1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
     var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
-    getBasisHndXmtx3Ret(&m1, 3, &resHnd);
-    try std.testing.expectEqual(expResHnd, resHnd);
 
+    var start = try Instant.now();
+    getBasisHndXmtx3Ret(&m1, 3, &resHnd);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXmtx3Ret #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXmtx3Ret", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     m1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, -1 };
     expResHnd = BASIS_HAND.LEFT;
     resHnd = BASIS_HAND.ERROR_ZERO;
-    getBasisHndXmtx3Ret(&m1, 3, &resHnd);
-    try std.testing.expectEqual(expResHnd, resHnd);
 
+    start = try Instant.now();
+    getBasisHndXmtx3Ret(&m1, 3, &resHnd);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXmtx3Ret #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXmtx3Ret", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
     m1 = .{ 0, 0, 0, 0, 0, 0, 0, 0, -1 };
     expResHnd = BASIS_HAND.ERROR_ZERO;
     resHnd = BASIS_HAND.LEFT;
+
+    start = try Instant.now();
     getBasisHndXmtx3Ret(&m1, 3, &resHnd);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetBasisHndXmtx3Ret #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getBasisHndXmtx3Ret", elapsed1);
+
     try std.testing.expectEqual(expResHnd, resHnd);
+    prntNl();
 }
 
+//fn eqlFncName(a: []const u8, b: []const u8) bool {
+//    return std.mem.eql(u8, a, b);
+//}
+
+//fn ltFncName(a: []const u8, b: []const u8) bool {
+//    return std.mem.lessThan(u8, a, b);
+//}
+
+//fn gtFncName(a: []const u8, b: []const u8) bool {
+//    return !std.mem.lessThan(u8, a, b);
+//}
+
+fn cmpFncName(a: []const u8, b: []const u8) f32 {
+    const alen = a.len;
+    const blen = b.len;
+    var l: usize = 0;
+
+    if (alen < blen) {
+        l = alen;
+    } else {
+        l = blen;
+    }
+
+    for (0..l) |i| {
+        if (a[i] < b[i]) {
+            return -1;
+        } else if (a[i] > b[i]) {
+            return 1;
+        } else if (a[i] == b[i]) {
+            continue;
+        }
+    }
+
+    if (alen < blen) {
+        return -1;
+    } else if (alen > blen) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+test "XMTX: sortExecTimeList process" {
+    //collapse exec time entries into a string hashmap
+    var t1: ?ExecTime = null;
+    var map = std.StringHashMap(ExecTime).init(std.testing.allocator);
+    var et1: ExecTime = undefined;
+    for (0..execTimesCnt) |i| {
+        et1 = execTimes[i];
+        t1 = map.get(et1.fncName);
+        if (t1 == null) {
+            et1.fncCnt = 1;
+            et1.fncAvg = et1.fncTime;
+            try map.put(et1.fncName, et1);
+        } else {
+            t1.?.fncCnt += 1.0;
+            t1.?.fncTime += et1.fncTime;
+            t1.?.fncAvg = et1.fncTime / et1.fncCnt;
+            try map.put(t1.?.fncName, t1.?);
+        }
+    }
+    defer map.deinit();
+
+    //copy string hash map into an array
+    prntNl();
+    var klen: usize = 0;
+    var keys: [1024]ExecTime = undefined;
+    var iterator = map.iterator();
+    while (iterator.next()) |execTime| {
+        keys[klen] = .{
+            .fncName = execTime.key_ptr.*,
+            .fncTime = execTime.value_ptr.*.fncTime,
+            .fncCnt = execTime.value_ptr.*.fncCnt,
+            .fncAvg = execTime.value_ptr.*.fncAvg,
+        };
+        klen += 1;
+        //try prntNlStrArgs("MapList: {s}: {} {d:.3}ms {d:.3}ns", .{ execTime.key_ptr.*, execTime.value_ptr.*.fncCnt, execTime.value_ptr.*.fncAvg / time.ns_per_ms, execTime.value_ptr.*.fncAvg });
+    }
+    prntNl();
+
+    //Test string compare
+    //const tt1: *const [6:0]u8 = "absF32";
+    //const tt2: *const [6:0]u8 = "absF32";
+    //const tt3: *const [9:0]u8 = "absF32Ref";
+    //const aa1: f32 = cmpFncName(tt1, tt2);
+    //const aa2: f32 = cmpFncName(tt1, tt3);
+    //const aa3: f32 = cmpFncName(tt3, tt1);
+    //try prntNlStrArgs("Answer1: {}", .{aa1});
+    //try prntNlStrArgs("Answer2: {}", .{aa2});
+    //try prntNlStrArgs("Answer3: {}", .{aa3});
+
+    //sot exec times
+    const n: usize = klen;
+    var temp: ExecTime = undefined;
+    for (0..n) |i| {
+        for (1..(n - i)) |j| {
+            if (cmpFncName(keys[j - 1].fncName, keys[j].fncName) == 1) {
+                //swap elements
+                temp = keys[j - 1];
+                keys[j - 1] = keys[j];
+                keys[j] = temp;
+            }
+        }
+    }
+
+    //List exec times
+    prntNlStr("Function Execution Times List:");
+    for (0..klen) |i| {
+        try prntNlStrArgs("{s}:\tCount: {}\tAvg: {d:.3}ms {d:.3}ns", .{ keys[i].fncName, keys[i].fncCnt, keys[i].fncAvg / time.ns_per_ms, keys[i].fncAvg });
+    }
+    prntNl();
+
+    //var sum: f64 = execTimes[0].fncTime;
+    //var avg: f64 = 0.0;
+    //var cnt: f64 = 1.0;
+    //var crntFncName: []u8 = @constCast(execTimes[0].fncName);
+    //try prntNlStrArgs("{s}: {d:.3}ms {d:.3}ns", .{ execTimes[0].fncName, execTimes[0].fncTime / time.ns_per_ms, execTimes[0].fncTime });
+    //for (1..execTimesCnt) |i| {
+    //    const execTime = execTimes[i];
+    //    if (eqlFncName(execTime.fncName, crntFncName)) {
+    //        sum += execTime.fncTime;
+    //        cnt += 1.0;
+    //    } else {
+    //        avg = sum / cnt;
+    //        try prntNlStrArgs("AVG: {s}: {} {d:.3}ms {d:.3}ns", .{ crntFncName, cnt, avg / time.ns_per_ms, avg });
+    //
+    //        crntFncName = @constCast(execTime.fncName);
+    //        sum = execTime.fncTime;
+    //        cnt = 1.0;
+    //        avg = 0.0;
+    //    }
+    //    try prntNlStrArgs("{s}: {d:.3}ms {d:.3}ns", .{ execTime.fncName, execTime.fncTime / time.ns_per_ms, execTime.fncTime });
+    //}
+}
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
@@ -7133,10 +9140,32 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     try std.testing.expectEqual(true, equXmtx(&idtF2, &invF2));
 }
 
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 //STOP THEOREMS
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 //START PROBLEMS
 //Elementary Linear Algebra - Larson, Edwards- 4th Edition
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
 test "XMTX: ELA - Larson, Edwards: 1.2 Example 3 test" {
     prntNl();
@@ -7418,7 +9447,6 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Problem 20 test" {
     try std.testing.expectEqual(false, isIdtXmtx(&idtM1, dim));
 }
 
-//Next guide topics
 test "XMTX: ELA - Larson, Edwards: 2.1 Example 2 test" {
     prntNl();
     var m1: [4]f32 = .{ -1, 2, 0, 1 };
@@ -10404,4 +12432,10 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 1, 3, 5 test" {
     try std.testing.expectEqual(true, isEquF32(mag, exp, false));
 }
 
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 //STOP PROBLEMS
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------

@@ -1,681 +1,1413 @@
-1/197 test.XMTX: absF32 test... 
- XMTX: absF32 test
+1/226 test.XMTX: absF32 test... 
+absF32: Time elapsed is: 0.000ms, 200.000ns
 OK
-2/197 test.XMTX: absF32Inl test... 
- XMTX: absF32Inl test
-
- Before Exp = 7.0e+00, V = -7.0e+00
- After Exp = 7.0e+00, V = 7.0e+00OK
-3/197 test.XMTX: absF32Ret test... 
- XMTX: absF32Ret test
-
- Before Exp = 7.0e+00, V = -7.0e+00, Ret = 0.0e+00
- After Exp = 7.0e+00, V = -7.0e+00, Ret = 7.0e+00OK
-4/197 test.XMTX: getPolyOrder test... 
- XMTX: getPolyOrder test
+2/226 test.XMTX: absF32Ref test... 
+Before Exp = 7.0e+00, V = -7.0e+00
+absF32Ref: Time elapsed is: 0.000ms, 100.000ns
+After Exp = 7.0e+00, V = 7.0e+00
 OK
-5/197 test.XMTX: getPolyOrderRet test... 
- XMTX: getPolyOrderRet test
+3/226 test.XMTX: absF32Ret test... 
+Before Exp = 7.0e+00, V = -7.0e+00, Ret = 0.0e+00
+absF32Ret: Time elapsed is: 0.000ms, 100.000ns
+After Exp = 7.0e+00, V = -7.0e+00, Ret = 7.0e+00
 OK
-6/197 test.XMTX: fndFactorsOf test... 
- XMTX: fndFactorsOf test
+4/226 test.XMTX: getPolyOrder test... 
+getPolyOrder #1: Time elapsed is: 0.000ms, 100.000ns
+getPolyOrder #2: Time elapsed is: 0.000ms, 100.000ns
+getPolyOrder #3: Time elapsed is: 0.000ms, 100.000ns
+OK
+5/226 test.XMTX: getPolyOrderRet test... 
+getPolyOrderRet #1: Time elapsed is: 0.000ms, 200.000ns
+getPolyOrderRet #2: Time elapsed is: 0.000ms, 100.000ns
+getPolyOrderRet #3: Time elapsed is: 0.000ms, 100.000ns
+OK
+6/226 test.XMTX: fndFactorsOf test... 
+fndFactorsOf: Time elapsed is: 0.005ms, 5400.000ns
 Given X = 6.0e+00 we have found 4.0e+00 factors.
 1.0e+00 is a factor of 6.0e+00
 2.0e+00 is a factor of 6.0e+00
 3.0e+00 is a factor of 6.0e+00
 6.0e+00 is a factor of 6.0e+00
 OK
-7/197 test.XMTX: fndFactorsOfRef test... 
- XMTX: fndFactorsOfRef test
+7/226 test.XMTX: fndFactorsOfRef test... 
+fndFactorsOfRef: Time elapsed is: 0.001ms, 500.000ns
 Given X = 6.0e+00 we have found 4.0e+00 factors.
 1.0e+00 is a factor of 6.0e+00
 2.0e+00 is a factor of 6.0e+00
 3.0e+00 is a factor of 6.0e+00
 6.0e+00 is a factor of 6.0e+00
 OK
-8/197 test.XMTX: fndFactorsOfRet test... 
- XMTX: fndFactorsOfRet test
+8/226 test.XMTX: fndFactorsOfRet test... 
+fndFactorsOfRet: Time elapsed is: 0.000ms, 400.000ns
 Given X = 6.0e+00 we have found 4.0e+00 factors.
 1.0e+00 is a factor of 6.0e+00
 2.0e+00 is a factor of 6.0e+00
 3.0e+00 is a factor of 6.0e+00
 6.0e+00 is a factor of 6.0e+00
 OK
-9/197 test.XMTX: synthDivPoly1IntoPoly2 test... 
- XMTX: synthDivPoly1IntoPoly2 test
-AAA Found remainder: 1.2e+01
-x: 1.0e+00 y: 6.0e+00 
+9/226 test.XMTX: synthDivPoly1IntoPoly2 test... 
+synthDivPoly1IntoPoly2 #1: Time elapsed is: 0.000ms, 100.000ns
+AAA Found remainder: 1.2e+01x: 1.0e+00 y: 6.0e+00 
 
-BBB Found remainder: 0.0e+00
-x: 1.0e+00 y: -1.0e+00 
 
-OK
-10/197 test.XMTX: synthDivPoly1IntoPoly2Ret test... 
- XMTX: synthDivPoly1IntoPoly2Ret test
-AAA Found remainder: 1.2e+01
-x: 1.0e+00 y: 6.0e+00 
+synthDivPoly1IntoPoly2 #2: Time elapsed is: 0.000ms, 100.000ns
+BBB Found remainder: 0.0e+00x: 1.0e+00 y: -1.0e+00 
 
-BBB Found remainder: 0.0e+00
-x: 1.0e+00 y: -1.0e+00 
 
 OK
-11/197 test.XMTX: synthDivPoly1IntoPoly3 test... 
- XMTX: synthDivPoly1IntoPoly3 test
+10/226 test.XMTX: synthDivPoly1IntoPoly2Ret test... 
+synthDivPoly1IntoPoly2Ret #1: Time elapsed is: 0.000ms, 100.000ns
+AAA Found remainder: 1.2e+01x: 1.0e+00 y: 6.0e+00 
+
+
+synthDivPoly1IntoPoly2Ret #2: Time elapsed is: 0.000ms, 200.000ns
+BBB Found remainder: 0.0e+00x: 1.0e+00 y: -1.0e+00 
+
+
+OK
+11/226 test.XMTX: synthDivPoly1IntoPoly3 test... 
+synthDivPoly1IntoPoly3: Time elapsed is: 0.000ms, 200.000ns
 
 AAA Found remainder: -1.0e+01
-synthDivPoly1IntoPoly3 Answers: { 2.0e+00, -5.0e+00, 9.0e+00 }
-x: 2.0e+00 y: -5.0e+00 z: 9.0e+00 
+synthDivPoly1IntoPoly3 Answers: { 2.0e+00, -5.0e+00, 9.0e+00 }x: 2.0e+00 y: -5.0e+00 z: 9.0e+00 
+
 
 OK
-12/197 test.XMTX: synthDivPoly1IntoPoly3Ret test... 
- XMTX: synthDivPoly1IntoPoly3Ret test
+12/226 test.XMTX: synthDivPoly1IntoPoly3Ret test... 
+synthDivPoly1IntoPoly3Ret: Time elapsed is: 0.000ms, 100.000ns
 
 AAA Found remainder: -1.0e+01
-synthDivPoly1IntoPoly3 Answers: { 2.0e+00, -5.0e+00, 9.0e+00 }
-x: 2.0e+00 y: -5.0e+00 z: 9.0e+00 
+synthDivPoly1IntoPoly3 Answers: { 2.0e+00, -5.0e+00, 9.0e+00 }x: 2.0e+00 y: -5.0e+00 z: 9.0e+00 
+
 
 OK
-13/197 test.XMTX: prntPolyExp test... 
- XMTX: prntPolyExp test
+13/226 test.XMTX: prntPolyExp test... 
 4.0e+00x^3 + 3.0e+00x^2 + 2.0e+00x + 1.0e+00
 3.0e+00x^2 + 2.0e+00x + 1.0e+00
 2.0e+00x + 1.0e+00
 1.0e+00
 OK
-14/197 test.XMTX: rslvPoly3 test... 
+14/226 test.XMTX: rslvPoly3 test... 
+rslvPoly3 #1: Time elapsed is: 0.008ms, 8200.000ns
+rslvPoly3 #2: Time elapsed is: 0.001ms, 600.000ns
+rslvPoly3 #3: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly3 #3: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3 #4: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3 #4: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3 #5: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3 #6: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly3 #7: Time elapsed is: 0.000ms, 200.000ns
 OK
-15/197 test.XMTX: rslvPoly3Ref test... 
- XMTX: rslvPoly3Ref test
+15/226 test.XMTX: rslvPoly3Ref test... 
+rslvPoly3Ref #1: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ref #2: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ref #3: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ref #4: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ref #5: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ref #6: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly3Ref #7: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ref #8: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ref #9: Time elapsed is: 0.000ms, 100.000ns
 OK
-16/197 test.XMTX: rslvPoly3Ret test... 
- XMTX: rslvPoly3Ret test
+16/226 test.XMTX: rslvPoly3Ret test... 
+rslvPoly3Ret #1: Time elapsed is: 0.008ms, 8100.000ns
+rslvPoly3Ret #2: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ret #3: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ret #4: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly3Ret #5: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly3Ret #6: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ret #7: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ret #8: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly3Ret #9: Time elapsed is: 0.000ms, 100.000ns
 OK
-17/197 test.XMTX: rslvPoly2 test... 
+17/226 test.XMTX: rslvPoly2 test... 
+rslvPoly2 #1: Time elapsed is: 0.009ms, 8500.000ns
+rslvPoly2 #2: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2 #3: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2 #4: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly2 #5: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly2 #6: Time elapsed is: 0.000ms, 100.000ns
 OK
-18/197 test.XMTX: rtsPoly3 test... 
+18/226 test.XMTX: rslvPoly2Ref test... 
+rslvPoly2Ref #1: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2Ref #2: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly2Ref #3: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly2Ref #4: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2Ref #5: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2Ref #6: Time elapsed is: 0.000ms, 100.000ns
+OK
+19/226 test.XMTX: rslvPoly2Ret test... 
+rslvPoly2Ret #1: Time elapsed is: 0.007ms, 7000.000ns
+rslvPoly2Ret #2: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2Ret #3: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2Ret #4: Time elapsed is: 0.000ms, 100.000ns
+rslvPoly2Ret #5: Time elapsed is: 0.000ms, 200.000ns
+rslvPoly2Ret #6: Time elapsed is: 0.000ms, 100.000ns
+OK
+20/226 test.XMTX: rtsPoly3 test... 
+rtsPoly3: Time elapsed is: 0.022ms, 21500.000ns
 1.0e+00x^3 + 1.5e+00x^2 + -5.5e+00x + -3.0e+00
 rtsPoly3 roots found: { 2.0e+00, -5.0e-01, -3.0e+00 }
 OK
-19/197 test.XMTX: rtsPoly2 test... 
+21/226 test.XMTX: rtsPoly3Ret test... 
+rtsPoly3Ret: Time elapsed is: 0.002ms, 1800.000ns
+1.0e+00x^3 + 1.5e+00x^2 + -5.5e+00x + -3.0e+00
+rtsPoly3 roots found: { 2.0e+00, -5.0e-01, -3.0e+00 }
+OK
+22/226 test.XMTX: rtsPoly2 test... 
+rtsPoly2: Time elapsed is: 0.001ms, 800.000ns
 x: 5.0e+00 y: 2.0e+00 
 
 OK
-20/197 test.XMTX: dscrPoly3 test... 
-OK
-21/197 test.XMTX: dscrPoly2 test... 
-x: 5.0e+00 y: 2.0e+00 
+23/226 test.XMTX: rtsPoly2Ret test... 
+rtsPoly2Ret: Time elapsed is: 0.009ms, 9200.000nsx: 5.0e+00 y: 2.0e+00 
+
 
 OK
-22/197 test.XMTX: fndEigVal3 test... 
-AAA Eigen Values Found:
-(a - &)*|(e - &), f, h, (i - &)| + (-b)*|d, f, g, (i - &)| + (c)*|d, (e - &), g, h|
+24/226 test.XMTX: dscrPoly3 test... 
+dscrPoly3: Time elapsed is: 0.009ms, 8600.000ns
+OK
+25/226 test.XMTX: dscrPoly2 test... 
+dscrPoly2: Time elapsed is: 0.001ms, 500.000nsx: 5.0e+00 y: 2.0e+00 
+
+
+OK
+26/226 test.XMTX: fndEigVal3 test... 
+fndEigVal3: Time elapsed is: 0.013ms, 12800.000ns
+AAA Eigen Values Found:(a - &)*|(e - &), f, h, (i - &)| + (-b)*|d, f, g, (i - &)| + (c)*|d, (e - &), g, h|
 (-2.0e+00 - &)*|(1.0e+00 - &), 2.0e+00, 2.0e+00, (2.0e+00 - &)| + (-2.0e+00)*|-4.0e+00, 2.0e+00, 2.0e+00, (5.0e+00 - &)| + (4.0e+00)*|-4.0e+00, (1.0e+00 - &), 2.0e+00, 2.0e+00|
 a&^3 + b&^2 + c& + d = 0
 1.0e+00&^3 + -4.0e+00&^2 + -2.3e+01& + 7.8e+01 = 0
 Eigen Values 3.0e+00, 5.62347555e+00, -4.62347555e+00 = 0
+
 OK
-23/197 test.XMTX: fndEigVal2 test... 
-AAA Eigen Values Found:
-(a + -&)(d + -&) + (-bc)
+27/226 test.XMTX: fndEigVal2 test... 
+fndEigVal2 #1: Time elapsed is: 0.008ms, 8200.000ns
+AAA Eigen Values Found:(a + -&)(d + -&) + (-bc)
 (5.0e+00 + -&)(9.0e+00 + -&) + (-4.8e+01)
 a&^2 + b& + c = 0
 1.0e+00&^2 + -1.4e+01& + -3.0e+00 = 0
 Eigen Values 1.42111024e+01, -2.11102485e-01 = 0
-BBB Eigen Values Found:
-(a + -&)(d + -&) + (-bc)
+
+fndEigVal2 #2: Time elapsed is: 0.001ms, 700.000ns
+BBB Eigen Values Found:(a + -&)(d + -&) + (-bc)
 (1.0e+00 + -&)(3.0e+00 + -&) + (-8.0e+00)
 a&^2 + b& + c = 0
 1.0e+00&^2 + -4.0e+00& + -5.0e+00 = 0
 Eigen Values 5.0e+00, -1.0e+00 = 0
+
 OK
-24/197 test.XMTX: clnXmtx test... 
-clnXmtx test:
+28/226 test.XMTX: clnXmtx test... 
+clnXmtx: Time elapsed is: 0.001ms, 600.000ns
 OK
-25/197 test.XMTX: isEquF32 test... 
+29/226 test.XMTX: isEquF32 test... 
+isEquF32 #1: Time elapsed is: 0.000ms, 100.000ns
+isEquF32 #2: Time elapsed is: 0.000ms, 100.000ns
 OK
-26/197 test.XMTX: cpyXmtx test... 
-cpyXmtx test:
+30/226 test.XMTX: isEquF32Ref test... 
+isEquF32Ref #1: Time elapsed is: 0.000ms, 300.000ns
+isEquF32Ref #2: Time elapsed is: 0.000ms, 0.000ns
+isEquF32Ref #3: Time elapsed is: 0.000ms, 200.000ns
+isEquF32Ref #4: Time elapsed is: 0.000ms, 100.000ns
 OK
-27/197 test.XMTX: cpyLessXmtx test... 
-cpyLessXmtx test:
+31/226 test.XMTX: isEquF32Ret test... 
+isEquF32Ret #1: Time elapsed is: 0.008ms, 8200.000ns
+isEquF32Ret #2: Time elapsed is: 0.000ms, 100.000ns
+isEquF32Ret #3: Time elapsed is: 0.000ms, 100.000ns
+isEquF32Ret #4: Time elapsed is: 0.000ms, 200.000ns
 OK
-28/197 test.XMTX: cpyXvec test... 
-cpyXvec test:
+32/226 test.XMTX: cpyXmtx test... 
+cpyXmtx #1: Time elapsed is: 0.008ms, 7600.000ns
+cpyXmtx #2: Time elapsed is: 0.000ms, 200.000ns
 OK
-29/197 test.XMTX: crtXmtxEz test... 
-crtXmtxEz test:
+33/226 test.XMTX: cpyLessXmtx test... 
+cpyLessXmtx: Time elapsed is: 0.001ms, 500.000ns
 OK
-30/197 test.XMTX: crtXmtx test... 
-crtXmtx test:
+34/226 test.XMTX: cpyLessColRowXmtx test... 
+cpyLessColRowXmtx #1: Time elapsed is: 0.000ms, 400.000ns
+cpyLessColRowXmtx #2: Time elapsed is: 0.000ms, 300.000ns
+cpyLessColRowXmtx #3: Time elapsed is: 0.000ms, 400.000ns
 OK
-31/197 test.XMTX: crtXvec test... 
-crtXvec test:
+35/226 test.XMTX: cpyLessColRowXmtx3 test... 
+cpyLessColRowXmtx3 #1: Time elapsed is: 0.000ms, 200.000ns
+cpyLessColRowXmtx3 #2: Time elapsed is: 0.000ms, 200.000ns
+cpyLessColRowXmtx3 #3: Time elapsed is: 0.000ms, 200.000ns
 OK
-32/197 test.XMTX: clrXmtx test... 
+36/226 test.XMTX: cpyXvec test... 
+cpyXvec #1: Time elapsed is: 0.000ms, 100.000ns
+cpyXvec #2: Time elapsed is: 0.000ms, 200.000ns
+OK
+37/226 test.XMTX: crtXmtxEz test... 
+crtXmtxEz #1: Time elapsed is: 0.155ms, 155200.000ns
+crtXmtxEz #2: Time elapsed is: 0.006ms, 6000.000ns
+OK
+38/226 test.XMTX: crtXmtx test... 
+crtXmtx #1: Time elapsed is: 0.024ms, 24400.000ns
+crtXmtx #2: Time elapsed is: 0.005ms, 4700.000ns
+OK
+39/226 test.XMTX: crtXvec test... 
+crtXmtx: Time elapsed is: 0.026ms, 25800.000ns
+crtXvec: Time elapsed is: 0.006ms, 5700.000ns
+OK
+40/226 test.XMTX: clrXmtx test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
+clrXmtx: Time elapsed is: 0.000ms, 200.000ns
 OK
-33/197 test.XMTX: cpyXmtxNew test... 
-cpyXmtxNew test:
+41/226 test.XMTX: cpyXmtxNew test... 
+cpyXmtxNew: Time elapsed is: 0.025ms, 24700.000ns
 OK
-34/197 test.XMTX: cpyXvecNew test... 
-cpyXvecNew test:
+42/226 test.XMTX: cpyXvecNew test... 
+cpyXvecNew: Time elapsed is: 0.039ms, 38500.000ns
 OK
-35/197 test.XMTX: magXvec test... 
-magXvec test:
+43/226 test.XMTX: magXvec test... 
+magXvec: Time elapsed is: 0.000ms, 200.000ns
 OK
-36/197 test.XMTX: hasInvXmtx test... 
+44/226 test.XMTX: hasInvXmtx test... 
 hasInvXmtx test: initial matrix
 0: x: 3.0e+00 y: 2.0e+00 z: -3.0e+00 w: 4.0e+00 
 1: x: -3.0e+00 y: 6.0e+00 z: 1.0e+00 w: 0.0e+00 
+
+
 Clean Short Answer:
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
+
 
 Orig M1:
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
+
 Trn M1:
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
+
+hasInvXmtx: Time elapsed is: 0.007ms, 6700.000ns
 OK
-37/197 test.XMTX: isSymXmtx test... 
+45/226 test.XMTX: isSymXmtx test... 
+isSymXmtx: Time elapsed is: 0.001ms, 500.000ns
 OK
-38/197 test.XMTX: isZeroXmtx test... 
-isZeroXmtx test:
+46/226 test.XMTX: isZeroXmtx test... 
+isZeroXmtx #1: Time elapsed is: 0.000ms, 200.000ns
+isZeroXmtx #2: Time elapsed is: 0.000ms, 200.000ns
 OK
-39/197 test.XMTX: isZeroXvec test... 
-isZeroXvec test:
+47/226 test.XMTX: isZeroXvec test... 
+isZeroXvec #1: Time elapsed is: 0.000ms, 100.000ns
+isZeroXvec #2: Time elapsed is: 0.000ms, 100.000ns
 OK
-40/197 test.XMTX: isLinIndXvec test... 
-isLinIndXvec test:
+48/226 test.XMTX: isLinIndXvec test... 
+isLinIndXvec #1: Time elapsed is: 0.000ms, 200.000ns
+isLinIndXvec #2: Time elapsed is: 0.000ms, 100.000ns
 OK
-41/197 test.XMTX: dotPrdXvec test... 
-dotPrdXvec test:
+49/226 test.XMTX: dotPrdXvec test... 
+dotPrdXvec #1: Time elapsed is: 0.000ms, 200.000ns
+dotPrdXvec #2: Time elapsed is: 0.000ms, 100.000ns
 OK
-42/197 test.XMTX: crsPrdXvec test... 
-crsPrdXvec test:
-x: 0.0e+00 y: -1.0e+00 z: 0.0e+00 
+50/226 test.XMTX: dotPrdXvec3 test... 
+dotPrdXvec #1: Time elapsed is: 0.000ms, 200.000ns
+dotPrdXvec #2: Time elapsed is: 0.000ms, 200.000ns
+OK
+51/226 test.XMTX: crsPrdXvec3 test... 
+crsPrdXvec3 #1: Time elapsed is: 0.005ms, 4700.000ns
+crsPrdXvec3 #2: Time elapsed is: 0.000ms, 100.000nsx: 0.0e+00 y: -1.0e+00 z: 0.0e+00 
 x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 OK
-43/197 test.XMTX: mulXvec test... 
-mulXvec test:
-x: 2.1e+01 y: 2.1e+01 z: 2.1e+01 
+52/226 test.XMTX: crsPrdXvec test... 
+crsPrdXvec #1: Time elapsed is: 0.000ms, 300.000ns
+crsPrdXvec #2: Time elapsed is: 0.000ms, 100.000nsx: 0.0e+00 y: -1.0e+00 z: 0.0e+00 
+x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 OK
-44/197 test.XMTX: divXvec test... 
-divXvec test:
-x: 4.76190485e-02 y: 4.76190485e-02 z: 4.76190485e-02 
+53/226 test.XMTX: mulXvec test... 
+mulXvec: Time elapsed is: 0.005ms, 5100.000nsx: 2.1e+01 y: 2.1e+01 z: 2.1e+01 
+
 OK
-45/197 test.XMTX: addXvec test... 
-addXvec test:
-x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+54/226 test.XMTX: divXvec test... 
+divXvec: Time elapsed is: 0.000ms, 200.000nsx: 4.76190485e-02 y: 4.76190485e-02 z: 4.76190485e-02 
+
 OK
-46/197 test.XMTX: subXvec test... 
-subXvec test:
-x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+55/226 test.XMTX: addXvec test... 
+addXvec: Time elapsed is: 0.000ms, 200.000nsx: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+
 OK
-47/197 test.XMTX: tmsXvec test... 
-tmsXvec test:
-x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+56/226 test.XMTX: subXvec test... 
+subXvec: Time elapsed is: 0.000ms, 100.000nsx: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+OK
+57/226 test.XMTX: tmsXvec test... 
+tmsXvec: Time elapsed is: 0.000ms, 200.000nsx: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
 x: 2.0e+00 y: 2.0e+00 z: 2.0e+00 
 x: 1.8e+01 
+
 OK
-48/197 test.XMTX: tmsXmtx test... 
-tmsXmtx test: initial matrix
+58/226 test.XMTX: tmsXmtx test... tmsXmtx test: initial matrix
+
 0: x: 3.0e+00 y: 2.0e+00 z: -3.0e+00 w: 4.0e+00 
 1: x: -3.0e+00 y: 6.0e+00 z: 1.0e+00 w: 0.0e+00 
+
 Clean Short Answer:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
+
+tmsXmtx: Time elapsed is: 0.001ms, 800.000ns
 OK
-49/197 test.XMTX: sum1Xvec test... 
-sum1Xvec test:
+59/226 test.XMTX: sum1Xvec test... 
+sum1Xvec: Time elapsed is: 0.000ms, 200.000nsx: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+
+OK
+60/226 test.XMTX: sum2Xvec test... 
+sum2Xvec: Time elapsed is: 0.000ms, 200.000nsx: 5.0e+00 y: 5.0e+00 z: 5.0e+00 
+
+OK
+61/226 test.XMTX: diff1Xvec test... 
+diff1Xvec: Time elapsed is: 0.000ms, 200.000nsx: 2.0e+00 y: 2.0e+00 z: 2.0e+00 
+
+OK
+62/226 test.XMTX: diff2Xvec test... 
+diff2Xvec: Time elapsed is: 0.000ms, 200.000nsx: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+
+OK
+63/226 test.XMTX: prntXmtx test... 
+0: x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+1: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+OK
+64/226 test.XMTX: prntXvec test... x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+OK
+65/226 test.XMTX: prntXvecNl test... 
 x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
 OK
-50/197 test.XMTX: sum2Xvec test... 
-sum2Xvec test:
-x: 5.0e+00 y: 5.0e+00 z: 5.0e+00 
+66/226 test.XMTX: aglBtwnXvec test... 
+aglBtwnXvec: Time elapsed is: 0.009ms, 9400.000nsx: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+Angle RAD: 1.57079625e+00
+Angle DEG: 9.0e+01
+
 OK
-51/197 test.XMTX: diff1Xvec test... 
-diff1Xvec test:
-x: 2.0e+00 y: 2.0e+00 z: 2.0e+00 
-OK
-52/197 test.XMTX: diff2Xvec test... 
-diff2Xvec test:
-x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
-OK
-53/197 test.XMTX: aglBtwnXvec test... 
-aglBtwnXvec test:
-x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+67/226 test.XMTX: rad2Deg test... 
+rad2Deg: Time elapsed is: 0.000ms, 300.000nsx: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+
 Angle RAD: 1.57079625e+00
 Angle DEG: 9.0e+01
 OK
-54/197 test.XMTX: rad2Deg test... 
-rad2Deg test:
-x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+68/226 test.XMTX: deg2Rad test... x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+
 Angle RAD: 1.57079625e+00
 Angle DEG: 9.0e+01
-OK
-55/197 test.XMTX: deg2Rad test... 
-deg2Rad test:
-x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
-Angle RAD: 1.57079625e+00
-Angle DEG: 9.0e+01
-Angle RAD: 1.57079625e+00
+deg2Rad: Time elapsed is: 0.000ms, 100.000nsAngle RAD: 1.57079625e+00
 Angle RAD 2: 1.57079637e+00
+
 OK
-56/197 test.XMTX: equXmtx test... 
-equXmtx test:
+69/226 test.XMTX: equXmtx test... 
+equXmtx: Time elapsed is: 0.000ms, 200.000ns
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
 OK
-57/197 test.XMTX: equXvec test... 
-equXvec test:
-x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 w: 4.0e+00 w: 5.0e+00 w: 6.0e+00 w: 7.0e+00 w: 8.0e+00 w: 9.0e+00 
+70/226 test.XMTX: equXvec test... 
+equXvec: Time elapsed is: 0.000ms, 200.000nsx: 1.0e+00 y: 2.0e+00 z: 3.0e+00 w: 4.0e+00 w: 5.0e+00 w: 6.0e+00 w: 7.0e+00 w: 8.0e+00 w: 9.0e+00 
+
 OK
-58/197 test.XMTX: INT_equXvec test... 
-INT_equXvec test:
-x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 w: 4.0e+00 w: 5.0e+00 w: 6.0e+00 w: 7.0e+00 w: 8.0e+00 w: 9.0e+00 
+71/226 test.XMTX: INT_equXvec test... 
+INT_equXvec: Time elapsed is: 0.000ms, 200.000nsx: 1.0e+00 y: 2.0e+00 z: 3.0e+00 w: 4.0e+00 w: 5.0e+00 w: 6.0e+00 w: 7.0e+00 w: 8.0e+00 w: 9.0e+00 
+
+INT_equXvec: Time elapsed is: 0.000ms, 300.000nsx: 1.0e+00 y: 2.0e+00 z: 3.0e+00 w: 4.0e+00 w: 5.0e+00 w: 6.0e+00 w: 7.0e+00 w: 8.0e+00 w: 9.0e+00 
+
 OK
-59/197 test.XMTX: absXmtx test... 
-absXmtx test:
+72/226 test.XMTX: absXmtx test... 
+absXmtx: Time elapsed is: 0.001ms, 500.000ns
 OK
-60/197 test.XMTX: absXvec test... 
-absXvec test:
+73/226 test.XMTX: absXvec test... 
+absXmtx: Time elapsed is: 0.000ms, 300.000ns
 OK
-61/197 test.XMTX: nrmXvec test... 
-x: 2.67261236e-01 y: 5.34522473e-01 z: 8.01783740e-01 
+74/226 test.XMTX: nrmXvec test... 
+nrmXvec: Time elapsed is: 0.000ms, 300.000nsx: 2.67261236e-01 y: 5.34522473e-01 z: 8.01783740e-01 
+
 OK
-62/197 test.XMTX: projXvec_VecP_Onto_VecQ test... 
-x: -4.44444447e-01 y: -4.44444447e-01 z: -2.22222223e-01 
+75/226 test.XMTX: projXvec_VecP_Onto_VecQ test... 
+projXvec_VecP_Onto_VecQ: Time elapsed is: 0.000ms, 300.000nsx: -4.44444447e-01 y: -4.44444447e-01 z: -2.22222223e-01 
 
 x: -4.44444447e-01 y: -4.44444447e-01 z: -2.22222223e-01 
 
+
 OK
-63/197 test.XMTX: perpXvec_VecP_To_VecQ test... 
+76/226 test.XMTX: perpXvec_VecP_To_VecQ test... 
+perpXvec_VecP_To_VecQ: Time elapsed is: 0.000ms, 400.000nsx: 1.44444441e+00 y: -1.55555558e+00 z: 2.22222223e-01 
+
 x: 1.44444441e+00 y: -1.55555558e+00 z: 2.22222223e-01 
 
-x: 1.44444441e+00 y: -1.55555558e+00 z: 2.22222223e-01 
 
 OK
-64/197 test.XMTX: idnfXmtx tests... 
+77/226 test.XMTX: idnfXmtx tests... 
 
+idnfXmtx: Time elapsed is: 0.000ms, 300.000ns
+idnfXmtx: Time elapsed is: 0.000ms, 400.000ns
 OK
-65/197 test.XMTX: procXmtx tests... 
-
+78/226 test.XMTX: procXmtx tests... 
 0: x: 1.0e+00 y: 3.0e+00 z: 5.0e+00 
 1: x: 1.0e+01 y: 3.0e+00 z: 6.0e+00 
 
-0: x: 2.0e+00 y: 6.0e+00 z: 1.0e+01 
+
+procXmtx #1: Time elapsed is: 0.125ms, 125100.000ns
+procXmtx #2: Time elapsed is: 0.000ms, 300.000ns0: x: 2.0e+00 y: 6.0e+00 z: 1.0e+01 
 1: x: 2.0e+01 y: 6.0e+00 z: 1.2e+01 
 
-0: x: 1.0e+00 y: 3.0e+00 z: 5.0e+00 
+
+procXmtx #3: Time elapsed is: 0.114ms, 114100.000ns
+procXmtx #4: Time elapsed is: 0.000ms, 200.000ns0: x: 1.0e+00 y: 3.0e+00 z: 5.0e+00 
 1: x: 1.0e+01 y: 3.0e+00 z: 6.0e+00 
 
-0: x: 2.0e+00 y: 4.0e+00 z: 6.0e+00 
+
+procXmtx #5: Time elapsed is: 0.114ms, 113800.000ns
+procXmtx #6: Time elapsed is: 0.000ms, 300.000ns0: x: 2.0e+00 y: 4.0e+00 z: 6.0e+00 
 1: x: 1.1e+01 y: 4.0e+00 z: 7.0e+00 
 
-0: x: 1.0e+00 y: 3.0e+00 z: 5.0e+00 
+
+procXmtx #7: Time elapsed is: 0.114ms, 114000.000ns
+procXmtx #8: Time elapsed is: 0.000ms, 300.000ns0: x: 1.0e+00 y: 3.0e+00 z: 5.0e+00 
 1: x: 1.0e+01 y: 3.0e+00 z: 6.0e+00 
 
-0: x: 1.0e+00 y: 3.0e+00 z: 5.0e+00 
+
+procXmtx #9: Time elapsed is: 0.117ms, 116600.000ns
+procXmtx #10: Time elapsed is: 0.000ms, 400.000ns0: x: 1.0e+00 y: 3.0e+00 z: 5.0e+00 
 1: x: 1.0e+01 y: 3.0e+00 z: 6.0e+00 
 
-0: x: 1.69030845e-01 y: 5.07092535e-01 z: 8.45154225e-01 
+
+procXmtx #11: Time elapsed is: 0.114ms, 114000.000ns
+procXmtx #12: Time elapsed is: 0.000ms, 400.000ns0: x: 1.69030845e-01 y: 5.07092535e-01 z: 8.45154225e-01 
 1: x: 8.30454826e-01 y: 2.49136447e-01 z: 4.98272895e-01 
 
+
+procXmtx #13: Time elapsed is: 0.119ms, 119100.000ns
 OK
-66/197 test.XMTX: rdcXmtxInl test... 
+79/226 test.XMTX: rdcXmtxInl test... 
 rdcXmtxInl test: initial matrix
 0: x: 3.0e+00 y: 2.0e+00 z: -3.0e+00 w: -1.3e+01 
 1: x: 4.0e+00 y: -3.0e+00 z: 6.0e+00 w: 7.0e+00 
 2: x: 1.0e+00 y: 0.0e+00 z: -1.0e+00 w: -5.0e+00 
+
+
+rdcXmtxInl #1: Time elapsed is: 0.003ms, 3100.000ns
 Full Answer:
 0: x: 1.0e+00 y: 0.0e+00 z: 1.49011611e-08 w: -2.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: -1.19209289e-07 w: 1.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 9.99999940e-01 w: 3.0e+00 
+
+
 Clean Short Answer:
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
+
+rdcXmtxInl #2: Time elapsed is: 0.002ms, 2200.000ns
 Inverse:
 0: x: 6.66666701e-02 y: 1.33333340e-01 z: -6.66666701e-02 
 1: x: -6.66666924e-02 y: 8.88889059e-02 z: 4.00000035e-01 
 2: x: 1.33333340e-01 y: -6.66666701e-02 z: -1.33333340e-01 
+
+
 
 Test:
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
+
+rdcXmtxInl #3: Time elapsed is: 0.002ms, 2100.000ns
 Inverse 2:
 0: x: -2.0e+00 y: -3.0e+00 z: -1.0e+00 
 1: x: -3.0e+00 y: -3.0e+00 z: -1.0e+00 
 2: x: -2.0e+00 y: -4.0e+00 z: -1.0e+00 
+
+
 
 Test 2:
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
 OK
-67/197 test.XMTX: rdcXmtx test... 
+80/226 test.XMTX: rdcXmtx test... 
 rdcXmtx test: initial matrix
 0: x: 3.0e+00 y: 2.0e+00 z: -3.0e+00 w: 4.0e+00 
 1: x: -3.0e+00 y: 6.0e+00 z: 1.0e+00 w: 0.0e+00 
+
+
+rdcXmtx: Time elapsed is: 0.002ms, 2300.000ns
 Clean Short Answer:
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
+
 OK
-68/197 test.XMTX: prntNl test... 
+81/226 test.XMTX: prntNlStr test... 
+ prntNlStr
+
+prntNlStr: Time elapsed is: 0.011ms, 10700.000ns
 OK
-69/197 test.XMTX: fndLgstRowAbsXmtx test... 
-No matching row found, v6
-No matching row found, v7
-No matching row found, v8
+82/226 test.XMTX: prntNlStrArgs test... 
+ prntNlStrArgs: 0
+prntNlStrArgs: Time elapsed is: 0.089ms, 89200.000ns
+OK
+83/226 test.XMTX: prntNl test... 
+
+prntNl: Time elapsed is: 0.004ms, 3700.000nsOK
+84/226 test.XMTX: fndLgstRowAbsXmtx test... 
+fndLgstRowAbsXmtx #1: Time elapsed is: 0.010ms, 10200.000ns
+fndLgstRowAbsXmtx #2: Time elapsed is: 0.000ms, 400.000ns
+fndLgstRowAbsXmtx #3: Time elapsed is: 0.001ms, 600.000ns
+fndLgstRowAbsXmtx #4: Time elapsed is: 0.000ms, 400.000ns
+fndLgstRowAbsXmtx #5: Time elapsed is: 0.001ms, 500.000ns
+fndLgstRowAbsXmtx #6: Time elapsed is: 0.001ms, 500.000ns
+fndLgstRowAbsXmtx #7: Time elapsed is: 0.000ms, 400.000nsNo matching row found, v6
+
+fndLgstRowAbsXmtx #8: Time elapsed is: 0.000ms, 400.000nsNo matching row found, v7
+
+fndLgstRowAbsXmtx #9: Time elapsed is: 0.000ms, 300.000nsNo matching row found, v8
+
 v0: 1 v1: 1 v2: 2 v3: 2 v4: 0 v5: 1 v6: 12 v7: 12 v8: 12
 OK
-70/197 test.XMTX: isRdcFrmXmtx test... 
+85/226 test.XMTX: isRdcFrmXmtx test... 
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
+
+isRdcFrmXmtx #1: Time elapsed is: 0.001ms, 500.000ns
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+
+
+isRdcFrmXmtx #2: Time elapsed is: 0.001ms, 500.000ns
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
+
+isRdcFrmXmtx #3: Time elapsed is: 0.001ms, 500.000ns
 OK
-71/197 test.XMTX: addSclMulXmtxRowsInl test... 
+86/226 test.XMTX: addSclMulXmtxRowsInl test... 
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 2.0e+00 y: 2.0e+00 z: 2.0e+00 
 2: x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+
+
+addSclMulXmtxRowsInl: Time elapsed is: 0.000ms, 200.000ns
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 2.0e+00 y: 2.0e+00 z: 2.0e+00 
 2: x: 7.0e+00 y: 7.0e+00 z: 7.0e+00 
+
+
 OK
-72/197 test.XMTX: addSclMulXmtxRows test... 
+87/226 test.XMTX: addSclMulXmtxRows test... 
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 2.0e+00 y: 2.0e+00 z: 2.0e+00 
 2: x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
+
+
+addSclMulXmtxRows: Time elapsed is: 0.001ms, 500.000ns
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 2.0e+00 y: 2.0e+00 z: 2.0e+00 
 2: x: 7.0e+00 y: 7.0e+00 z: 7.0e+00 
+
+
 OK
-73/197 test.XMTX: sclMulXmtxRowsInl test... 
+88/226 test.XMTX: sclMulXmtxRowsInl test... 
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
+sclMulXmtxRowsInl: Time elapsed is: 0.000ms, 200.000ns
 0: x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
 OK
-74/197 test.XMTX: sclMulXmtxRows test... 
+89/226 test.XMTX: sclMulXmtxRows test... 
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
+sclMulXmtxRows: Time elapsed is: 0.000ms, 300.000ns
 0: x: 3.0e+00 y: 3.0e+00 z: 3.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
 OK
-75/197 test.XMTX: addSclXmtxRowsInl test... 
+90/226 test.XMTX: addSclXmtxRowsInl test... 
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
+addSclXmtxRowsInl: Time elapsed is: 0.005ms, 4900.000ns
 0: x: 4.0e+00 y: 4.0e+00 z: 4.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
 OK
-76/197 test.XMTX: addSclXmtxRows test... 
+91/226 test.XMTX: addSclXmtxRows test... 
 0: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
+addSclXmtxRows: Time elapsed is: 0.000ms, 300.000ns
 0: x: 4.0e+00 y: 4.0e+00 z: 4.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
 OK
-77/197 test.XMTX: altXmtxRowsInl test... 
+92/226 test.XMTX: altXmtxRowsInl test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
+altXmtxRowsInl: Time elapsed is: 0.000ms, 400.000ns
 0: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
+
+
 OK
-78/197 test.XMTX: altXmtxRows test... 
+93/226 test.XMTX: altXmtxRows test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
+altXmtxRows: Time elapsed is: 0.001ms, 500.000ns
 0: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
+
+
 OK
-79/197 test.XMTX: trnXmtxInl test... 
+94/226 test.XMTX: trnXmtxInl test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
+trnXmtxInl: Time elapsed is: 0.039ms, 39400.000ns
 0: x: 1.0e+00 y: 4.0e+00 z: 7.0e+00 
 1: x: 2.0e+00 y: 5.0e+00 z: 8.0e+00 
 2: x: 3.0e+00 y: 6.0e+00 z: 9.0e+00 
+
+
 OK
-80/197 test.XMTX: trnXmtx test... 
+95/226 test.XMTX: trnXmtx test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
+trnXmtx: Time elapsed is: 0.000ms, 300.000ns
 0: x: 1.0e+00 y: 4.0e+00 z: 7.0e+00 
 1: x: 2.0e+00 y: 5.0e+00 z: 8.0e+00 
 2: x: 3.0e+00 y: 6.0e+00 z: 9.0e+00 
+
+
 OK
-81/197 test.XMTX: trnXmtxRect test... 
+96/226 test.XMTX: trnXmtxRect test... 
 0: x: 2.0e+00 y: 1.0e+00 z: -2.0e+00 
 1: x: -1.0e+00 y: 0.0e+00 z: 3.0e+00 
 2: x: 0.0e+00 y: -2.0e+00 z: 1.0e+00 
+
+
 
 0: x: 2.0e+00 y: -1.0e+00 z: 0.0e+00 
 1: x: 1.0e+00 y: 0.0e+00 z: -2.0e+00 
 2: x: -2.0e+00 y: 3.0e+00 z: 1.0e+00 
 
+
+
 0: x: 3.0e+00 y: 1.0e+00 
 1: x: 2.0e+00 y: -1.0e+00 
 2: x: 3.0e+00 y: 0.0e+00 
 
+
+
+trnXmtxRect: Time elapsed is: 0.000ms, 300.000ns
 0: x: 3.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 1.0e+00 y: -1.0e+00 z: 0.0e+00 
 
+
+
 OK
-82/197 test.XMTX: isSqrXmtx test... 
+97/226 test.XMTX: isSqrXmtx test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 3: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 
+
+
+isSqrXmtx #1: Time elapsed is: 0.000ms, 200.000ns
+isSqrXmtx #2: Time elapsed is: 0.000ms, 100.000ns
 OK
-83/197 test.XMTX: isDiagXmtx test... 
+98/226 test.XMTX: isDiagXmtx test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
+
+isDiagXmtx #1: Time elapsed is: 0.000ms, 200.000ns
+isDiagXmtx #2: Time elapsed is: 0.000ms, 300.000ns
 OK
-84/197 test.XMTX: isIdtXmtx test... 
+99/226 test.XMTX: isIdtXmtx test... 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 7.0e+00 y: 8.0e+00 z: 9.0e+00 
+
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
+
+isIdtXmtx #1: Time elapsed is: 0.000ms, 200.000ns
+isIdtXmtx #2: Time elapsed is: 0.000ms, 400.000ns
 OK
-85/197 test.XMTX: cofXmtx test... 
+100/226 test.XMTX: cofXmtx test... 
+cofXmtx #1: Time elapsed is: 0.005ms, 5400.000ns
 0: x: 5.0e+00 y: 6.0e+00 
 1: x: 2.0e+00 y: 9.0e+00 
 
+
+
+cofXmtx #2: Time elapsed is: 0.000ms, 300.000ns
 0: x: 4.0e+00 y: 6.0e+00 
 1: x: 7.0e+00 y: 9.0e+00 
 
+
+
 OK
-86/197 test.XMTX: cofXmtxSign test... 
+101/226 test.XMTX: cofXmtxSign test... 
+cofXmtx #1: Time elapsed is: 0.000ms, 200.000ns
+cofXmtx #2: Time elapsed is: 0.000ms, 300.000ns
 OK
-87/197 test.XMTX: rmvRowColXmtx4 test... 
-rmvRowColXmtx4:
+102/226 test.XMTX: rmvRowColXmtx4 test... 
+rmvRowColXmtx4: Time elapsed is: 0.001ms, 700.000nsrmvRowColXmtx4:
+
 0: x: 2.0e+00 y: 2.0e+00 
 1: x: 2.0e+00 y: 3.0e+00 
 2: x: 3.0e+00 y: 3.0e+00 
 3: x: 4.0e+00 y: 4.0e+00 
+
+
 OK
-88/197 test.XMTX: rmvRowColXmtx3 test... 
-rmvRowColXmtx3:
+103/226 test.XMTX: rmvRowColXmtx3 test... 
+rmvRowColXmtx3: Time elapsed is: 0.001ms, 600.000nsrmvRowColXmtx3:
+
 0: x: 2.0e+00 y: 2.0e+00 
 1: x: 3.0e+00 y: 3.0e+00 
+
+
 OK
-89/197 test.XMTX: adjXmtx4 test... 
+104/226 test.XMTX: adjXmtx4 test... 
+adjXmtx4: Time elapsed is: 0.013ms, 12600.000ns
 OK
-90/197 test.XMTX: adjXmtx3 test... 
+105/226 test.XMTX: adjXmtx3 test... 
+adjXmtx3: Time elapsed is: 0.012ms, 12200.000ns
 OK
-91/197 test.XMTX: cofXmtx4 test... OK
-92/197 test.XMTX: cofXmtx3 test... 
+106/226 test.XMTX: cofXmtx4 test... 
+cofXmtx4: Time elapsed is: 0.001ms, 500.000ns
+AAA cofXmtx4 test
+0: x: 0.0e+00 y: 0.0e+00 z: 3.0e+00 w: 0.0e+00 
+1: x: -2.0e+00 y: 8.0e+00 z: 1.3e+01 w: 4.0e+00 
+2: x: 4.0e+00 y: -3.4e+01 z: -5.6e+01 w: -1.4e+01 
+3: x: 2.0e+00 y: -2.0e+01 z: -3.4e+01 w: -1.0e+01 
+
+
+BBB cofXmtx4 test
+0: x: 0.0e+00 y: 0.0e+00 z: 3.0e+00 w: 0.0e+00 
+1: x: -2.0e+00 y: 8.0e+00 z: 1.3e+01 w: 4.0e+00 
+2: x: 4.0e+00 y: -3.4e+01 z: -5.6e+01 w: -1.4e+01 
+3: x: 2.0e+00 y: -2.0e+01 z: -3.4e+01 w: -1.0e+01 
+
+
+CCC cofXmtx4: true
+DDD cofXmtx4 test
+0: x: 1.0e+00 y: 3.0e+00 z: -2.0e+00 w: 1.0e+00 
+1: x: 5.0e+00 y: 1.0e+00 z: 0.0e+00 w: -1.0e+00 
+2: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 w: -2.0e+00 
+3: x: 2.0e+00 y: -1.0e+00 z: 0.0e+00 w: 3.0e+00 
+
+
 OK
-93/197 test.XMTX: mnrXmtx4 test... 
+107/226 test.XMTX: cofXmtx3 test... 
+cofXmtx3: Time elapsed is: 0.000ms, 300.000ns
+AAA cofXmtx3 test
+0: x: -1.0e+00 y: 5.0e+00 z: 4.0e+00 
+1: x: -2.0e+00 y: -4.0e+00 z: 8.0e+00 
+2: x: 5.0e+00 y: 3.0e+00 z: -6.0e+00 
+
+
+BBB cofXmtx3 test
+0: x: -1.0e+00 y: 5.0e+00 z: 4.0e+00 
+1: x: -2.0e+00 y: -4.0e+00 z: 8.0e+00 
+2: x: 5.0e+00 y: 3.0e+00 z: -6.0e+00 
+
+
+CCC cofXmtx3: true
 OK
-94/197 test.XMTX: mnrXmtx3 test... 
+108/226 test.XMTX: mnrXmtx4Ret test... 
+mnrXmtx4Ret: Time elapsed is: 0.000ms, 400.000ns
 OK
-95/197 test.XMTX: cofXmtxSign4 test... 
+109/226 test.XMTX: mnrXmtx4 test... 
+mnrXmtx4: Time elapsed is: 0.000ms, 200.000ns
 OK
-96/197 test.XMTX: cofXmtxSign3 test... 
+110/226 test.XMTX: mnrXmtx3Ret test... 
+mnrXmtx3Ret: Time elapsed is: 0.000ms, 100.000ns
 OK
-97/197 test.XMTX: detXmtx1 test... 
+111/226 test.XMTX: mnrXmtx3 test... 
+mnrXmtx3: Time elapsed is: 0.000ms, 200.000ns
 OK
-98/197 test.XMTX: detXmtx2 test... 
+112/226 test.XMTX: mnrXmtx2Ret test... 
+mnrXmtx2Ret: Time elapsed is: 0.000ms, 300.000ns
 OK
-99/197 test.XMTX: detXmtx3 test... 
+113/226 test.XMTX: mnrXmtx2 test... 
+mnrXmtx2: Time elapsed is: 0.000ms, 100.000ns
 OK
-100/197 test.XMTX: detXmtx4 test... 
+114/226 test.XMTX: cofXmtxSign4 test... 
+cofXmtxSign4: Time elapsed is: 0.000ms, 200.000ns
 OK
-101/197 test.XMTX: detTriangXmtx test... 
-detA: 8.0e+00 detB: 8.1e+01
+115/226 test.XMTX: cofXmtxSign4Ret test... 
+cofXmtxSign4Ret: Time elapsed is: 0.000ms, 300.000ns
 OK
-102/197 test.XMTX: detDiagXmtx test... 
-detA: 8.0e+00 detB: 8.1e+01
+116/226 test.XMTX: cofXmtxSign3 test... 
+cofXmtxSign3: Time elapsed is: 0.000ms, 100.000ns
 OK
-103/197 test.XMTX: detXmtx test... 
-Found detXmtx 2x2 value: -3.0e+00
-Found detXmtx 3x3 value: 0.0e+00
-Found detXmtx 4x4 value: 0.0e+00
+117/226 test.XMTX: cofXmtxSign3Ret test... 
+cofXmtxSign3Ret: Time elapsed is: 0.000ms, 100.000ns
 OK
-104/197 test.XMTX: getInvFromDet2 test... 
+118/226 test.XMTX: cofXmtxSign2 test... 
+cofXmtxSign2: Time elapsed is: 0.000ms, 0.000ns
 OK
-105/197 test.XMTX: getInvFromDet3 test... 
+119/226 test.XMTX: cofXmtxSign2Ret test... 
+cofXmtxSign2Ret: Time elapsed is: 0.000ms, 100.000ns
 OK
-106/197 test.XMTX: getInvFromDet4 test... 
+120/226 test.XMTX: detXmtx1 test... 
+detXmtx1: Time elapsed is: 0.000ms, 100.000ns
+OK
+121/226 test.XMTX: detXmtx2 test... 
+detXmtx2: Time elapsed is: 0.000ms, 100.000ns
+OK
+122/226 test.XMTX: detXmtx3 test... 
+
+detXmtx3: Time elapsed is: 0.000ms, 100.000ns
+OK
+123/226 test.XMTX: detXmtx4 test... 
+detXmtx4: Time elapsed is: 0.001ms, 1300.000ns
+OK
+124/226 test.XMTX: detTriangXmtx test... 
+detTriangXmtx: Time elapsed is: 0.005ms, 4800.000ns
+detTriangXmtx: Time elapsed is: 0.000ms, 300.000nsdetA: 8.0e+00 detB: 8.1e+01
+
+OK
+125/226 test.XMTX: detDiagXmtx test... 
+detTriangXmtx: Time elapsed is: 0.000ms, 200.000ns
+detTriangXmtx: Time elapsed is: 0.000ms, 200.000nsdetA: 8.0e+00 detB: 8.1e+01
+
+OK
+126/226 test.XMTX: detXmtx test... 
+detXmtx #1: Time elapsed is: 0.000ms, 200.000nsFound detXmtx 2x2 value: -3.0e+00
+
+detXmtx #2: Time elapsed is: 0.061ms, 60900.000nsFound detXmtx 3x3 value: 0.0e+00
+
+detXmtx #3: Time elapsed is: 0.220ms, 220000.000nsFound detXmtx 4x4 value: 0.0e+00
+
+OK
+127/226 test.XMTX: getInvFromDet1 test... 
+getInvFromDet1: Time elapsed is: 0.000ms, 100.000ns
+ Res:
+
+0: x: 1.42857149e-01 
+
+
+
+ invM1:
+
+0: x: 1.42857149e-01 
+
+
+
+OK
+128/226 test.XMTX: getInvFromDet2 test... 
+getInvFromDet2: Time elapsed is: 0.006ms, 5500.000ns
+OK
+129/226 test.XMTX: getInvFromDet3 test... 
+getInvFromDet3: Time elapsed is: 0.005ms, 5400.000ns
+OK
+130/226 test.XMTX: getInvFromDet4 test... 
 
 0: x: -4.0e+00 y: -4.0e+00 z: -4.0e+00 w: 4.0e+00 
 1: x: -4.0e+00 y: -4.0e+00 z: 4.0e+00 w: -4.0e+00 
 2: x: -4.0e+00 y: 4.0e+00 z: -4.0e+00 w: -4.0e+00 
 3: x: 4.0e+00 y: -4.0e+00 z: -4.0e+00 w: -4.0e+00 
 
-getInvFromDet4 det: -1.6e+01 expDet: -1.6e+01
+
+
+getInvFromDet4: Time elapsed is: 0.302ms, 302400.000nsgetInvFromDet4 det: -1.6e+01 expDet: -1.6e+01
+
 0: x: 2.5e-01 y: 2.5e-01 z: 2.5e-01 w: -2.5e-01 
 1: x: 2.5e-01 y: 2.5e-01 z: -2.5e-01 w: 2.5e-01 
 2: x: 2.5e-01 y: -2.5e-01 z: 2.5e-01 w: 2.5e-01 
 3: x: -2.5e-01 y: 2.5e-01 z: 2.5e-01 w: 2.5e-01 
+
 
 getInvFromDet4 det:
+
 0: x: 2.5e-01 y: 2.5e-01 z: 2.5e-01 w: -2.5e-01 
 1: x: 2.5e-01 y: 2.5e-01 z: -2.5e-01 w: 2.5e-01 
 2: x: 2.5e-01 y: -2.5e-01 z: 2.5e-01 w: 2.5e-01 
 3: x: -2.5e-01 y: 2.5e-01 z: 2.5e-01 w: 2.5e-01 
 
+
+
 OK
-107/197 test.XMTX: getCramerSupportMtx test... 
+131/226 test.XMTX: getCramerSupportMtx test... 
+getCramerSupportMtx #1: Time elapsed is: 0.005ms, 5100.000ns
 Matrix A0:
 0: x: 1.0e+00 y: 2.0e+00 z: -3.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 2.0e+00 y: -4.0e+00 z: 4.0e+00 
+
+
 Matrix Exp A0:
 0: x: 1.0e+00 y: 2.0e+00 z: -3.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 2.0e+00 y: -4.0e+00 z: 4.0e+00 
+
+
+getCramerSupportMtx #2: Time elapsed is: 0.000ms, 400.000ns
 Matrix A1:
 0: x: -1.0e+00 y: 1.0e+00 z: -3.0e+00 
 1: x: 2.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 3.0e+00 y: 2.0e+00 z: 4.0e+00 
+
+
 Matrix Exp A1:
 0: x: 1.0e+00 y: 2.0e+00 z: -3.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 2.0e+00 y: -4.0e+00 z: 4.0e+00 
+
+
+getCramerSupportMtx #3: Time elapsed is: 0.000ms, 200.000ns
 Matrix A2:
 0: x: -1.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 2.0e+00 y: 0.0e+00 z: 0.0e+00 
 2: x: 3.0e+00 y: -4.0e+00 z: 2.0e+00 
+
+
 Matrix Exp A2:
 0: x: 1.0e+00 y: 2.0e+00 z: -3.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 2.0e+00 y: -4.0e+00 z: 4.0e+00 
-OK
-108/197 test.XMTX: rslvCramersRule test... 
-Cramer's Rule Return 8.00000011e-01 -1.5e+00 -1.60000002e+00:
-x: 8.00000011e-01 y: -1.5e+00 z: -1.60000002e+00 
+
 
 OK
-109/197 test.XMTX: chgVecBasis test... 
-chgVecBasis test:
-chgVecBasis:change basis is identity so conversion matrix = basis true
+132/226 test.XMTX: rslvCramersRule test... 
+rslvCramersRule: Time elapsed is: 0.005ms, 5400.000nsCramer's Rule Return 8.00000011e-01 -1.5e+00 -1.60000002e+00:
+x: 8.00000011e-01 y: -1.5e+00 z: -1.60000002e+00 
+
+
+OK
+133/226 test.XMTX: chgXvecBasis test... chgVecBasis:change basis is identity so conversion matrix = basis true
+
 0: x: 1.0e+00 y: 1.0e+00 
 1: x: 0.0e+00 y: 2.0e+00 
 
+
+
 0: x: 0.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 
+
+
 
 0: x: 3.0e+00 
 1: x: 2.0e+00 
 
-chgVecBasis test:chgVecBasis ret true
+
+
+chgXvecBasis: Time elapsed is: 0.261ms, 260500.000ns
+chgXvecBasis ret true
 0: x: 0.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 
 
-chgVecBasis test:chgVecBasis B
+
+
+chgXvecBasis B
 0: x: 1.0e+00 y: 1.0e+00 
 1: x: 0.0e+00 y: 2.0e+00 
 
-chgVecBasis test:chgVecBasis nvec
+
+
+chgXvecBasis nvec
 0: x: 5.0e+00 
 1: x: 4.0e+00 
 
+
+
 OK
-110/197 test.XMTX: getBasisCnvMtx test... 
-getBasisCnvMtx test:
-getBasisCnvMtx test:getBasisCnvMtx ret true
+134/226 test.XMTX: getBasisCnvXmtx test... 
+getBasisCnvXmtx: Time elapsed is: 0.008ms, 7700.000nsgetBasisCnvMtx test:getBasisCnvMtx ret true
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 getBasisCnvMtx test:getBasisCnvMtx B
+
 0: x: -1.0e+00 y: 4.0e+00 z: 2.0e+00 
 1: x: 3.0e+00 y: -7.0e+00 z: -3.0e+00 
 2: x: 1.0e+00 y: -2.0e+00 z: -1.0e+00 
 
+
+
 OK
-111/197 test.XMTX: isOrthogonal test... 
-isOrthogonal test:
+135/226 test.XMTX: isOrthXmtx test... 
+isOrthXmtx: Time elapsed is: 0.003ms, 2500.000ns
 OK
-112/197 test.XMTX: MF3D - Lengyel: Theorem 2.1 test... 
+136/226 test.XMTX: getBasisHndXvec3 test... 
+getBasisHndXvec3: Time elapsed is: 0.005ms, 4700.000ns
+getBasisHndXvec3: Time elapsed is: 0.000ms, 200.000ns
+getBasisHndXvec3: Time elapsed is: 0.000ms, 200.000ns
+OK
+137/226 test.XMTX: getBasisHndXvec3Ret test... 
+getBasisHndXvec3Ret: Time elapsed is: 0.000ms, 200.000ns
+getBasisHndXvec3Ret #2: Time elapsed is: 0.000ms, 200.000ns
+getBasisHndXvec3Ret #3: Time elapsed is: 0.000ms, 100.000ns
+OK
+138/226 test.XMTX: getBasisHndXmtx3 test... 
+ XMTX: getBasisHndXmtx3 test
+
+getBasisHndXmtx3 #1: Time elapsed is: 0.005ms, 4600.000ns
+getBasisHndXmtx3 #2: Time elapsed is: 0.000ms, 400.000ns
+getBasisHndXmtx3 #3: Time elapsed is: 0.000ms, 300.000ns
+OK
+139/226 test.XMTX: getBasisHndXmtx3Ret test... 
+getBasisHndXmtx3Ret #1: Time elapsed is: 0.001ms, 500.000ns
+getBasisHndXmtx3Ret #2: Time elapsed is: 0.000ms, 300.000ns
+getBasisHndXmtx3Ret #3: Time elapsed is: 0.000ms, 300.000ns
+OK
+140/226 test.XMTX: sortExecTimeList process... 
+
+ MapList: absF32Ret: 1.0e+00 0.000ms 100.000ns
+ MapList: addSclMulXmtxRowsInl: 1.0e+00 0.000ms 200.000ns
+ MapList: sclMulXmtxRowsInl: 1.0e+00 0.000ms 200.000ns
+ MapList: cpyLessXmtx: 1.0e+00 0.001ms 500.000ns
+ MapList: rtsPoly2Ret: 1.0e+00 0.009ms 9200.000ns
+ MapList: rad2Deg: 1.0e+00 0.000ms 300.000ns
+ MapList: clnXmtx: 1.0e+00 0.001ms 600.000ns
+ MapList: rdcXmtx: 1.0e+00 0.002ms 2300.000ns
+ MapList: getBasisCnvXmtx: 1.0e+00 0.008ms 7700.000ns
+ MapList: trnXmtx: 1.0e+00 0.000ms 300.000ns
+ MapList: crtXmtxEz: 2.0e+00 0.006ms 6000.000ns
+ MapList: isZeroXmtx: 2.0e+00 0.000ms 200.000ns
+ MapList: rdcXmtxInl: 3.0e+00 0.002ms 2100.000ns
+ MapList: mnrXmtx3Ret: 1.0e+00 0.000ms 100.000ns
+ MapList: fndEigVal3: 1.0e+00 0.013ms 12800.000ns
+ MapList: tmsXvec: 1.0e+00 0.000ms 200.000ns
+ MapList: prntNlStr: 1.0e+00 0.011ms 10700.000ns
+ MapList: cofXmtxSign2: 1.0e+00 0.000ms 0.000ns
+ MapList: isLinIndXvec: 2.0e+00 0.000ms 100.000ns
+ MapList: crsPrdXvec: 2.0e+00 0.000ms 100.000ns
+ MapList: detXmtx2: 1.0e+00 0.000ms 100.000ns
+ MapList: cpyXmtx: 2.0e+00 0.000ms 200.000ns
+ MapList: getBasisHndXmtx3Ret: 3.0e+00 0.000ms 300.000ns
+ MapList: sum2Xvec: 1.0e+00 0.000ms 200.000ns
+ MapList: rmvRowColXmtx3: 1.0e+00 0.001ms 600.000ns
+ MapList: cpyXvec: 2.0e+00 0.000ms 200.000ns
+ MapList: rslvPoly2Ref: 6.0e+00 0.000ms 100.000ns
+ MapList: mnrXmtx2: 1.0e+00 0.000ms 100.000ns
+ MapList: equXvec: 1.0e+00 0.000ms 200.000ns
+ MapList: synthDivPoly1IntoPoly2Ret: 2.0e+00 0.000ms 200.000ns
+ MapList: rslvCramersRule: 1.0e+00 0.005ms 5400.000ns
+ MapList: cofXmtx4: 1.0e+00 0.001ms 500.000ns
+ MapList: getInvFromDet2: 1.0e+00 0.006ms 5500.000ns
+ MapList: sclMulXmtxRows: 1.0e+00 0.000ms 300.000ns
+ MapList: rslvPoly3: 9.0e+00 0.000ms 200.000ns
+ MapList: adjXmtx3: 1.0e+00 0.012ms 12200.000ns
+ MapList: altXmtxRows: 1.0e+00 0.001ms 500.000ns
+ MapList: isRdcFrmXmtx: 3.0e+00 0.001ms 500.000ns
+ MapList: mnrXmtx4Ret: 1.0e+00 0.000ms 400.000ns
+ MapList: isOrthXmtx: 1.0e+00 0.003ms 2500.000ns
+ MapList: getBasisHndXvec3: 3.0e+00 0.000ms 200.000ns
+ MapList: fndEigVal2: 2.0e+00 0.001ms 700.000ns
+ MapList: prntNlStrArgs: 1.0e+00 0.089ms 89200.000ns
+ MapList: getCramerSupportMtx: 3.0e+00 0.000ms 200.000ns
+ MapList: fndFactorsOfRef: 1.0e+00 0.001ms 500.000ns
+ MapList: cofXmtxSign2Ret: 1.0e+00 0.000ms 100.000ns
+ MapList: projXvec_VecP_Onto_VecQ: 1.0e+00 0.000ms 300.000ns
+ MapList: getInvFromDet3: 1.0e+00 0.005ms 5400.000ns
+ MapList: clrXmtx: 1.0e+00 0.000ms 200.000ns
+ MapList: fndFactorsOfRet: 1.0e+00 0.000ms 400.000ns
+ MapList: rslvPoly2: 6.0e+00 0.000ms 100.000ns
+ MapList: fndLgstRowAbsXmtx: 9.0e+00 0.000ms 300.000ns
+ MapList: isIdtXmtx: 2.0e+00 0.000ms 400.000ns
+ MapList: cpyLessColRowXmtx: 3.0e+00 0.000ms 400.000ns
+ MapList: isEquF32Ret: 4.0e+00 0.000ms 200.000ns
+ MapList: tmsXmtx: 1.0e+00 0.001ms 800.000ns
+ MapList: rslvPoly3Ref: 9.0e+00 0.000ms 100.000ns
+ MapList: INT_equXvec: 2.0e+00 0.000ms 300.000ns
+ MapList: cpyXmtxNew: 1.0e+00 0.025ms 24700.000ns
+ MapList: magXvec: 1.0e+00 0.000ms 200.000ns
+ MapList: mnrXmtx4: 1.0e+00 0.000ms 200.000ns
+ MapList: cofXmtxSign3: 1.0e+00 0.000ms 100.000ns
+ MapList: nrmXvec: 1.0e+00 0.000ms 300.000ns
+ MapList: rmvRowColXmtx4: 1.0e+00 0.001ms 700.000ns
+ MapList: dscrPoly2: 1.0e+00 0.001ms 500.000ns
+ MapList: absF32Ref: 1.0e+00 0.000ms 100.000ns
+ MapList: deg2Rad: 1.0e+00 0.000ms 100.000ns
+ MapList: cofXmtxSign3Ret: 1.0e+00 0.000ms 100.000ns
+ MapList: isZeroXvec: 2.0e+00 0.000ms 100.000ns
+ MapList: adjXmtx4: 1.0e+00 0.013ms 12600.000ns
+ MapList: rslvPoly3Ret: 9.0e+00 0.000ms 100.000ns
+ MapList: getBasisHndXvec3Ret: 3.0e+00 0.000ms 100.000ns
+ MapList: synthDivPoly1IntoPoly3: 1.0e+00 0.000ms 200.000ns
+ MapList: synthDivPoly1IntoPoly3Ret: 1.0e+00 0.000ms 100.000ns
+ MapList: isEquF32Ref: 4.0e+00 0.000ms 100.000ns
+ MapList: diff1Xvec: 1.0e+00 0.000ms 200.000ns
+ MapList: fndFactorsOf: 1.0e+00 0.005ms 5400.000ns
+ MapList: dotPrdXvec: 4.0e+00 0.000ms 200.000ns
+ MapList: crtXmtx: 3.0e+00 0.026ms 25800.000ns
+ MapList: getPolyOrderRet: 3.0e+00 0.000ms 100.000ns
+ MapList: aglBtwnXvec: 1.0e+00 0.009ms 9400.000ns
+ MapList: detXmtx: 3.0e+00 0.220ms 220000.000ns
+ MapList: getInvFromDet4: 1.0e+00 0.302ms 302400.000ns
+ MapList: crtXvec: 1.0e+00 0.006ms 5700.000ns
+ MapList: addSclXmtxRowsInl: 1.0e+00 0.005ms 4900.000ns
+ MapList: perpXvec_VecP_To_VecQ: 1.0e+00 0.000ms 400.000ns
+ MapList: getPolyOrder: 3.0e+00 0.000ms 100.000ns
+ MapList: altXmtxRowsInl: 1.0e+00 0.000ms 400.000ns
+ MapList: rslvPoly2Ret: 6.0e+00 0.000ms 100.000ns
+ MapList: prntNl: 1.0e+00 0.004ms 3700.000ns
+ MapList: trnXmtxRect: 1.0e+00 0.000ms 300.000ns
+ MapList: getInvFromDet1: 1.0e+00 0.000ms 100.000ns
+ MapList: isSqrXmtx: 2.0e+00 0.000ms 100.000ns
+ MapList: cofXmtx: 4.0e+00 0.000ms 300.000ns
+ MapList: detXmtx4: 1.0e+00 0.001ms 1300.000ns
+ MapList: detXmtx3: 1.0e+00 0.000ms 100.000ns
+ MapList: getBasisHndXmtx3: 3.0e+00 0.000ms 300.000ns
+ MapList: detTriangXmtx: 4.0e+00 0.000ms 200.000ns
+ MapList: isEquF32: 2.0e+00 0.000ms 100.000ns
+ MapList: subXvec: 1.0e+00 0.000ms 100.000ns
+ MapList: divXvec: 1.0e+00 0.000ms 200.000ns
+ MapList: sum1Xvec: 1.0e+00 0.000ms 200.000ns
+ MapList: isDiagXmtx: 2.0e+00 0.000ms 300.000ns
+ MapList: procXmtx: 1.3e+01 0.119ms 119100.000ns
+ MapList: chgXvecBasis: 1.0e+00 0.261ms 260500.000ns
+ MapList: diff2Xvec: 1.0e+00 0.000ms 200.000ns
+ MapList: addXvec: 1.0e+00 0.000ms 200.000ns
+ MapList: cofXmtxSign4: 1.0e+00 0.000ms 200.000ns
+ MapList: rtsPoly3: 1.0e+00 0.022ms 21500.000ns
+ MapList: cpyXvecNew: 1.0e+00 0.039ms 38500.000ns
+ MapList: rtsPoly3Ret: 1.0e+00 0.002ms 1800.000ns
+ MapList: addSclMulXmtxRows: 1.0e+00 0.001ms 500.000ns
+ MapList: trnXmtxInl: 1.0e+00 0.039ms 39400.000ns
+ MapList: cpyLessColRowXmtx3: 3.0e+00 0.000ms 200.000ns
+ MapList: crsPrdXvec3: 2.0e+00 0.000ms 100.000ns
+ MapList: absXmtx: 2.0e+00 0.000ms 300.000ns
+ MapList: synthDivPoly1IntoPoly2: 2.0e+00 0.000ms 100.000ns
+ MapList: mnrXmtx3: 1.0e+00 0.000ms 200.000ns
+ MapList: cofXmtxSign4Ret: 1.0e+00 0.000ms 300.000ns
+ MapList: idnfXmtx: 2.0e+00 0.000ms 400.000ns
+ MapList: isSymXmtx: 1.0e+00 0.001ms 500.000ns
+ MapList: mnrXmtx2Ret: 1.0e+00 0.000ms 300.000ns
+ MapList: cofXmtx3: 1.0e+00 0.000ms 300.000ns
+ MapList: dscrPoly3: 1.0e+00 0.009ms 8600.000ns
+ MapList: hasInvXmtx: 1.0e+00 0.007ms 6700.000ns
+ MapList: rtsPoly2: 1.0e+00 0.001ms 800.000ns
+ MapList: addSclXmtxRows: 1.0e+00 0.000ms 300.000ns
+ MapList: equXmtx: 1.0e+00 0.000ms 200.000ns
+ MapList: absF32: 1.0e+00 0.000ms 200.000ns
+ MapList: detXmtx1: 1.0e+00 0.000ms 100.000ns
+ MapList: mulXvec: 1.0e+00 0.005ms 5100.000ns
+
+ Key List:
+
+ INT_equXvec:	Count: 2.0e+00	Avg: 0.000ms 300.000ns
+ absF32:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ absF32Ref:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ absF32Ret:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ absXmtx:	Count: 2.0e+00	Avg: 0.000ms 300.000ns
+ addSclMulXmtxRows:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ addSclMulXmtxRowsInl:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ addSclXmtxRows:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ addSclXmtxRowsInl:	Count: 1.0e+00	Avg: 0.005ms 4900.000ns
+ addXvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ adjXmtx3:	Count: 1.0e+00	Avg: 0.012ms 12200.000ns
+ adjXmtx4:	Count: 1.0e+00	Avg: 0.013ms 12600.000ns
+ aglBtwnXvec:	Count: 1.0e+00	Avg: 0.009ms 9400.000ns
+ altXmtxRows:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ altXmtxRowsInl:	Count: 1.0e+00	Avg: 0.000ms 400.000ns
+ chgXvecBasis:	Count: 1.0e+00	Avg: 0.261ms 260500.000ns
+ clnXmtx:	Count: 1.0e+00	Avg: 0.001ms 600.000ns
+ clrXmtx:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ cofXmtx:	Count: 4.0e+00	Avg: 0.000ms 300.000ns
+ cofXmtx3:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ cofXmtx4:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ cofXmtxSign2:	Count: 1.0e+00	Avg: 0.000ms 0.000ns
+ cofXmtxSign2Ret:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ cofXmtxSign3:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ cofXmtxSign3Ret:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ cofXmtxSign4:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ cofXmtxSign4Ret:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ cpyLessColRowXmtx:	Count: 3.0e+00	Avg: 0.000ms 400.000ns
+ cpyLessColRowXmtx3:	Count: 3.0e+00	Avg: 0.000ms 200.000ns
+ cpyLessXmtx:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ cpyXmtx:	Count: 2.0e+00	Avg: 0.000ms 200.000ns
+ cpyXmtxNew:	Count: 1.0e+00	Avg: 0.025ms 24700.000ns
+ cpyXvec:	Count: 2.0e+00	Avg: 0.000ms 200.000ns
+ cpyXvecNew:	Count: 1.0e+00	Avg: 0.039ms 38500.000ns
+ crsPrdXvec:	Count: 2.0e+00	Avg: 0.000ms 100.000ns
+ crsPrdXvec3:	Count: 2.0e+00	Avg: 0.000ms 100.000ns
+ crtXmtx:	Count: 3.0e+00	Avg: 0.026ms 25800.000ns
+ crtXmtxEz:	Count: 2.0e+00	Avg: 0.006ms 6000.000ns
+ crtXvec:	Count: 1.0e+00	Avg: 0.006ms 5700.000ns
+ deg2Rad:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ detTriangXmtx:	Count: 4.0e+00	Avg: 0.000ms 200.000ns
+ detXmtx:	Count: 3.0e+00	Avg: 0.220ms 220000.000ns
+ detXmtx1:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ detXmtx2:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ detXmtx3:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ detXmtx4:	Count: 1.0e+00	Avg: 0.001ms 1300.000ns
+ diff1Xvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ diff2Xvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ divXvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ dotPrdXvec:	Count: 4.0e+00	Avg: 0.000ms 200.000ns
+ dscrPoly2:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ dscrPoly3:	Count: 1.0e+00	Avg: 0.009ms 8600.000ns
+ equXmtx:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ equXvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ fndEigVal2:	Count: 2.0e+00	Avg: 0.001ms 700.000ns
+ fndEigVal3:	Count: 1.0e+00	Avg: 0.013ms 12800.000ns
+ fndFactorsOf:	Count: 1.0e+00	Avg: 0.005ms 5400.000ns
+ fndFactorsOfRef:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ fndFactorsOfRet:	Count: 1.0e+00	Avg: 0.000ms 400.000ns
+ fndLgstRowAbsXmtx:	Count: 9.0e+00	Avg: 0.000ms 300.000ns
+ getBasisCnvXmtx:	Count: 1.0e+00	Avg: 0.008ms 7700.000ns
+ getBasisHndXmtx3:	Count: 3.0e+00	Avg: 0.000ms 300.000ns
+ getBasisHndXmtx3Ret:	Count: 3.0e+00	Avg: 0.000ms 300.000ns
+ getBasisHndXvec3:	Count: 3.0e+00	Avg: 0.000ms 200.000ns
+ getBasisHndXvec3Ret:	Count: 3.0e+00	Avg: 0.000ms 100.000ns
+ getCramerSupportMtx:	Count: 3.0e+00	Avg: 0.000ms 200.000ns
+ getInvFromDet1:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ getInvFromDet2:	Count: 1.0e+00	Avg: 0.006ms 5500.000ns
+ getInvFromDet3:	Count: 1.0e+00	Avg: 0.005ms 5400.000ns
+ getInvFromDet4:	Count: 1.0e+00	Avg: 0.302ms 302400.000ns
+ getPolyOrder:	Count: 3.0e+00	Avg: 0.000ms 100.000ns
+ getPolyOrderRet:	Count: 3.0e+00	Avg: 0.000ms 100.000ns
+ hasInvXmtx:	Count: 1.0e+00	Avg: 0.007ms 6700.000ns
+ idnfXmtx:	Count: 2.0e+00	Avg: 0.000ms 400.000ns
+ isDiagXmtx:	Count: 2.0e+00	Avg: 0.000ms 300.000ns
+ isEquF32:	Count: 2.0e+00	Avg: 0.000ms 100.000ns
+ isEquF32Ref:	Count: 4.0e+00	Avg: 0.000ms 100.000ns
+ isEquF32Ret:	Count: 4.0e+00	Avg: 0.000ms 200.000ns
+ isIdtXmtx:	Count: 2.0e+00	Avg: 0.000ms 400.000ns
+ isLinIndXvec:	Count: 2.0e+00	Avg: 0.000ms 100.000ns
+ isOrthXmtx:	Count: 1.0e+00	Avg: 0.003ms 2500.000ns
+ isRdcFrmXmtx:	Count: 3.0e+00	Avg: 0.001ms 500.000ns
+ isSqrXmtx:	Count: 2.0e+00	Avg: 0.000ms 100.000ns
+ isSymXmtx:	Count: 1.0e+00	Avg: 0.001ms 500.000ns
+ isZeroXmtx:	Count: 2.0e+00	Avg: 0.000ms 200.000ns
+ isZeroXvec:	Count: 2.0e+00	Avg: 0.000ms 100.000ns
+ magXvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ mnrXmtx2:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ mnrXmtx2Ret:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ mnrXmtx3:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ mnrXmtx3Ret:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ mnrXmtx4:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ mnrXmtx4Ret:	Count: 1.0e+00	Avg: 0.000ms 400.000ns
+ mulXvec:	Count: 1.0e+00	Avg: 0.005ms 5100.000ns
+ nrmXvec:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ perpXvec_VecP_To_VecQ:	Count: 1.0e+00	Avg: 0.000ms 400.000ns
+ prntNl:	Count: 1.0e+00	Avg: 0.004ms 3700.000ns
+ prntNlStr:	Count: 1.0e+00	Avg: 0.011ms 10700.000ns
+ prntNlStrArgs:	Count: 1.0e+00	Avg: 0.089ms 89200.000ns
+ procXmtx:	Count: 1.3e+01	Avg: 0.119ms 119100.000ns
+ projXvec_VecP_Onto_VecQ:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ rad2Deg:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ rdcXmtx:	Count: 1.0e+00	Avg: 0.002ms 2300.000ns
+ rdcXmtxInl:	Count: 3.0e+00	Avg: 0.002ms 2100.000ns
+ rmvRowColXmtx3:	Count: 1.0e+00	Avg: 0.001ms 600.000ns
+ rmvRowColXmtx4:	Count: 1.0e+00	Avg: 0.001ms 700.000ns
+ rslvCramersRule:	Count: 1.0e+00	Avg: 0.005ms 5400.000ns
+ rslvPoly2:	Count: 6.0e+00	Avg: 0.000ms 100.000ns
+ rslvPoly2Ref:	Count: 6.0e+00	Avg: 0.000ms 100.000ns
+ rslvPoly2Ret:	Count: 6.0e+00	Avg: 0.000ms 100.000ns
+ rslvPoly3:	Count: 9.0e+00	Avg: 0.000ms 200.000ns
+ rslvPoly3Ref:	Count: 9.0e+00	Avg: 0.000ms 100.000ns
+ rslvPoly3Ret:	Count: 9.0e+00	Avg: 0.000ms 100.000ns
+ rtsPoly2:	Count: 1.0e+00	Avg: 0.001ms 800.000ns
+ rtsPoly2Ret:	Count: 1.0e+00	Avg: 0.009ms 9200.000ns
+ rtsPoly3:	Count: 1.0e+00	Avg: 0.022ms 21500.000ns
+ rtsPoly3Ret:	Count: 1.0e+00	Avg: 0.002ms 1800.000ns
+ sclMulXmtxRows:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ sclMulXmtxRowsInl:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ subXvec:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ sum1Xvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ sum2Xvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ synthDivPoly1IntoPoly2:	Count: 2.0e+00	Avg: 0.000ms 100.000ns
+ synthDivPoly1IntoPoly2Ret:	Count: 2.0e+00	Avg: 0.000ms 200.000ns
+ synthDivPoly1IntoPoly3:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ synthDivPoly1IntoPoly3Ret:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
+ tmsXmtx:	Count: 1.0e+00	Avg: 0.001ms 800.000ns
+ tmsXvec:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
+ trnXmtx:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+ trnXmtxInl:	Count: 1.0e+00	Avg: 0.039ms 39400.000ns
+ trnXmtxRect:	Count: 1.0e+00	Avg: 0.000ms 300.000ns
+OK
+141/226 test.XMTX: MF3D - Lengyel: Theorem 2.1 test... 
 Theorem 2.1:
 XMTX: P + Q = Q + P:
 XMTX: (P + Q) + R = P + (Q + R):
@@ -683,18 +1415,18 @@ XMTX: a * (b * Q) = (a * b) * Q:
 a * (P + Q) = (a * P) + (a * Q):
 (a + b) * P = (a * P) + (b * P):
 OK
-113/197 test.XMTX: MF3D - Lengyel: Theorem 2.2 test... 
+142/226 test.XMTX: MF3D - Lengyel: Theorem 2.2 test... 
 Theorem 2.2:
 ||P|| >= 0:
 ||P|| = 0 if isZerO(P) = true:
 ||a * P|| = |a| * ||P||:
 ||P + Q|| <= ||P|| + ||Q||:
 OK
-114/197 test.XMTX: MF3D - Lengyel: Theorem 2.4 test... 
+143/226 test.XMTX: MF3D - Lengyel: Theorem 2.4 test... 
 Theorem 2.4:
 dotProd(P, Q) = ||P|| * ||Q|| * cos(a):
 OK
-115/197 test.XMTX: MF3D - Lengyel: Theorem 2.5 test... 
+144/226 test.XMTX: MF3D - Lengyel: Theorem 2.5 test... 
 Theorem 2.5:
 dotProd(P, Q) = dotProd(Q, P):
 x: 1.0e+00 y: 3.0e+00 
@@ -707,10 +1439,10 @@ dotProd(P, (Q + R)) = dotProd(P, Q) + dotProd(P, R):
 dotProd(P, P) = ||P|| * ||P||:
 |dotProd(P, Q)| <= ||P|| * ||Q||:
 OK
-116/197 test.XMTX: MF3D - Lengyel: Theorem 2.7 test... 
+145/226 test.XMTX: MF3D - Lengyel: Theorem 2.7 test... 
 (P X Q) . Q = (P X Q)  . P = 0:
 OK
-117/197 test.XMTX: MF3D - Lengyel: Theorem 2.9 test... 
+146/226 test.XMTX: MF3D - Lengyel: Theorem 2.9 test... 
 Q X P = -(P X Q):
 (aP) X Q = a(P X Q):
 x: -1.8e+01 y: 2.8e+01 z: -1.1e+01 
@@ -720,1006 +1452,1394 @@ P X P = [0,0,0]:
 (P X Q) . R = (R X P) . Q = (Q X R) . P:
 P X (Q X P) = P X Q X P = (||P|| * ||P||) * Q - (P . Q) * P:
 OK
-118/197 test.XMTX: MF3D - Lengyel: Theorem 2.14 test... 
+147/226 test.XMTX: MF3D - Lengyel: Theorem 2.14 test... 
 Theorem 2.14:
 (P . Q) = 0 if P and Q are linearly independent:
 OK
-119/197 test.XMTX: MF3D - Lengyel: Theorem 3.1 test... 
+148/226 test.XMTX: MF3D - Lengyel: Theorem 3.1 test... 
 XMTX: F + G = G + F:
 XMTX: (F + G) + H = F + (G + H):
 XMTX: (a * (b * F)) = ((a * b) * F):
 XMTX: (a * (F + G)) = ((a * F) + (a * G)):
 XMTX: ((a + b) * F) = ((a * F) + (b * F)):
 OK
-120/197 test.XMTX: MF3D - Lengyel: Theorem 3.2 test... 
+149/226 test.XMTX: MF3D - Lengyel: Theorem 3.2 test... 
 XMTX: ((a * F) * G) = (a * (F * G)):
 XMTX: ((F * G) * H) = (F * (G * H)):
 XMTX: ((F * G) ^ T) = (G^T * F^T):
 OK
-121/197 test.XMTX: MF3D - Lengyel: Theorem 3.9 test... 
+150/226 test.XMTX: MF3D - Lengyel: Theorem 3.9 test... 
 Found zero vector index start 6 and stop 8x: 0.0e+00 y: 0.0e+00 
 
 Matrix state:
+
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 0.0e+00 y: -3.0e+00 z: -6.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+
+
 
 0: x: 2.0e+00 y: 3.0e+00 z: 8.0e+00 
 1: x: 6.0e+00 y: 0.0e+00 z: -3.0e+00 
 2: x: -1.0e+00 y: 3.0e+00 z: 2.0e+00 
 
-0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
-1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
-2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
 
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
+
+
+0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
+2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
 
 OK
-122/197 test.XMTX: MF3D - Lengyel: Theorem 3.10 test... 
+151/226 test.XMTX: MF3D - Lengyel: Theorem 3.10 test... 
+
 0: x: 1.0e+00 y: 4.0e+00 z: 0.0e+00 
 1: x: 2.0e+00 y: 5.0e+00 z: 0.0e+00 
 2: x: 3.0e+00 y: 6.0e+00 z: 0.0e+00 
 
+
 Found zero vector index start 6 and stop 8x: 0.0e+00 y: 0.0e+00 
 
 Matrix state:
-0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
-1: x: -0.0e+00 y: 1.0e+00 z: -0.0e+00 
-2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: -0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
+
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: -0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+
+
+
+0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+1: x: -0.0e+00 y: 1.0e+00 z: -0.0e+00 
+2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+
+
 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 z: 6.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
+
 Found zero vector index start 6 and stop 8x: 0.0e+00 y: 0.0e+00 
 
 Matrix state:
-0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
-1: x: 0.0e+00 y: -3.0e+00 z: -6.0e+00 
-2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 0.0e+00 y: -3.0e+00 z: -6.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
+
+
 0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 0.0e+00 y: -3.0e+00 z: -6.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+
+
+
+0: x: 1.0e+00 y: 2.0e+00 z: 3.0e+00 
+1: x: 0.0e+00 y: -3.0e+00 z: -6.0e+00 
+2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+
+
 
 0: x: 2.0e+00 y: 6.0e+00 z: -1.0e+00 
 1: x: 3.0e+00 y: 0.0e+00 z: 3.0e+00 
 2: x: 8.0e+00 y: -3.0e+00 z: 2.0e+00 
 
-0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
-1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 
-2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
 
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
+
+
+0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 
+2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
+
 
 0: x: 2.0e+00 y: 3.0e+00 z: 8.0e+00 
 1: x: 6.0e+00 y: 0.0e+00 z: -3.0e+00 
 2: x: -1.0e+00 y: 3.0e+00 z: 2.0e+00 
 
-0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
-1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
-2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
 
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
+
+
+0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
+1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
+2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
 
 OK
-123/197 test.XMTX: MF3D - Lengyel: Theorem 3.11 test... 
+152/226 test.XMTX: MF3D - Lengyel: Theorem 3.11 test... 
 BBB FG
+
 0: x: 5.7e+01 y: 9.8e+01 z: -6.4e+01 
 1: x: 2.7e+01 y: -3.0e+00 z: 4.2e+01 
 2: x: -9.0e+00 y: 3.2e+01 z: -2.5e+01 
 
+
 BBB Reduced FG
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
 BBB invFG
+
 0: x: 1.31101794e-02 y: -4.15309891e-03 z: -4.05392758e-02 
 1: x: -3.06833907e-03 y: 2.06725504e-02 z: 4.25848364e-02 
 2: x: -8.64714011e-03 y: 2.79559846e-02 z: 2.91027352e-02 
 
+
 CCC Reduced F
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 CCC invF
+
 0: x: 6.66666701e-02 y: 1.33333340e-01 z: -6.66666701e-02 
 1: x: -6.66666924e-02 y: 8.88889059e-02 z: 4.00000035e-01 
 2: x: 1.33333340e-01 y: -6.66666701e-02 z: -1.33333340e-01 
 
+
 DDD Reduced G
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 DDD invG
+
 0: x: 4.18409965e-02 y: -8.22873115e-02 z: 3.62622030e-02 
 1: x: 7.53138139e-02 y: 1.18549510e-01 z: -1.39470014e-03 
 2: x: 1.21338918e-01 y: 6.13668076e-02 z: -9.48396101e-02 
 
+
 EEE invG * invF
+
 0: x: 1.31101831e-02 y: -4.15311008e-03 z: -4.05392907e-02 
 1: x: -3.06834280e-03 y: 2.06725578e-02 z: 4.25848476e-02 
 2: x: -8.64714197e-03 y: 2.79559940e-02 z: 2.91027463e-02 
 
+
 FIN invFG
+
 0: x: 1.31101794e-02 y: -4.15309891e-03 z: -4.05392758e-02 
 1: x: -3.06833907e-03 y: 2.06725504e-02 z: 4.25848364e-02 
 2: x: -8.64714011e-03 y: 2.79559846e-02 z: 2.91027352e-02 
 
+
 FIN invGinvF
+
 0: x: 1.31101831e-02 y: -4.15311008e-03 z: -4.05392907e-02 
 1: x: -3.06834280e-03 y: 2.06725578e-02 z: 4.25848476e-02 
 2: x: -8.64714197e-03 y: 2.79559940e-02 z: 2.91027463e-02 
 
+
 OK
-124/197 test.XMTX: MF3D - Lengyel: Theorem 3.15 test... 
+153/226 test.XMTX: MF3D - Lengyel: Theorem 3.15 test... 
 AAA Reduced M
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 AAA invM
+
 0: x: 6.66666701e-02 y: 1.33333340e-01 z: -6.66666701e-02 
 1: x: -6.66666924e-02 y: 8.88889059e-02 z: 4.00000035e-01 
 2: x: 1.33333340e-01 y: -6.66666701e-02 z: -1.33333340e-01 
 
+
 Found zero vector index start 3 and stop 5x: 0.0e+00 y: 0.0e+00 
 
 Matrix state:
+
 0: x: 1.0e+00 y: 1.5e+00 z: 4.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 2: x: -1.0e+00 y: 3.0e+00 z: 2.0e+00 
+
 
 BBB Reduced M
+
 0: x: 1.0e+00 y: 1.5e+00 z: 4.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 2: x: -1.0e+00 y: 3.0e+00 z: 2.0e+00 
 
+
 BBB invM
+
 0: x: 5.0e-01 y: 0.0e+00 z: 0.0e+00 
 1: x: -2.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
 OK
-125/197 test.XMTX: MF3D - Lengyel: Theorem 3.17 test... 
+154/226 test.XMTX: MF3D - Lengyel: Theorem 3.17 test... 
 Found detXmtx 2x2 value: -3.0e+00
 Found detXmtx 2x2 after add scalar multiple copy of row: -3.0e+00
 Found detXmtx 2x2 after add scalar multiple to row: -6.0e+00
 Found detXmtx 2x2 after alternating two rows: 3.0e+00
 OK
-126/197 test.XMTX: MF3D - Lengyel: Corollary 3.18 test... 
+155/226 test.XMTX: MF3D - Lengyel: Corollary 3.18 test... 
 Found detXmtx 2x2 value: 0.0e+00
 OK
-127/197 test.XMTX: MF3D - Lengyel: Theorem 3.19 test... 
+156/226 test.XMTX: MF3D - Lengyel: Theorem 3.19 test... 
 AAA Found detXmtx 2x2 value: 0.0e+00
 Found zero vector index start 2 and stop 3x: 0.0e+00 
 
 Matrix state:
+
 0: x: 1.0e+00 y: 1.20000004e+00 
 1: x: 0.0e+00 y: 0.0e+00 
 
+
 BBB Found detXmtx 2x2 value: -3.0e+00
+
 
 0: x: 1.0e+00 y: 1.19209289e-07 
 1: x: -0.0e+00 y: 9.99999940e-01 
+
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
+
 OK
-128/197 test.XMTX: MF3D - Lengyel: Theorem 3.20 test... 
+157/226 test.XMTX: MF3D - Lengyel: Theorem 3.20 test... 
 OK
-129/197 test.XMTX: MF3D - Lengyel: Theorem 3.21 test... 
+158/226 test.XMTX: MF3D - Lengyel: Theorem 3.21 test... 
 Test 1:
 F Matrix:
+
 0: x: 5.0e+00 y: 6.0e+00 
 1: x: 8.0e+00 y: 9.0e+00 
+
 detF = -3.0e+00
 Calculated inverse F (should be identity matrix):
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
+
 Calculated inverse F (should be inverse matrix):
+
 0: x: -3.0e+00 y: 2.0e+00 
 1: x: 2.66666483e+00 y: -1.66666555e+00 
+
 Generated inverse from detF (should be inverse matrix):
+
 0: x: -3.0e+00 y: 2.0e+00 
-1: x: 2.66666674e+00 y: -1.66666674e+00 
+1: x: 2.66666674e+00 y: -1.66666662e+00 
+
 Test 2:
 F2 Matrix:
+
 0: x: 2.0e+00 y: 3.0e+00 z: 8.0e+00 
 1: x: 6.0e+00 y: 0.0e+00 z: -3.0e+00 
 2: x: -1.0e+00 y: 3.0e+00 z: 2.0e+00 
+
 detF2 = 1.35e+02
 Calculated inverse F2 (should be identity matrix):
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 Calculated inverse F2 (should be inverse matrix):
+
 0: x: 6.66666701e-02 y: 1.33333340e-01 z: -6.66666701e-02 
 1: x: -6.66666924e-02 y: 8.88889059e-02 z: 4.00000035e-01 
 2: x: 1.33333340e-01 y: -6.66666701e-02 z: -1.33333340e-01 
+
 Generated inverse from detF2 (should be inverse matrix):
+
 0: x: 6.66666626e-02 y: 1.33333325e-01 z: -6.66666626e-02 
 1: x: -6.66666626e-02 y: 8.88888835e-02 z: 4.00000005e-01 
 2: x: 1.33333325e-01 y: -6.66666626e-02 z: -1.33333325e-01 
+
 OK
-130/197 test.XMTX: ELA - Larson, Edwards: 1.2 Example 3 test... 
+159/226 test.XMTX: ELA - Larson, Edwards: 1.2 Example 3 test... 
 Matrix M1:
+
 0: x: 1.0e+00 y: -2.0e+00 z: 3.0e+00 w: 9.0e+00 
 1: x: -1.0e+00 y: 3.0e+00 z: 0.0e+00 w: -4.0e+00 
 2: x: 2.0e+00 y: -5.0e+00 z: 5.0e+00 w: 1.7e+01 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 w: 1.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 w: -1.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 w: 2.0e+00 
 
+
 Matrix Inv:
+
 0: x: 7.5e+00 y: -2.5e+00 z: -4.5e+00 
 1: x: 2.5e+00 y: -5.0e-01 z: -1.5e+00 
 2: x: -5.0e-01 y: 5.0e-01 z: 5.0e-01 
 
+
 Copy Matrix M1:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
 OK
-131/197 test.XMTX: ELA - Larson, Edwards: 1.2 Example 4 test... 
+160/226 test.XMTX: ELA - Larson, Edwards: 1.2 Example 4 test... 
 Matrix M1:
+
 0: x: 0.0e+00 y: 1.0e+00 z: 1.0e+00 w: -2.0e+00 w: -3.0e+00 
 1: x: 1.0e+00 y: 2.0e+00 z: -1.0e+00 w: 0.0e+00 w: 2.0e+00 
 2: x: 2.0e+00 y: 4.0e+00 z: 1.0e+00 w: -3.0e+00 w: -2.0e+00 
 3: x: 1.0e+00 y: -4.0e+00 z: -7.0e+00 w: -1.0e+00 w: -1.9e+01 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 w: -1.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 w: 0.0e+00 w: 1.99999809e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 w: 0.0e+00 w: 1.0e+00 
 3: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 1.0e+00 w: 3.0e+00 
 
+
 Matrix Inv:
+
 0: x: -1.53846120e+00 y: -1.07692313e+00 z: 1.0e+00 w: 7.69231319e-02 
 1: x: 5.38461685e-01 y: 7.43589699e-01 z: -3.33333343e-01 w: -7.69230127e-02 
 2: x: -4.61538314e-01 y: -5.89743614e-01 z: 3.33333343e-01 w: -7.69230723e-02 
 3: x: -4.61538493e-01 y: 7.69230797e-02 z: 0.0e+00 w: -7.69230797e-02 
 
+
 Copy Matrix M1:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 w: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 w: 0.0e+00 
 3: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 1.0e+00 
 
+
 OK
-132/197 test.XMTX: ELA - Larson, Edwards: 1.2 Example 6 test... 
+161/226 test.XMTX: ELA - Larson, Edwards: 1.2 Example 6 test... 
 Found zero vector index start 8 and stop 11x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
 Matrix state:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 1.0e+00 w: 6.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: -1.0e+00 w: 2.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: -2.0e+00 
 3: x: 0.0e+00 y: 5.0e+00 z: -7.0e+00 w: -1.1e+01 
 
+
 Matrix M1:
+
 0: x: 1.0e+00 y: -1.0e+00 z: 2.0e+00 w: 4.0e+00 
 1: x: 1.0e+00 y: 0.0e+00 z: 1.0e+00 w: 6.0e+00 
 2: x: 2.0e+00 y: -3.0e+00 z: 5.0e+00 w: 4.0e+00 
 3: x: 3.0e+00 y: 2.0e+00 z: -1.0e+00 w: 1.0e+00 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 1.0e+00 w: 6.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: -1.0e+00 w: 2.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: -2.0e+00 
 3: x: 0.0e+00 y: 5.0e+00 z: -7.0e+00 w: -1.1e+01 
 
+
 Matrix Inv:
+
 0: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 w: 0.0e+00 
 1: x: -1.0e+00 y: 1.0e+00 z: 0.0e+00 w: 0.0e+00 
 2: x: -3.0e+00 y: 1.0e+00 z: 1.0e+00 w: 0.0e+00 
 3: x: -3.0e+00 y: 0.0e+00 z: 0.0e+00 w: 1.0e+00 
 
+
 OK
-133/197 test.XMTX: ELA - Larson, Edwards: 1.2 Example 7 test... 
+162/226 test.XMTX: ELA - Larson, Edwards: 1.2 Example 7 test... 
 Matrix M1:
+
 0: x: 1.0e+00 y: -2.0e+00 z: 3.0e+00 w: 9.0e+00 
 1: x: -1.0e+00 y: 3.0e+00 z: 0.0e+00 w: -4.0e+00 
 2: x: 2.0e+00 y: -5.0e+00 z: 5.0e+00 w: 1.7e+01 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 w: 1.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 w: -1.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 w: 2.0e+00 
 
+
 Matrix Inv:
+
 0: x: 7.5e+00 y: -2.5e+00 z: -4.5e+00 
 1: x: 2.5e+00 y: -5.0e-01 z: -1.5e+00 
 2: x: -5.0e-01 y: 5.0e-01 z: 5.0e-01 
 
+
 Copy Matrix M1:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
 OK
-134/197 test.XMTX: ELA - Larson, Edwards: 1.2 Example 8 test... 
+163/226 test.XMTX: ELA - Larson, Edwards: 1.2 Example 8 test... 
 Matrix M1:
+
 0: x: 2.0e+00 y: 4.0e+00 z: -2.0e+00 w: 0.0e+00 
 1: x: 3.0e+00 y: 5.0e+00 z: 0.0e+00 w: 1.0e+00 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 5.0e+00 w: 2.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: -3.0e+00 w: -1.0e+00 
 
+
 Matrix Inv:
+
 0: x: -2.5e+00 y: 2.0e+00 
 1: x: 1.5e+00 y: -1.0e+00 
 
+
 Copy Matrix M1:
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 
 
+
 OK
-135/197 test.XMTX: ELA - Larson, Edwards: 1.2 Example 9 test... 
+164/226 test.XMTX: ELA - Larson, Edwards: 1.2 Example 9 test... 
 Matrix M1:
+
 0: x: 1.0e+00 y: -1.0e+00 z: 3.0e+00 w: 0.0e+00 
 1: x: 2.0e+00 y: 1.0e+00 z: 3.0e+00 w: 0.0e+00 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 2.0e+00 w: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: -1.0e+00 w: 0.0e+00 
 
+
 Matrix Inv:
+
 0: x: 3.33333313e-01 y: 3.33333343e-01 
 1: x: -6.66666686e-01 y: 3.33333343e-01 
 
+
 Copy Matrix M1:
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
 
+
 OK
-136/197 test.XMTX: ELA - Larson, Edwards: 1.2 Problem 19 test... 
+165/226 test.XMTX: ELA - Larson, Edwards: 1.2 Problem 19 test... 
 Matrix M1:
+
 0: x: 1.0e+00 y: 2.0e+00 z: 7.0e+00 
 1: x: 2.0e+00 y: 1.0e+00 z: 8.0e+00 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 3.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: 2.0e+00 
 
+
 Matrix Inv:
+
 0: x: -3.33333373e-01 y: 6.66666686e-01 
 1: x: 6.66666686e-01 y: -3.33333343e-01 
 
+
 Copy Matrix M1:
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 
 
+
 OK
-137/197 test.XMTX: ELA - Larson, Edwards: 1.2 Problem 20 test... 
+166/226 test.XMTX: ELA - Larson, Edwards: 1.2 Problem 20 test... 
 Matrix M1:
+
 0: x: 2.0e+00 y: 6.0e+00 z: 1.6e+01 
 1: x: -2.0e+00 y: -6.0e+00 z: -1.6e+01 
 
+
 Matrix Ret:
+
 0: x: 1.0e+00 y: 3.0e+00 z: 8.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
+
 Matrix Inv:
+
 0: x: -2.5e+00 y: -3.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 
 
+
 Copy Matrix M1:
+
 0: x: 1.0e+00 y: 3.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 
 
+
 OK
-138/197 test.XMTX: ELA - Larson, Edwards: 2.1 Example 2 test... 
+167/226 test.XMTX: ELA - Larson, Edwards: 2.1 Example 2 test... 
 OK
-139/197 test.XMTX: ELA - Larson, Edwards: 2.1 Example 3 test... 
+168/226 test.XMTX: ELA - Larson, Edwards: 2.1 Example 3 test... 
 OK
-140/197 test.XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test... 
+169/226 test.XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test... 
 
 Question D:
+
 0: x: 1.0e+00 y: -2.0e+00 z: -3.0e+00 
+
+
 
 0: x: 2.0e+00 
 1: x: -1.0e+00 
 2: x: 1.0e+00 
+
+
 
 0: x: 1.0e+00 
 
 
+
 Question E:
+
 0: x: 1.0e+00 y: -2.0e+00 z: -3.0e+00 
+
+
 
 0: x: 2.0e+00 
 1: x: -1.0e+00 
 2: x: 1.0e+00 
+
+
 
 0: x: 2.0e+00 y: -4.0e+00 z: -6.0e+00 
 1: x: -1.0e+00 y: 2.0e+00 z: 3.0e+00 
 2: x: 1.0e+00 y: -2.0e+00 z: -3.0e+00 
 
+
 OK
-141/197 test.XMTX: ELA - Larson, Edwards: 2.1 Example 6 test... 
+170/226 test.XMTX: ELA - Larson, Edwards: 2.1 Example 6 test... 
+
 0: x: 1.0e+00 y: -2.0e+00 z: 1.0e+00 w: 0.0e+00 
 1: x: 2.0e+00 y: 3.0e+00 z: -2.0e+00 w: 0.0e+00 
+
+
 
 0: x: 1.0e+00 y: 0.0e+00 z: -1.42857193e-01 w: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: -5.71428596e-01 w: 0.0e+00 
 
-0: x: 1.0e+00 y: 0.0e+00 
-1: x: 0.0e+00 y: 1.0e+00 
+
 
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
 
+
+
+0: x: 1.0e+00 y: 0.0e+00 
+1: x: 0.0e+00 y: 1.0e+00 
+
+
 OK
-142/197 test.XMTX: ELA - Larson, Edwards: 2.1 Problem 1 test... 
-0: x: -1.0e+00 y: 0.0e+00 
-1: x: 3.0e+00 y: -9.0e+00 
+171/226 test.XMTX: ELA - Larson, Edwards: 2.1 Problem 1 test... 
 
 0: x: -1.0e+00 y: 0.0e+00 
 1: x: 3.0e+00 y: -9.0e+00 
 
+
+
+0: x: -1.0e+00 y: 0.0e+00 
+1: x: 3.0e+00 y: -9.0e+00 
+
+
 OK
-143/197 test.XMTX: ELA - Larson, Edwards: 2.1 Problem 3 test... 
+172/226 test.XMTX: ELA - Larson, Edwards: 2.1 Problem 3 test... 
+
 0: x: 5.0e+00 y: -5.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 
 2: x: -4.0e+00 y: -5.0e+00 
 
+
+
 0: x: 5.0e+00 y: -5.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 
 2: x: -4.0e+00 y: -5.0e+00 
 
+
 OK
-144/197 test.XMTX: ELA - Larson, Edwards: 2.1 Problem 9 test... 
+173/226 test.XMTX: ELA - Larson, Edwards: 2.1 Problem 9 test... 
 OK
-145/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 1 test... 
-0: x: 2.0e+00 y: -1.0e+00 z: 1.0e+00 
+174/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 1 test... 
 
 0: x: 2.0e+00 y: -1.0e+00 z: 1.0e+00 
 
+
+
+0: x: 2.0e+00 y: -1.0e+00 z: 1.0e+00 
+
+
 OK
-146/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 2 test... 
-0: x: -1.33333337e+00 y: 2.0e+00 
-1: x: 6.66666686e-01 y: -6.66666686e-01 
+175/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 2 test... 
 
 0: x: -1.33333337e+00 y: 2.0e+00 
 1: x: 6.66666686e-01 y: -6.66666686e-01 
 
+
+
+0: x: -1.33333337e+00 y: 2.0e+00 
+1: x: 6.66666686e-01 y: -6.66666686e-01 
+
+
 OK
-147/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 3 test... 
+176/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 3 test... 
+
 0: x: -5.0e+00 y: 4.0e+00 
 1: x: 0.0e+00 y: -1.0e+00 
 2: x: 2.0e+00 y: 3.0e+00 
 
-0: x: 1.7e+01 y: 4.0e+00 
-1: x: 1.3e+01 y: 1.4e+01 
+
 
 0: x: 1.7e+01 y: 4.0e+00 
 1: x: 1.3e+01 y: 1.4e+01 
+
+
+
+0: x: 1.7e+01 y: 4.0e+00 
+1: x: 1.3e+01 y: 1.4e+01 
+
 
 OK
-148/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 4 test... 
+177/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 4 test... 
+
 0: x: 2.0e+00 y: 5.0e+00 
 1: x: 4.0e+00 y: -4.0e+00 
+
+
 
 0: x: 0.0e+00 y: 7.0e+00 
 1: x: 4.0e+00 y: -2.0e+00 
 
+
 OK
-149/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 5 test... 
-0: x: -2.0e+00 y: 4.0e+00 
-1: x: -1.0e+00 y: 2.0e+00 
+178/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 5 test... 
 
 0: x: -2.0e+00 y: 4.0e+00 
 1: x: -1.0e+00 y: 2.0e+00 
 
+
+
+0: x: -2.0e+00 y: 4.0e+00 
+1: x: -1.0e+00 y: 2.0e+00 
+
+
 OK
-150/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 6 test... 
+179/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 6 test... 
+
 0: x: 3.0e+00 y: -2.0e+00 
 1: x: 4.0e+00 y: 0.0e+00 
 2: x: -1.0e+00 y: 1.0e+00 
 
+
+
 0: x: -2.0e+00 y: 1.0e+00 z: 4.0e+00 
 
+
 OK
-151/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 7 test... 
+180/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 7 test... 
+
 0: x: 2.0e+00 y: -1.0e+00 
 1: x: 3.0e+00 y: 0.0e+00 
+
+
 
 0: x: 1.0e+00 y: -2.0e+00 
 1: x: 6.0e+00 y: -3.0e+00 
 
+
+
 0: x: 2.0e+00 y: -1.0e+00 
 1: x: 3.0e+00 y: 0.0e+00 
+
+
 
 0: x: -4.0e+00 y: -1.0e+00 
 1: x: 3.0e+00 y: -6.0e+00 
 
+
 OK
-152/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 8 test... 
+181/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 8 test... 
+
 0: x: 0.0e+00 y: 1.0e+00 
 1: x: 2.0e+00 y: 4.0e+00 
 2: x: 1.0e+00 y: -1.0e+00 
 
+
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 1.0e+00 y: 4.0e+00 z: -1.0e+00 
 
+
 OK
-153/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 9 test... 
+182/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 9 test... 
+
 0: x: 2.0e+00 y: 1.0e+00 z: -2.0e+00 
 1: x: -1.0e+00 y: 0.0e+00 z: 3.0e+00 
 2: x: 0.0e+00 y: -2.0e+00 z: 1.0e+00 
+
+
 
 0: x: 3.0e+00 y: 1.0e+00 
 1: x: 2.0e+00 y: -1.0e+00 
 2: x: 3.0e+00 y: 0.0e+00 
 
-0: x: 2.0e+00 y: 1.0e+00 
-1: x: 6.0e+00 y: -1.0e+00 
-2: x: -1.0e+00 y: 2.0e+00 
+
 
 0: x: 2.0e+00 y: 1.0e+00 
 1: x: 6.0e+00 y: -1.0e+00 
 2: x: -1.0e+00 y: 2.0e+00 
+
+
+
+0: x: 2.0e+00 y: 1.0e+00 
+1: x: 6.0e+00 y: -1.0e+00 
+2: x: -1.0e+00 y: 2.0e+00 
+
+
 
 0: x: 2.0e+00 y: -1.0e+00 z: 0.0e+00 
 1: x: 1.0e+00 y: 0.0e+00 z: -2.0e+00 
 2: x: -2.0e+00 y: 3.0e+00 z: 1.0e+00 
 
+
+
 0: x: 3.0e+00 y: 2.0e+00 z: 3.0e+00 
 1: x: 1.0e+00 y: -1.0e+00 z: 0.0e+00 
+
+
 
 0: x: 2.0e+00 y: 6.0e+00 z: -1.0e+00 
 1: x: 1.0e+00 y: -1.0e+00 z: 2.0e+00 
 
+
 OK
-154/197 test.XMTX: ELA - Larson, Edwards: 2.2 Example 10 test... 
+183/226 test.XMTX: ELA - Larson, Edwards: 2.2 Example 10 test... 
 OK
-155/197 test.XMTX: ELA - Larson, Edwards: 2.2 Problem 1, 3, 5 test... 
+184/226 test.XMTX: ELA - Larson, Edwards: 2.2 Problem 1, 3, 5 test... 
 OK
-156/197 test.XMTX: ELA - Larson, Edwards: 2.2 Problem 19, 21 test... 
+185/226 test.XMTX: ELA - Larson, Edwards: 2.2 Problem 19, 21 test... 
 OK
-157/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 1 test... 
+186/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 1 test... 
 OK
-158/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 2 test... 
+187/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 2 test... 
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
+
+
 
 0: x: -3.0e+00 y: -4.0e+00 
 1: x: 1.0e+00 y: 1.0e+00 
 
+
 OK
-159/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 3 test... 
+188/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 3 test... 
+
 0: x: 1.0e+00 y: -1.0e+00 z: 0.0e+00 
 1: x: 1.0e+00 y: 0.0e+00 z: -1.0e+00 
 2: x: -6.0e+00 y: 2.0e+00 z: 3.0e+00 
+
+
 
 0: x: -2.0e+00 y: -3.0e+00 z: -1.0e+00 
 1: x: -3.0e+00 y: -3.0e+00 z: -1.0e+00 
 2: x: -2.0e+00 y: -4.0e+00 z: -1.0e+00 
 
+
 OK
-160/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 4 test... 
+189/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 4 test... 
 Found zero vector index start 6 and stop 8x: 0.0e+00 y: 0.0e+00 
 
 Matrix state:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 5.71428596e-01 
 1: x: -0.0e+00 y: 1.0e+00 z: -2.85714298e-01 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
+
+
 
 0: x: 1.0e+00 y: 2.0e+00 z: 0.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: -2.0e+00 y: 3.0e+00 z: -2.0e+00 
 
+
+
 0: x: 1.42857074e-01 y: 2.85714298e-01 z: 0.0e+00 
 1: x: 4.28571462e-01 y: -1.42857149e-01 z: -0.0e+00 
 2: x: -1.00000023e+00 y: 1.0e+00 z: 1.0e+00 
 
+
 OK
-161/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 5 test... 
+190/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 5 test... 
 Found zero vector index start 2 and stop 3x: 0.0e+00 
 
 Matrix state:
+
 0: x: 1.0e+00 y: -3.33333343e-01 
 1: x: 0.0e+00 y: 0.0e+00 
+
+
 
 0: x: 3.0e+00 y: -1.0e+00 
 1: x: -2.0e+00 y: 2.0e+00 
 
+
+
 0: x: 5.0e-01 y: 2.50000029e-01 
 1: x: 5.00000059e-01 y: 7.50000059e-01 
 
+
 OK
-162/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 6 test... 
+191/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 6 test... 
+
 0: x: 2.0e+00 y: -5.0e-01 
 1: x: -1.0e+00 y: 5.0e-01 
+
+
 
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
 
+
 OK
-163/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 7 test... 
+192/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 7 test... 
 OK
-164/197 test.XMTX: ELA - Larson, Edwards: 2.3 Example 8 test... 
+193/226 test.XMTX: ELA - Larson, Edwards: 2.3 Example 8 test... 
 
 XMTX: A
+
 0: x: 2.0e+00 y: 3.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: 3.0e+00 z: 1.0e+00 
 2: x: 2.0e+00 y: 4.0e+00 z: 1.0e+00 
 
+
 XMTX: TMP
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 XMTX: invA
+
 0: x: -1.0e+00 y: 1.0e+00 z: 0.0e+00 
 1: x: -1.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 6.0e+00 y: -2.0e+00 z: -3.0e+00 
 
+
 XMTX: a:
+
 0: x: 2.0e+00 
 1: x: -1.0e+00 
 2: x: -2.0e+00 
 
+
 XMTX: b:
+
 0: x: 4.0e+00 
 1: x: 1.0e+00 
 2: x: -7.0e+00 
 
+
 XMTX: c:
+
 0: x: 0.0e+00 
 1: x: 0.0e+00 
 2: x: 0.0e+00 
+
 OK
-165/197 test.XMTX: ELA - Larson, Edwards: 2.3 Problem 1, 3 test... 
+194/226 test.XMTX: ELA - Larson, Edwards: 2.3 Problem 1, 3 test... 
 OK
-166/197 test.XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test... 
+195/226 test.XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test... 
 
 XMTX: A:
+
 0: x: 7.0e+00 y: -2.0e+00 
 1: x: -3.0e+00 y: 1.0e+00 
 
+
 XMTX: B:
+
 0: x: -1.90000724e+01 y: -3.30001258e+01 
 1: x: -4.00001525e+00 y: -7.00002670e+00 
 
+
 XMTX: C:
+
 0: x: 1.0e+00 y: 1.0e+00 z: -1.0e+00 
 1: x: -3.0e+00 y: 2.0e+00 z: -1.0e+00 
 2: x: 3.0e+00 y: -3.0e+00 z: 2.0e+00 
+
 OK
-167/197 test.XMTX: ELA - Larson, Edwards: 2.4 Example 3 test... 
+196/226 test.XMTX: ELA - Larson, Edwards: 2.4 Example 3 test... 
 
 XMTX: A:
+
 0: x: 0.0e+00 y: 1.0e+00 z: 3.0e+00 
 1: x: 5.0e+00 y: 1.0e+00 z: -3.0e+00 
 2: x: 0.0e+00 y: 2.0e+00 z: 2.0e+00 
 3: x: -6.0e+00 y: 2.0e+00 z: 0.0e+00 
 
+
 XMTX: TMP3:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 3.5e+01 y: 0.0e+00 z: 1.0e+00 
 2: x: 0.0e+00 y: 1.1e+01 z: -0.0e+00 
 3: x: -0.0e+00 y: 1.0e+00 z: -2.0e+00 
 
+
 XMTX: IDT3:
+
 0: x: 3.0e+00 y: 1.0e+01 z: -4.5e+00 
 1: x: 1.0e+00 y: 3.0e+00 z: -1.5e+00 
 2: x: -0.0e+00 y: -1.0e+00 z: 5.0e-01 
+
 OK
-168/197 test.XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test... 
+197/226 test.XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test... 
 
 XMTX: A:
+
 0: x: 1.0e+00 y: -2.0e+00 z: 2.0e+00 
 1: x: -1.0e+00 y: 1.0e+00 z: 3.0e+00 
 2: x: 1.0e+00 y: -1.0e+00 z: -4.0e+00 
 
+
 XMTX: TMP3:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 XMTX: IDT3:
+
 0: x: -1.0e+00 y: -1.0e+01 z: -8.0e+00 
 1: x: -1.0e+00 y: -6.0e+00 z: -5.0e+00 
 2: x: -0.0e+00 y: -1.0e+00 z: -1.0e+00 
 
+
 XMTX: W1:
+
 0: x: 1.3e+01 y: 5.0e+00 z: 5.0e+00 
+
 
 XMTX: ENC_W1:
+
 0: x: 1.3e+01 y: -2.6e+01 z: 2.1e+01 
 
+
 XMTX: W2:
+
 0: x: 2.0e+01 y: 0.0e+00 z: 1.3e+01 
+
 
 XMTX: ENC_W2:
+
 0: x: 3.3e+01 y: -5.3e+01 z: -1.2e+01 
 
+
 XMTX: W3:
+
 0: x: 5.0e+00 y: 0.0e+00 z: 1.3e+01 
+
 
 XMTX: ENC_W3:
+
 0: x: 1.8e+01 y: -2.3e+01 z: -4.2e+01 
 
+
 XMTX: W4:
+
 0: x: 1.5e+01 y: 1.4e+01 z: 4.0e+00 
+
 
 XMTX: ENC_W4:
+
 0: x: 5.0e+00 y: -2.0e+01 z: 5.6e+01 
 
+
 XMTX: W5:
+
 0: x: 1.0e+00 y: 2.5e+01 z: 0.0e+00 
+
 
 XMTX: ENC_W5:
+
 0: x: -2.4e+01 y: 2.3e+01 z: 7.7e+01 
 
+
 XMTX: DEC_W1:
+
 0: x: 1.3e+01 y: 5.0e+00 z: 5.0e+00 
 
+
 XMTX: DEC_W2:
+
 0: x: 2.0e+01 y: 0.0e+00 z: 1.3e+01 
 
+
 XMTX: DEC_W3:
+
 0: x: 5.0e+00 y: 0.0e+00 z: 1.3e+01 
 
+
 XMTX: DEC_W4:
+
 0: x: 1.5e+01 y: 1.4e+01 z: 4.0e+00 
 
+
 XMTX: DEC_W5:
+
 0: x: 1.0e+00 y: 2.5e+01 z: 0.0e+00 
+
 OK
-169/197 test.XMTX: ELA - Larson, Edwards: 2.5 Example 15, 17 test... 
+198/226 test.XMTX: ELA - Larson, Edwards: 2.5 Example 15, 17 test... 
 OK
-170/197 test.XMTX: ELA - Larson, Edwards: 3.1 Example 1, 2, 3, 4, 5 test... 
+199/226 test.XMTX: ELA - Larson, Edwards: 3.1 Example 1, 2, 3, 4, 5 test... 
 
 Row: 0 Col: 0
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: -1.0e+00 y: 2.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
+
 Sign: 1.0e+00 Val: -1.0e+00
 
 Row: 0 Col: 1
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 3.0e+00 y: 2.0e+00 
 1: x: 4.0e+00 y: 1.0e+00 
+
 Sign: -1.0e+00 Val: 5.0e+00
 
 Row: 0 Col: 2
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 3.0e+00 y: -1.0e+00 
 1: x: 4.0e+00 y: 0.0e+00 
+
 Sign: 1.0e+00 Val: 4.0e+00
 
 Row: 1 Col: 0
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 2.0e+00 y: 1.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
+
 Sign: -1.0e+00 Val: -2.0e+00
 
 Row: 1 Col: 1
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 0.0e+00 y: 1.0e+00 
 1: x: 4.0e+00 y: 1.0e+00 
+
 Sign: 1.0e+00 Val: -4.0e+00
 
 Row: 1 Col: 2
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 0.0e+00 y: 2.0e+00 
 1: x: 4.0e+00 y: 0.0e+00 
+
 Sign: -1.0e+00 Val: 8.0e+00
 
 Row: 2 Col: 0
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 2.0e+00 y: 1.0e+00 
 1: x: -1.0e+00 y: 2.0e+00 
+
 Sign: 1.0e+00 Val: 5.0e+00
 
 Row: 2 Col: 1
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 0.0e+00 y: 1.0e+00 
 1: x: 3.0e+00 y: 2.0e+00 
+
 Sign: -1.0e+00 Val: 3.0e+00
 
 Row: 2 Col: 2
 XMTX: B:
+
 0: x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 z: 2.0e+00 
 2: x: 4.0e+00 y: 0.0e+00 z: 1.0e+00 
+
 XMTX: retB:
+
 0: x: 0.0e+00 y: 2.0e+00 
 1: x: 3.0e+00 y: -1.0e+00 
+
 Sign: 1.0e+00 Val: -6.0e+00
 OK
-171/197 test.XMTX: ELA - Larson, Edwards: 3.1 Example 6 test... 
+200/226 test.XMTX: ELA - Larson, Edwards: 3.1 Example 6 test... 
 detA: -1.2e+01 detB: 4.8e+01
 OK
-172/197 test.XMTX: ELA - Larson, Edwards: 3.1 Problem 1, 3, 5 test... 
+201/226 test.XMTX: ELA - Larson, Edwards: 3.1 Problem 1, 3, 5 test... 
 OK
-173/197 test.XMTX: ELA - Larson, Edwards: 3.1 Problem 13, 15 test... 
+202/226 test.XMTX: ELA - Larson, Edwards: 3.1 Problem 13, 15 test... 
 
 B: Row: 0 Col: 0
 XMTX: retB:
+
+
 SignB: 1.0e+00 Val: 4.0e+00
 
 B: Row: 0 Col: 1
 XMTX: retB:
+
+
 SignB: -1.0e+00 Val: -3.0e+00
 
 B: Row: 1 Col: 0
 XMTX: retB:
+
+
 SignB: -1.0e+00 Val: -2.0e+00
 
 B: Row: 1 Col: 1
 XMTX: retB:
+
+
 SignB: 1.0e+00 Val: 1.0e+00
 
 C: Row: 0 Col: 0
 XMTX: retC:
+
 0: x: 5.0e+00 y: 6.0e+00 
 1: x: -3.0e+00 y: 1.0e+00 
+
 SignC: 1.0e+00 Val: 2.3e+01
 
 C: Row: 0 Col: 1
 XMTX: retC:
+
 0: x: 4.0e+00 y: 6.0e+00 
 1: x: 2.0e+00 y: 1.0e+00 
+
 SignC: -1.0e+00 Val: 8.0e+00
 
 C: Row: 0 Col: 2
 XMTX: retC:
+
 0: x: 4.0e+00 y: 5.0e+00 
 1: x: 2.0e+00 y: -3.0e+00 
+
 SignC: 1.0e+00 Val: -2.2e+01
 
 C: Row: 1 Col: 0
 XMTX: retC:
+
 0: x: 2.0e+00 y: 1.0e+00 
 1: x: -3.0e+00 y: 1.0e+00 
+
 SignC: -1.0e+00 Val: -5.0e+00
 
 C: Row: 1 Col: 1
 XMTX: retC:
+
 0: x: -3.0e+00 y: 1.0e+00 
 1: x: 2.0e+00 y: 1.0e+00 
+
 SignC: 1.0e+00 Val: -5.0e+00
 
 C: Row: 1 Col: 2
 XMTX: retC:
+
 0: x: -3.0e+00 y: 2.0e+00 
 1: x: 2.0e+00 y: -3.0e+00 
+
 SignC: -1.0e+00 Val: -5.0e+00
 
 C: Row: 2 Col: 0
 XMTX: retC:
+
 0: x: 2.0e+00 y: 1.0e+00 
 1: x: 5.0e+00 y: 6.0e+00 
+
 SignC: 1.0e+00 Val: 7.0e+00
 
 C: Row: 2 Col: 1
 XMTX: retC:
+
 0: x: -3.0e+00 y: 1.0e+00 
 1: x: 4.0e+00 y: 6.0e+00 
+
 SignC: -1.0e+00 Val: 2.2e+01
 
 C: Row: 2 Col: 2
 XMTX: retC:
+
 0: x: -3.0e+00 y: 2.0e+00 
 1: x: 4.0e+00 y: 5.0e+00 
+
 SignC: 1.0e+00 Val: -2.3e+01
 OK
-174/197 test.XMTX: ELA - Larson, Edwards: 3.2 Example 1, 2, 3 test... 
+203/226 test.XMTX: ELA - Larson, Edwards: 3.2 Example 1, 2, 3 test... 
 AAA START DetG:
+
 0: x: 1.0e+00 y: -1.5e+00 z: 5.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: -2.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
+
 AAA STOP DetG: -7.0e+00
 BBB DetG: -7.0e+00
 OK
-175/197 test.XMTX: ELA - Larson, Edwards: 3.2 Problem 15, 17, 19, 21 test... 
+204/226 test.XMTX: ELA - Larson, Edwards: 3.2 Problem 15, 17, 19, 21 test... 
 OK
-176/197 test.XMTX: ELA - Larson, Edwards: 3.3 Example 1, 2, 3, 4 test... 
+205/226 test.XMTX: ELA - Larson, Edwards: 3.3 Example 1, 2, 3, 4 test... 
 DetD: 0.0e+00 DetE: -1.2e+01
 OK
-177/197 test.XMTX: ELA - Larson, Edwards: 3.3 Problem 1, 3, 5, 7 test... 
+206/226 test.XMTX: ELA - Larson, Edwards: 3.3 Problem 1, 3, 5, 7 test... 
 OK
-178/197 test.XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test... 
+207/226 test.XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test... 
 Found Eigen Values:
 x: 5.0e+00 y: -1.0e+00 
 Matrix A:
+
 0: x: -1.0e+00 y: 3.0e+00 z: 2.0e+00 
 1: x: 0.0e+00 y: -2.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 0.0e+00 z: -2.0e+00 
+
 Matrix adjA:
+
 0: x: 4.0e+00 y: 6.0e+00 z: 7.0e+00 
 1: x: 1.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 2.0e+00 y: 3.0e+00 z: 2.0e+00 
+
 Matrix Expected adjA:
+
 0: x: 4.0e+00 y: 6.0e+00 z: 7.0e+00 
 1: x: 1.0e+00 y: 0.0e+00 z: 1.0e+00 
 2: x: 2.0e+00 y: 3.0e+00 z: 2.0e+00 
+
 Found Cramer's Rule Return Values:
 x: 2.0e+00 y: -1.0e+00 
 OK
-179/197 test.XMTX: ELA - Larson, Edwards: 3.4 Theorem 10 test... 
+208/226 test.XMTX: ELA - Larson, Edwards: 3.4 Theorem 10 test... 
 Adjoint Matrix Test:
+
 0: x: 1.33333337e+00 y: 2.0e+00 z: 2.33333349e+00 
 1: x: 3.33333343e-01 y: 0.0e+00 z: 3.33333343e-01 
 2: x: 6.66666686e-01 y: 1.0e+00 z: 6.66666686e-01 
+
 OK
-180/197 test.XMTX: ELA - Larson, Edwards: 3.4 Theorem 11 test... 
+209/226 test.XMTX: ELA - Larson, Edwards: 3.4 Theorem 11 test... 
 Cramer's Rule Return 8.00000011e-01 -1.5e+00 -1.60000002e+00:
 x: 8.00000011e-01 y: -1.5e+00 z: -1.60000002e+00 
 
 OK
-181/197 test.XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test... 
+210/226 test.XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test... 
 Problem 3: pg. 150 Eigen Values:
 x: 0.0e+00 y: 2.0e+00 z: 1.0e+00 
 Problem 5: pg. 150 a) Characteristic Equation:
-1.0e+00x^2 + -1.0e+00x + -2.0e+00
-Problem 5: pg. 150 b) Eigen Values:
+
+1.0e+00x^2 + -1.0e+00x + -2.0e+00Problem 5: pg. 150 b) Eigen Values:
 x: 2.0e+00 y: -1.0e+00 
 Problem 7: pg. 150 a) Characteristic Equation:
-1.0e+00x^2 + -2.0e+00x + -3.0e+00
-Problem 7: pg. 150 b) Eigen Values:
+
+1.0e+00x^2 + -2.0e+00x + -3.0e+00Problem 7: pg. 150 b) Eigen Values:
 x: 3.0e+00 y: -1.0e+00 
 OK
-182/197 test.XMTX: ELA - Larson, Edwards: 3.4 Problem 15, 17, 29, 31 test... 
+211/226 test.XMTX: ELA - Larson, Edwards: 3.4 Problem 15, 17, 29, 31 test... 
 Problem 15: pg. 151: detA:0.0e+00 
 NOT Possible
 Problem 17: pg. 151: detA:-3.0e+00
@@ -1729,175 +2849,233 @@ x: 1.0e+00 y: 2.0e+00
 Problem 31: pg. 151 Values:
 x: 2.0e+00 y: -2.0e+00 
 OK
-183/197 test.XMTX: ELA - Larson, Edwards: 4.1 Theorem 1 test... 
+212/226 test.XMTX: ELA - Larson, Edwards: 4.1 Theorem 1 test... 
 OK
-184/197 test.XMTX: ELA - Larson, Edwards: 4.1 Theorem 2 test... 
+213/226 test.XMTX: ELA - Larson, Edwards: 4.1 Theorem 2 test... 
 OK
-185/197 test.XMTX: ELA - Larson, Edwards: 4.1 Theorem 3 test... 
+214/226 test.XMTX: ELA - Larson, Edwards: 4.1 Theorem 3 test... 
 OK
-186/197 test.XMTX: ELA - Larson, Edwards: 4.2 Example 3 test... 
+215/226 test.XMTX: ELA - Larson, Edwards: 4.2 Example 3 test... 
 OK
-187/197 test.XMTX: ELA - Larson, Edwards: 4.3 Theorem 4 test... 
+216/226 test.XMTX: ELA - Larson, Edwards: 4.3 Theorem 4 test... 
 OK
-188/197 test.XMTX: ELA - Larson, Edwards: 4.3 Theorem 5 test... 
+217/226 test.XMTX: ELA - Larson, Edwards: 4.3 Theorem 5 test... 
 OK
-189/197 test.XMTX: ELA - Larson, Edwards: 4.3 Example 2 test... 
+218/226 test.XMTX: ELA - Larson, Edwards: 4.3 Example 2 test... 
 OK
-190/197 test.XMTX: ELA - Larson, Edwards: 4.3 Theorem 6 test... 
+219/226 test.XMTX: ELA - Larson, Edwards: 4.3 Theorem 6 test... 
 OK
-191/197 test.XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test... 
+220/226 test.XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test... 
 RdcMtx Result Example 8: true
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 0.0e+00 w: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 w: -0.0e+00 
 
+
 RdcMtx Result Example 9: true
+
 0: x: 1.0e+00 y: 0.0e+00 z: -6.66666686e-01 w: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 3.33333343e-01 w: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 
+
 Found zero vector index start 12 and stop 15x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
 Matrix state:
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 w: -0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 w: 0.0e+00 
 3: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 
+
 RdcMtx Result Example 10: false
+
 0: x: 1.0e+00 y: 0.0e+00 z: -6.66666686e-01 w: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 3.33333343e-01 w: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 
+
 OK
-192/197 test.XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test... 
+221/226 test.XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test... 
 chgVecBasis:change basis is identity so conversion matrix = basis true
+
 0: x: 1.0e+00 y: 1.0e+00 
 1: x: 0.0e+00 y: 2.0e+00 
 
+
+
 0: x: 0.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 
+
+
 
 0: x: 3.0e+00 
 1: x: 2.0e+00 
 
+
 4.7 Example 2 ret true
+
 0: x: 0.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 
 
+
 4.7 Example 2 B
+
 0: x: 1.0e+00 y: 1.0e+00 
 1: x: 0.0e+00 y: 2.0e+00 
 
+
 4.7 Example 2 nvec
+
 0: x: 5.0e+00 
 1: x: 4.0e+00 
 
+
 4.7 Example 3 ret3 true
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 4.7 Example 3 B3
+
 0: x: -1.0e+00 y: 4.0e+00 z: 2.0e+00 
 1: x: 3.0e+00 y: -7.0e+00 z: -3.0e+00 
 2: x: 1.0e+00 y: -2.0e+00 z: -1.0e+00 
 
+
 4.7 Example 3 nvec3
+
 0: x: 5.0e+00 
 1: x: -8.0e+00 
 2: x: -2.0e+00 
 
+
 4.7 Example 4 ret3 true
+
 0: x: 1.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: -0.0e+00 y: 1.0e+00 z: 0.0e+00 
 2: x: -0.0e+00 y: -0.0e+00 z: 1.0e+00 
 
+
 4.7 Example 4 B3
+
 0: x: -1.0e+00 y: 4.0e+00 z: 2.0e+00 
 1: x: 3.0e+00 y: -7.0e+00 z: -3.0e+00 
 2: x: 1.0e+00 y: -2.0e+00 z: -1.0e+00 
 
+
 4.7 Example 4 nvec
+
 0: x: 0.0e+00 
 1: x: 0.0e+00 
 2: x: 0.0e+00 
 
+
 getBasisCnvMtx:rdcXmtx true
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
+
 
 4.7 Example 5 ret5 true
+
 0: x: 1.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 
 
+
 4.7 Example 5 B
+
 0: x: -1.0e+00 y: 2.0e+00 
 1: x: -2.0e+00 y: 3.0e+00 
 
+
 4.7 Example 5 nvec
+
 0: x: 0.0e+00 
 1: x: 0.0e+00 
 
+
 OK
-193/197 test.XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test... 
+222/226 test.XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test... 
 4.7 Problem 1 ret2 true
+
 0: x: 0.0e+00 y: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 
 
+
 4.7 Problem 1 B2
+
 0: x: 2.0e+00 y: 0.0e+00 
 1: x: -1.0e+00 y: 1.0e+00 
 
+
 4.7 Problem 1 nvec2
+
 0: x: 8.0e+00 
 1: x: -3.0e+00 
 
+
 4.7 Problem 3 ret3 true
+
 0: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 
 
+
 4.7 Problem 3 B3
+
 0: x: 1.0e+00 y: 1.0e+00 z: 0.0e+00 
 1: x: 0.0e+00 y: 1.0e+00 z: 1.0e+00 
 2: x: 1.0e+00 y: 0.0e+00 z: 1.0e+00 
 
+
 4.7 Problem 3 nvec3
+
 0: x: 5.0e+00 
 1: x: 4.0e+00 
 2: x: 3.0e+00 
 
+
 4.7 Problem 5 ret4 true
+
 0: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 2: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 3: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 0.0e+00 
 
+
 4.7 Problem 5 B4
+
 0: x: 0.0e+00 y: 0.0e+00 z: 0.0e+00 w: 1.0e+00 
 1: x: 0.0e+00 y: 0.0e+00 z: 1.0e+00 w: 1.0e+00 
 2: x: 0.0e+00 y: 1.0e+00 z: 1.0e+00 w: 1.0e+00 
 3: x: 1.0e+00 y: 1.0e+00 z: 1.0e+00 w: 1.0e+00 
 
+
 4.7 Problem 5 nvec4
+
 0: x: -1.0e+00 
 1: x: 2.0e+00 
 2: x: 0.0e+00 
 3: x: 1.0e+00 
 
+
 OK
-194/197 test.XMTX: ELA - Larson, Edwards: 5.1 Example 1, 2, 3, 4 test... 
+223/226 test.XMTX: ELA - Larson, Edwards: 5.1 Example 1, 2, 3, 4 test... 
 5.1 example 2 mag 1: 3.74165749e+00
 5.1 example 2 mag 2: 9.99999940e-01
 OK
-195/197 test.XMTX: ELA - Larson, Edwards: 5.1 Example Theorem 5.4 test... 
+224/226 test.XMTX: ELA - Larson, Edwards: 5.1 Example Theorem 5.4 test... 
 OK
-196/197 test.XMTX: ELA - Larson, Edwards: 5.1 Example Theorem 5.5 test... 
+225/226 test.XMTX: ELA - Larson, Edwards: 5.1 Example Theorem 5.5 test... 
 OK
-197/197 test.XMTX: ELA - Larson, Edwards: 5.1 Problem 1, 3, 5 test... 
+226/226 test.XMTX: ELA - Larson, Edwards: 5.1 Problem 1, 3, 5 test... 
 5.1 Problem 1 mag: 5.0e+00
 5.1 Problem 3 mag: 3.0e+00
 5.1 Problem 5 mag: 7.07106781e+00
 OK
-All 197 tests passed.
+All 226 tests passed.
