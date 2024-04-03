@@ -149,7 +149,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
 ## Execution Times
 
-Execution times are calculated after the last unit test that uses them.
+Execution times are calculated after the last unit test that uses them. You can find the execution time summary in the test output by searching for the term "Key List". An example of the execution time summary is shown below.
 
 <pre>
 Key List:
