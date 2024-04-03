@@ -10,7 +10,7 @@ Some of them are listed here.
 <li>addSclXmtxRowsInl</li>
 <li>altXmtxRows</li>
 <li>altXmtxRowsInl</li>
-<ul>
+</ul>
 
 The <b>addSclMulXmtxRows</b> and <b>addSclMulXmtxRowsInl</b> functions add a scalar multiple of one matrix row to another. In the example below we add a scalar multiple of one matrix row to another and then check the results against a known matrix, exp.
 
