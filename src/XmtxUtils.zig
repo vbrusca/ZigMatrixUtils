@@ -68,13 +68,19 @@ pub const EigVal2 = struct {
     eignVec1: [2]f32 = .{ 0, 0 },
     eignVec2: [2]f32 = .{ 0, 0 },
 
-    ///Supports printing out the Eigen value structure in a readable form.
+    ///Supports printing out the Eigen value 2 structure in a readable form.
     pub fn prnt(self: EigVal2) void {
         std.debug.print("(a + -&)(d + -&) + (-bc)\n", .{});
         std.debug.print("({} + -&)({} + -&) + ({})\n", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4] });
         std.debug.print("a&^2 + b& + c = 0\n", .{});
         std.debug.print("{}&^2 + {}& + {} = 0\n", .{ self.polyExp[0], self.polyExp[1], self.polyExp[2] });
         std.debug.print("Eigen Values {}, {} = 0\n", .{ self.eignVals[0], self.eignVals[1] });
+    }
+
+    ///Supports printing out the Eigen value 2 structure in a readable form, following a new line.
+    pub fn prntNl(self: EigVal2) void {
+        std.debug.print("\n");
+        prnt(self);
     }
 };
 
@@ -89,13 +95,19 @@ pub const EigVal3 = struct {
     eignVec2: [3]f32 = .{ 0, 0, 0 },
     eignVec3: [3]f32 = .{ 0, 0, 0 },
 
-    ///Supports printing out the Eigen value structure in a readable form.
+    ///Supports printing out the Eigen value 3 structure in a readable form.
     pub fn prnt(self: EigVal3) void {
         std.debug.print("(a - &)*|(e - &), f, h, (i - &)| + (-b)*|d, f, g, (i - &)| + (c)*|d, (e - &), g, h|\n", .{});
         std.debug.print("({} - &)*|({} - &), {}, {}, ({} - &)| + (-{})*|{}, {}, {}, ({} - &)| + ({})*|{}, ({} - &), {}, {}|\n", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4], self.lamdExp[5], self.lamdExp[6], self.lamdExp[8], self.lamdExp[9], self.lamdExp[10], self.lamdExp[11], self.lamdExp[12], self.lamdExp[14], self.lamdExp[15], self.lamdExp[16], self.lamdExp[18], self.lamdExp[19] });
         std.debug.print("a&^3 + b&^2 + c& + d = 0\n", .{});
         std.debug.print("{}&^3 + {}&^2 + {}& + {} = 0\n", .{ self.polyExp[0], self.polyExp[1], self.polyExp[2], self.polyExp[3] });
         std.debug.print("Eigen Values {}, {}, {} = 0\n", .{ self.eignVals[0], self.eignVals[1], self.eignVals[2] });
+    }
+
+    ///Supports printing out the Eigen value 3 structure in a readable form, following a new line.
+    pub fn prntNl(self: EigVal3) void {
+        std.debug.print("\n");
+        prnt(self);
     }
 };
 
@@ -105,6 +117,17 @@ pub const ExecTime = struct {
     fncTime: f64,
     fncCnt: f64,
     fncAvg: f64,
+
+    ///Supports printing out the ExecTime in a readable form.
+    pub fn prnt(self: ExecTime) void {
+        std.debug.print("{s}:\tCount: {}\tAvg: {d:.3}ms {d:.3}ns", .{ self.fncName, self.fncCnt, self.fncAvg / time.ns_per_ms, self.fncAvg });
+    }
+
+    ///Supports printing out the ExecTime in a readable form, following a new line.
+    pub fn prntNl(self: ExecTime) void {
+        std.debug.print("\n");
+        prnt(self);
+    }
 };
 
 ///The current count of recorded function execution times.
@@ -136,7 +159,7 @@ pub fn addExecTime(key: []const u8, value: f64) void {
     }
 
     if (VERBOSE) {
-        std.debug.print("\nmaxExecTime entry count: {}", .{execTimesCnt});
+        std.debug.print("\nAdded a new entry, maxExecTime entry count is now {}.", .{execTimesCnt});
     }
 }
 
@@ -3628,7 +3651,7 @@ test "XMTX: diff2Xvec test" {
 ///  cols = The number of columns in the matrix.
 ///
 pub fn prntXmtx(mtx: []f32, cols: usize) void {
-    std.debug.print("\n", .{});
+    std.debug.print("", .{});
     const l: usize = mtx.len / cols;
     var i: usize = 0;
     while (i < l) {
@@ -3643,6 +3666,30 @@ pub fn prntXmtx(mtx: []f32, cols: usize) void {
 test "XMTX: prntXmtx test" {
     var v1: [9]f32 = .{ 3, 3, 3, 0, 0, 0, 1, 1, 1 };
     prntXmtx(&v1, 3);
+}
+
+///Prints the matrix, following a new line, with the specified number of columns.
+///
+///  mtx = The matrix to print.
+///
+///  cols = The number of columns in the matrix.
+///
+pub fn prntXmtxNl(mtx: []f32, cols: usize) void {
+    std.debug.print("\n", .{});
+    const l: usize = mtx.len / cols;
+    var i: usize = 0;
+    while (i < l) {
+        const vec: []f32 = mtx[(i * cols)..((i * cols) + cols)];
+        std.debug.print("{}: ", .{i});
+        prntXvec(vec);
+        i += 1;
+    }
+    std.debug.print("\n", .{});
+}
+
+test "XMTX: prntXmtxNl test" {
+    var v1: [9]f32 = .{ 3, 3, 3, 0, 0, 0, 1, 1, 1 };
+    prntXmtxNl(&v1, 3);
 }
 
 ///Prints the specified vector.
@@ -4691,6 +4738,7 @@ test "XMTX: prntNl test" {
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nprntNl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("prntNl", elapsed1);
+    prntNl();
 }
 
 ///Finds the largest row, by absolute value, in the given matrix, at the specified column, starting on the given row.

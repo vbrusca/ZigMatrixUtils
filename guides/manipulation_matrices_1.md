@@ -1,19 +1,20 @@
 # Manipulation of Matrices
 
-There are a number of functions that help with matrix manipulation.
-Some of them are listed here.
+There are a number of functions that help with matrix manipulations.
+Some of them are listed as follows. This set of functions is particularly useful for Gaussian elimination.
 
 <ul>
-<li>addSclMulXmtxRows</li>
-<li>addSclMulXmtxRowsInl</li>
-<li>addSclXmtxRows</li>
-<li>addSclXmtxRowsInl</li>
-<li>altXmtxRows</li>
-<li>altXmtxRowsInl</li>
+    <li>addSclMulXmtxRows</li>
+    <li>addSclMulXmtxRowsInl</li>
+    <li>addSclXmtxRows</li>
+    <li>addSclXmtxRowsInl</li>
+    <li>altXmtxRows</li>
+    <li>altXmtxRowsInl</li>
 </ul>
 
-The <b>addSclMulXmtxRows</b> and <b>addSclMulXmtxRowsInl</b> functions add a scalar multiple of one matrix row to another. In the example below we add a scalar multiple of one matrix row to another and then check the results against a known matrix, exp.
+The <b>addSclMulXmtxRows</b> and <b>addSclMulXmtxRowsInl</b> functions add a scalar multiple of one matrix row to another. In the example below we add a scalar multiple of one matrix row to another and then check the results against a known matrix, exp. The function takes the source row, the destination row, a scalar multiplier, the number of columns in the matrix, the source matrix, and the destination matrix as aruments, line 12. The inline version of this function performs the matrix manipulation on the source matrix, with no return matrix specified.
 
+<!-- //"XMTX: addSclMulXmtxRows test" -->
 <pre>
 01 var mtx: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 3, 3, 3 };
 02 var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -42,8 +43,9 @@ The <b>addSclMulXmtxRows</b> and <b>addSclMulXmtxRowsInl</b> functions add a sca
 25 try std.testing.expectEqual(true, equXvec(&exp, &res));
 </pre>
 
-To add a sclar to a matrix row use either the <b>addSclXmtxRows</b> or the <b>addSclXmtxRowsInl</b> function. Example as follows.
+To add a scalar to a matrix row use either the <b>addSclXmtxRows</b> or the <b>addSclXmtxRowsInl</b> function. An example is as follows. Note the arguments to the function are the source row, the scalar amount, the number of columns in the matrix, a source matrix, and a destination matrix, line 11. The inline version of this function performs the matrix manipulation on the source matrix, with no return matrix specified.
 
+<!-- //"XMTX: addSclXmtxRows test" -->
 <pre>
 01 var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 02 var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -70,8 +72,9 @@ To add a sclar to a matrix row use either the <b>addSclXmtxRows</b> or the <b>ad
 23 try std.testing.expectEqual(true, equXvec(&exp, &res));
 </pre>
 
-To alternate two rows of a matrix use the <b>altXmtxRows</b> or the <b>altXmtxRowsInl</b> function.
+To alternate two rows of a matrix use the <b>altXmtxRows</b> or the <b>altXmtxRowsInl</b> function. The function takes the source row, the destination row, the number of columns in the matrix, and a souce and destination matrix as arguments. The inline version of this function makes the changes to the source matrix and not a target output matrix.
 
+<!-- //"XMTX: altXmtxRows test" -->
 <pre>
 01 var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 02 var exp: [9]f32 = .{ 7, 8, 9, 4, 5, 6, 1, 2, 3 };

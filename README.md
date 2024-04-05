@@ -149,11 +149,10 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
 ## Execution Times
 
-Execution times are calculated after the last unit test that uses them. You can find the execution time summary in the test output by searching for the term "Key List". An example of the execution time summary is shown below.
+Execution times are calculated after the last unit test that uses them. You can find the execution time summary in the test output by searching for the term "Function Execution Times List". An example of the execution time summary is shown below.
 
 <pre>
-Key List:
- INT_equXvec:	Count: 2.0e+00	Avg: 0.000ms 300.000ns
+Function Execution Times List:
  absF32:	Count: 1.0e+00	Avg: 0.000ms 200.000ns
  absF32Ref:	Count: 1.0e+00	Avg: 0.000ms 100.000ns
  absF32Ret:	Count: 1.0e+00	Avg: 0.000ms 100.000ns

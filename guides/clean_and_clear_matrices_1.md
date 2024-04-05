@@ -2,7 +2,7 @@
 
 To clear a matrix, zero out all matrix values, you can use the <b>clrXmtx</b> function as shown below on line 5.
 
-<!-- "XMTX: clrXmtx test" -->
+<!-- //"XMTX: clrXmtx test" -->
 <pre>
 01 var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 02 var exp: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -14,7 +14,7 @@ To clear a matrix, zero out all matrix values, you can use the <b>clrXmtx</b> fu
 
 When cleaning a matrix to normalize the floating point value of matrix entries use the <b>clnXmtx</b> function, line 18, of the following example.
 
-<!-- "XMTX: hasInvXmtx test" -->
+<!-- //"XMTX: hasInvXmtx test" -->
 <pre>
 01 var m1: [9]f32 = .{ 3, 2, -3, 4, -3, 6, 1, 0, -1 };
 02 var m2: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };

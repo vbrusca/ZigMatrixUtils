@@ -2,7 +2,7 @@
 
 To apply Cramer’s rule to the given matrix, <b>B</b>, with <b>BA</b> representing the un-augmented version of matrix <b>B</b>, and <b>BAi</b> representing Cramer rule’s supporting matrix.
 
-<!-- "XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" -->
+<!-- //"XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" -->
 <pre>
 01 //Use Cramer's rule to solve the following system of equations: B = |4,-2,10 ,3,-5,11|
 02 var B: [6]f32 = .{ 4, -2, 10, 3, -5, 11 };

@@ -1,6 +1,11 @@
 # Transpose of Matrices
 
-The transpose of a matrix can be calculated using the <b>trnXmtx</b> or <b>trnXmtxRect</b> functions, lines 31 - 32, 33 - 34, respectively.
+The transpose of a matrix can be calculated using the <b>trnXmtx</b>, <b>trnXmtxInl</b>, or <b>trnXmtxRect</b> functions, lines 31 - 32, 33 - 34, respectively.
+
+<!--
+NEEDED:
+trnXmtxRectInl
+-->
 
 <!-- //"XMTX: ELA - Larson, Edwards: 2.2 Example 8 test" -->
 <pre>
@@ -58,4 +63,4 @@ The transpose of a matrix can be calculated using the <b>trnXmtx</b> or <b>trnXm
 51 const b4: bool = equXmtx(&r4, &e4);
 </pre>
 
-Note that one tranpose matrix function, <b>trnXmtx</b> assumes the matrices provided are square based on the input matrix. The second version of the function, <b>trnXmtxRect</b> allows you to specify the column count of the matrix arguments. 
+Note that one tranpose matrix function, <b>trnXmtx</b> assumes the matrices provided are square based on the input matrix. The second version of the function, <b>trnXmtxRect</b> allows you to specify the column count of the matrix arguments.
