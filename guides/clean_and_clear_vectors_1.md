@@ -1,6 +1,6 @@
-# Clean and Clear Matrices
+# Clean and Clear Vectors
 
-To clear a matrix, zero out all matrix values, you can use the <b>clrXmtx</b> function as shown below on line 5.
+To clear a vector, zero out all vector components, you can use the <b>clrXvec</b> function as shown below on line 5.
 
 <!-- //"XMTX: clrXmtx test" -->
 <pre>
@@ -8,11 +8,11 @@ To clear a matrix, zero out all matrix values, you can use the <b>clrXmtx</b> fu
 02 var exp: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 03 prntXmtx(&mtx, 3);
 04 prntXmtx(&mtx, 3);
-05 clrXmtx(&mtx);
+05 clrXvec(&mtx);
 06 try std.testing.expectEqual(true, equXvec(&mtx, &exp));
 </pre>
 
-When cleaning a matrix to normalize the floating point value of matrix entries use the <b>clnXmtx</b> function, line 22, of the following example.
+When cleaning a vector to normalize the floating point value of vector components use the <b>clnXvec</b> function, line 22, of the following example.
 
 <!-- //"XMTX: hasInvXmtx test" -->
 <pre>
@@ -42,4 +42,4 @@ When cleaning a matrix to normalize the floating point value of matrix entries u
 24 try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 </pre>
 
-Note that the <b>clrXmtx</b> and <b>clnXmtx</b> function work on the provided matrix and make changes directly to the matrix. These methods are the same as their corresponding vector versions.
+Note that the <b>clrXvec</b> and <b>clnXvec</b> function work on the provided vector and make changes directly to the vector. These methods are the same as their corresponding matrix versions.

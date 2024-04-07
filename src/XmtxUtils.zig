@@ -70,11 +70,11 @@ pub const EigVal2 = struct {
 
     ///Supports printing out the Eigen value 2 structure in a readable form.
     pub fn prnt(self: EigVal2) void {
-        std.debug.print("(a + -&)(d + -&) + (-bc)\n", .{});
-        std.debug.print("({} + -&)({} + -&) + ({})\n", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4] });
-        std.debug.print("a&^2 + b& + c = 0\n", .{});
-        std.debug.print("{}&^2 + {}& + {} = 0\n", .{ self.polyExp[0], self.polyExp[1], self.polyExp[2] });
-        std.debug.print("Eigen Values {}, {} = 0\n", .{ self.eignVals[0], self.eignVals[1] });
+        std.debug.print("\n(a + -&)(d + -&) + (-bc)", .{});
+        std.debug.print("\n({} + -&)({} + -&) + ({})", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4] });
+        std.debug.print("\na&^2 + b& + c = 0", .{});
+        std.debug.print("\n{}&^2 + {}& + {} = 0", .{ self.polyExp[0], self.polyExp[1], self.polyExp[2] });
+        std.debug.print("\nEigen Values {}, {} = 0", .{ self.eignVals[0], self.eignVals[1] });
     }
 
     ///Supports printing out the Eigen value 2 structure in a readable form, following a new line.
@@ -97,11 +97,11 @@ pub const EigVal3 = struct {
 
     ///Supports printing out the Eigen value 3 structure in a readable form.
     pub fn prnt(self: EigVal3) void {
-        std.debug.print("(a - &)*|(e - &), f, h, (i - &)| + (-b)*|d, f, g, (i - &)| + (c)*|d, (e - &), g, h|\n", .{});
-        std.debug.print("({} - &)*|({} - &), {}, {}, ({} - &)| + (-{})*|{}, {}, {}, ({} - &)| + ({})*|{}, ({} - &), {}, {}|\n", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4], self.lamdExp[5], self.lamdExp[6], self.lamdExp[8], self.lamdExp[9], self.lamdExp[10], self.lamdExp[11], self.lamdExp[12], self.lamdExp[14], self.lamdExp[15], self.lamdExp[16], self.lamdExp[18], self.lamdExp[19] });
-        std.debug.print("a&^3 + b&^2 + c& + d = 0\n", .{});
-        std.debug.print("{}&^3 + {}&^2 + {}& + {} = 0\n", .{ self.polyExp[0], self.polyExp[1], self.polyExp[2], self.polyExp[3] });
-        std.debug.print("Eigen Values {}, {}, {} = 0\n", .{ self.eignVals[0], self.eignVals[1], self.eignVals[2] });
+        std.debug.print("\n(a - &)*|(e - &), f, h, (i - &)| + (-b)*|d, f, g, (i - &)| + (c)*|d, (e - &), g, h|", .{});
+        std.debug.print("\n({} - &)*|({} - &), {}, {}, ({} - &)| + (-{})*|{}, {}, {}, ({} - &)| + ({})*|{}, ({} - &), {}, {}|", .{ self.lamdExp[0], self.lamdExp[2], self.lamdExp[4], self.lamdExp[5], self.lamdExp[6], self.lamdExp[8], self.lamdExp[9], self.lamdExp[10], self.lamdExp[11], self.lamdExp[12], self.lamdExp[14], self.lamdExp[15], self.lamdExp[16], self.lamdExp[18], self.lamdExp[19] });
+        std.debug.print("\na&^3 + b&^2 + c& + d = 0", .{});
+        std.debug.print("\n{}&^3 + {}&^2 + {}& + {} = 0", .{ self.polyExp[0], self.polyExp[1], self.polyExp[2], self.polyExp[3] });
+        std.debug.print("\nEigen Values {}, {}, {} = 0", .{ self.eignVals[0], self.eignVals[1], self.eignVals[2] });
     }
 
     ///Supports printing out the Eigen value 3 structure in a readable form, following a new line.
@@ -432,7 +432,10 @@ pub fn fndFactorsOfRef(x: *const f32, ret: []f32) f32 {
 
     while (i < t) : (i += 1) {
         if (i < l) {
-            //std.debug.print("t = {}, (i + 1) = {}, (t % (i + 1)) = {}\n", .{t, (i + 1), (t % (i + 1))});
+            if (VERBOSE) {
+                std.debug.print("\nt = {}, (i + 1) = {}, (t % (i + 1)) = {}", .{ t, (i + 1), (t % (i + 1)) });
+            }
+
             if ((t % (i + 1)) == 0) {
                 ret[i] = @floatFromInt(i + 1);
                 fnd += 1;
@@ -568,7 +571,7 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
     addExecTime("synthDivPoly1IntoPoly2", elapsed1);
 
     std.debug.print("\nAAA Found remainder: {}", .{rmnd});
-    prntXvec(&retPoly1Exp);
+    prntXvecNl(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
 
@@ -585,7 +588,7 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
     addExecTime("synthDivPoly1IntoPoly2", elapsed1);
 
     std.debug.print("\nBBB Found remainder: {}", .{rmnd});
-    prntXvec(&retPoly1Exp);
+    prntXvecNl(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
     prntNl();
@@ -620,7 +623,7 @@ test "XMTX: synthDivPoly1IntoPoly2Ret test" {
     addExecTime("synthDivPoly1IntoPoly2Ret", elapsed1);
 
     std.debug.print("\nAAA Found remainder: {}", .{rmnd});
-    prntXvec(&retPoly1Exp);
+    prntXvecNl(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
 
@@ -638,7 +641,7 @@ test "XMTX: synthDivPoly1IntoPoly2Ret test" {
     addExecTime("synthDivPoly1IntoPoly2Ret", elapsed1);
 
     std.debug.print("\nBBB Found remainder: {}", .{rmnd});
-    prntXvec(&retPoly1Exp);
+    prntXvecNl(&retPoly1Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
     prntNl();
@@ -706,7 +709,7 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     std.debug.print("\nsynthDivPoly1IntoPoly3 Answers: {any}", .{retPoly2Exp});
 
     const pexp: [3]f32 = .{ 2.0, -5.0, 9.0 };
-    prntXvec(&retPoly2Exp);
+    prntXvecNl(&retPoly2Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
     try std.testing.expectEqual(pexp[0], retPoly2Exp[0]);
@@ -753,7 +756,7 @@ test "XMTX: synthDivPoly1IntoPoly3Ret test" {
     std.debug.print("\nsynthDivPoly1IntoPoly3 Answers: {any}", .{retPoly2Exp});
 
     const pexp: [3]f32 = .{ 2.0, -5.0, 9.0 };
-    prntXvec(&retPoly2Exp);
+    prntXvecNl(&retPoly2Exp);
     prntNl();
     try std.testing.expectEqual(exp, rmnd);
     try std.testing.expectEqual(pexp[0], retPoly2Exp[0]);
@@ -1482,9 +1485,12 @@ pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
     const hasD: bool = (polyExp[3] != 0.0);
     const origD: f32 = polyExp[3];
 
-    //std.debug.print("AAA Found {}x^3 + {}x^2 + {}x + {}\n", .{polyExp[0], polyExp[1], polyExp[2], polyExp[3]});
+    if (VERBOSE) {
+        std.debug.print("\nAAA Found {}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
+    }
+
     if (polyExp[0] != 1.0) {
-        //std.debug.print("AAA\n", .{});
+        //std.debug.print("\nAAA", .{});
         if (polyExp[0] != 0.0) {
             //std.debug.print("BBB\n", .{});
             polyExp[3] = (polyExp[3] / polyExp[0]);
@@ -1492,12 +1498,15 @@ pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
             polyExp[1] = (polyExp[1] / polyExp[0]);
             polyExp[0] = 1.0;
         } else {
-            std.debug.print("!! Warning expected polynomial to have a degree 3 coefficient !!\n", .{});
+            std.debug.print("\n!! Warning expected polynomial to have a degree 3 coefficient !!", .{});
             ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32, std.math.nan_f32 };
             return ret;
         }
     }
-    //std.debug.print("BBB Found {}x^3 + {}x^2 + {}x + {}\n", .{polyExp[0], polyExp[1], polyExp[2], polyExp[3]});
+
+    if (VERBOSE) {
+        std.debug.print("\nBBB Found {}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
+    }
 
     if (!hasD) {
         //approach #1, if d = 0
@@ -1566,7 +1575,7 @@ pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
                 return ret;
             }
         } else {
-            std.debug.print("!! Warning expected to find one root using factors of d !!\n", .{});
+            std.debug.print("\n!! Warning expected to find one root using factors of d !!", .{});
             ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32, std.math.nan_f32 };
             return ret;
         }
@@ -1648,7 +1657,7 @@ pub fn rtsPoly2(polyExp: *[3]f32) [2]f32 {
     var ret: [2]f32 = .{ std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32 };
 
     if (polyExp.len != 3) {
-        std.debug.print("!! Warning expected a polynomial expression of order to to have a length of 3 !!\n", .{});
+        std.debug.print("\n!! Warning expected a polynomial expression of order to to have a length of 3 !!", .{});
         ret = .{ std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32 };
         return ret;
     }
@@ -1658,14 +1667,14 @@ pub fn rtsPoly2(polyExp: *[3]f32) [2]f32 {
     const negB: f32 = (-1 * polyExp[1]);
     const twoA: f32 = (2 * polyExp[0]);
 
-    //std.debug.print("Discriminant: {}\n", .{descr});
-    //std.debug.print("{} / {}\n", .{(negB + sqrt4ac), twoA});
+    //std.debug.print("\nDiscriminant: {}", .{descr});
+    //std.debug.print("\n{} / {}", .{(negB + sqrt4ac), twoA});
     ret[0] = (negB + sqrt4ac) / twoA;
 
-    //std.debug.print("{} / {}\n", .{(negB - sqrt4ac), twoA});
+    //std.debug.print("\n{} / {}", .{(negB - sqrt4ac), twoA});
     ret[1] = (negB - sqrt4ac) / twoA;
 
-    //std.debug.print("{}, {}\n", .{ret[0], ret[1]});
+    //std.debug.print("\n{}, {}", .{ret[0], ret[1]});
     return ret;
 }
 
@@ -1681,7 +1690,7 @@ test "XMTX: rtsPoly2 test" {
     addExecTime("rtsPoly2", elapsed1);
 
     prntNl();
-    prntXvec(&roots);
+    prntXvecNl(&roots);
 
     const exp1: f32 = 5;
     const exp2: f32 = 2;
@@ -1712,7 +1721,7 @@ test "XMTX: rtsPoly2Ret test" {
     std.debug.print("\nrtsPoly2Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("rtsPoly2Ret", elapsed1);
 
-    prntXvec(&roots);
+    prntXvecNl(&roots);
     prntNl();
 
     const exp1: f32 = 5;
@@ -1790,7 +1799,7 @@ test "XMTX: dscrPoly2 test" {
     addExecTime("dscrPoly2", elapsed1);
 
     try std.testing.expectEqual(POLY2_SOL_TYPE.TWO_REAL, solt);
-    prntXvec(&roots);
+    prntXvecNl(&roots);
     prntNl();
 
     const exp1: f32 = 5;
@@ -1833,7 +1842,7 @@ pub fn fndEigVal3(mtx: []f32, evs: *EigVal3, factors: []f32) bool {
     //position  T         Z                X                           Y
 
     if (mtx.len != 9) {
-        std.debug.print("!! Warning fndEigVal3 requires 3x3 matrices !!\n", .{});
+        std.debug.print("\n!! Warning fndEigVal3 requires 3x3 matrices !!", .{});
         return false;
     }
 
@@ -1934,7 +1943,7 @@ pub fn fndEigVal2(mtx: []f32, evs: *EigVal2) bool {
     //position  Y    X       X       Z     Y
 
     if (mtx.len != 4) {
-        std.debug.print("!! Warning fndEigVal2 requires 2x2 matrices !!\n", .{});
+        std.debug.print("\n!! Warning fndEigVal2 requires 2x2 matrices !!", .{});
         return false;
     }
 
@@ -2027,6 +2036,45 @@ test "XMTX: clnXmtx test" {
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nclnXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("clnXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, equXvec(&m1, &m2));
+    prntNl();
+}
+
+///Cleans the given vector by rounding float values to the nearest significance, ZERO_F32, resulting in clean 0.0, 1.0, etc, values.
+///
+///  vec = The vector to process.
+///
+///  returns = A clean vector with values truncated.
+///
+pub fn clnXvec(vec: []f32) void {
+    const l: usize = vec.len;
+    var i: usize = 0;
+    while (i < l) {
+        if (absF32(@floor(vec[i]) - vec[i]) < ZERO_F32) {
+            vec[i] = @floor(vec[i]);
+        } else if (absF32(@ceil(vec[i]) - vec[i]) < ZERO_F32) {
+            vec[i] = @ceil(vec[i]);
+        }
+
+        if (vec[i] == -0.0) {
+            vec[i] = 0.0;
+        }
+
+        i += 1;
+    }
+}
+
+test "XMTX: clnXvec test" {
+    var m1: [3]f32 = .{ 1.00000001, 2.00000001, 3.00000001 };
+    var m2: [3]f32 = .{ 1, 2, 3 };
+
+    const start = try Instant.now();
+    clnXvec(&m1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nclnXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("clnXvec", elapsed1);
 
     try std.testing.expectEqual(true, equXvec(&m1, &m2));
     prntNl();
@@ -2633,8 +2681,8 @@ pub fn clrXmtx(mtx: []f32) void {
 test "XMTX: clrXmtx test" {
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    prntXmtx(&mtx, 3);
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     clrXmtx(&mtx);
@@ -2642,6 +2690,35 @@ test "XMTX: clrXmtx test" {
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nclrXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("clrXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, equXvec(&mtx, &exp));
+    prntNl();
+}
+
+///Clears the values of the given vector.
+///
+///  vec = The vector to reset to zero for all values.
+///
+pub fn clrXvec(vec: []f32) void {
+    const l = vec.len;
+    var i: usize = 0;
+    while (i < l) : (i += 1) {
+        vec[i] = 0;
+    }
+}
+
+test "XMTX: clrXvec test" {
+    var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    var exp: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    prntXmtxNl(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
+
+    const start = try Instant.now();
+    clrXvec(&mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nclrXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("clrXvec", elapsed1);
 
     try std.testing.expectEqual(true, equXvec(&mtx, &exp));
     prntNl();
@@ -2756,32 +2833,32 @@ test "XMTX: magXvec test" {
 ///
 pub fn hasInvXmtx(mtx: []f32, cols: usize, trnMtx: []f32) bool {
     if (isZeroXmtx(mtx, cols)) {
-        std.debug.print("hasInvXmtx: Exit 1\n", .{});
+        std.debug.print("\nhasInvXmtx: Exit 1", .{});
         return false;
     }
 
     if (!idnfXmtx(mtx, cols, MTX_OPS.MTX_IS_LIN_INDP)) {
-        std.debug.print("hasInvXmtx: Exit 2\n", .{});
+        std.debug.print("\nhasInvXmtx: Exit 2", .{});
         return false;
     }
 
     if (!isSqrXmtx(mtx, cols)) {
-        std.debug.print("hasInvXmtx: Exit 3\n", .{});
+        std.debug.print("\nhasInvXmtx: Exit 3", .{});
         return false;
     }
 
     if (isZeroXmtx(trnMtx, cols)) {
-        std.debug.print("hasInvXmtx: Exit 4\n", .{});
+        std.debug.print("\nhasInvXmtx: Exit 4", .{});
         return false;
     }
 
     if (!idnfXmtx(trnMtx, cols, MTX_OPS.MTX_IS_LIN_INDP)) {
-        std.debug.print("hasInvXmtx: Exit 5\n", .{});
+        std.debug.print("\nhasInvXmtx: Exit 5", .{});
         return false;
     }
 
     if (!isSqrXmtx(trnMtx, cols)) {
-        std.debug.print("hasInvXmtx: Exit 6\n", .{});
+        std.debug.print("\nhasInvXmtx: Exit 6", .{});
         return false;
     }
 
@@ -2799,7 +2876,7 @@ test "XMTX: hasInvXmtx test" {
     var b: bool = false;
 
     std.debug.print("\nhasInvXmtx test: initial matrix", .{});
-    prntXmtx(&m1, 4);
+    prntXmtxNl(&m1, 4);
 
     var sclr: f32 = 0.0;
     b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
@@ -2812,7 +2889,7 @@ test "XMTX: hasInvXmtx test" {
     try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 
     std.debug.print("\nClean Short Answer:", .{});
-    prntXmtx(&m2, 3);
+    prntXmtxNl(&m2, 3);
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
 
@@ -2827,11 +2904,11 @@ test "XMTX: hasInvXmtx test" {
     trnXmtx(&m1, cols, &trnM1);
 
     std.debug.print("\nOrig M1:", .{});
-    prntXmtx(&origM1, 3);
+    prntXmtxNl(&origM1, 3);
     prntNl();
 
     std.debug.print("\nTrn M1:", .{});
-    prntXmtx(&trnM1, 3);
+    prntXmtxNl(&trnM1, 3);
     prntNl();
 
     const start = try Instant.now();
@@ -3016,7 +3093,7 @@ test "XMTX: isZeroXvec test" {
 ///  returns = A Boolean value indicating if the two vectors, vecL and vecR, are linearly independent.
 ///
 pub fn isLinIndXvec(vecL: []f32, vecR: []f32) bool {
-    //std.debug.print("dotPrdXvec: {}\n", .{dotPrdXvec(vecL, vecR)});
+    //std.debug.print("\ndotPrdXvec: {}", .{dotPrdXvec(vecL, vecR)});
     if (dotPrdXvec(vecL, vecR) == 0) {
         return true;
     }
@@ -3046,6 +3123,73 @@ test "XMTX: isLinIndXvec test" {
     addExecTime("isLinIndXvec", elapsed1);
 
     try std.testing.expectEqual(false, b);
+    prntNl();
+}
+
+///Returns true if the vectors of the given matrix, mtx, are linearly independent when tested in series.
+///
+///  mtx = The matrix to use to test for linear independence.
+///
+///  cols = The number of columns in the matrix, mtx.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors.
+///
+pub fn isLinIndXmtx(mtx: []f32, cols: usize) bool {
+    const llen: usize = mtx.len;
+    const rows: usize = llen / cols;
+    var i: usize = 0;
+    var vecZ: [128]f32 = std.mem.zeroes([128]f32);
+    var vecL: []f32 = undefined;
+    var vecR: []f32 = undefined;
+    var vecLset: bool = false;
+    var vecRset: bool = false;
+    var lind: bool = false;
+
+    while (i < rows) {
+        if (vecLset == false) {
+            vecL = vecZ[(i * cols)..((i * cols) + cols)];
+            cpyLessColRowXmtx(mtx, vecL, 0, cols, i, i + 1, cols, cols);
+            vecLset = true;
+        } else if (vecRset == false) {
+            vecR = vecZ[(i * cols)..((i * cols) + cols)];
+            cpyLessColRowXmtx(mtx, vecR, 0, cols, i, i + 1, cols, cols);
+            vecRset = true;
+        }
+
+        if (vecLset and vecRset) {
+            lind = isLinIndXvec(vecL, vecR);
+        } else {
+            lind = false;
+        }
+
+        if (vecLset and vecRset) {
+            if (!lind) {
+                return false;
+            } else if (lind) {
+                vecL = vecR;
+                vecLset = true;
+                vecR = undefined;
+                vecRset = false;
+            }
+        }
+
+        i += 1;
+    }
+    return true;
+}
+
+test "XMTX: isLinIndXmtx test" {
+    var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = isLinIndXmtx(&mtx, 3);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
     prntNl();
 }
 
@@ -3174,8 +3318,8 @@ test "XMTX: crsPrdXvec3 test" {
 
     var exp1: [3]f32 = .{ 0, -1, 0 };
     var exp2: [3]f32 = .{ 0, 0, 1 };
-    prntXvec(&v4);
-    prntXvec(&v5);
+    prntXvecNl(&v4);
+    prntXvecNl(&v5);
 
     try std.testing.expectEqual(true, equXvec(&exp1, &v4));
     try std.testing.expectEqual(true, equXvec(&exp2, &v5));
@@ -3209,8 +3353,8 @@ test "XMTX: crsPrdXvec test" {
 
     var exp1: [3]f32 = .{ 0, -1, 0 };
     var exp2: [3]f32 = .{ 0, 0, 1 };
-    prntXvec(&v4);
-    prntXvec(&v5);
+    prntXvecNl(&v4);
+    prntXvecNl(&v5);
 
     try std.testing.expectEqual(true, equXvec(&exp1, &v4));
     try std.testing.expectEqual(true, equXvec(&exp2, &v5));
@@ -3244,7 +3388,7 @@ test "XMTX: mulXvec test" {
     std.debug.print("\nmulXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("mulXvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
     prntNl();
 }
@@ -3276,7 +3420,7 @@ test "XMTX: divXvec test" {
     std.debug.print("\ndivXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("divXvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
     prntNl();
 }
@@ -3308,7 +3452,7 @@ test "XMTX: addXvec test" {
     std.debug.print("\naddXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("addXvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
     prntNl();
 }
@@ -3340,7 +3484,7 @@ test "XMTX: subXvec test" {
     std.debug.print("\nsubXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("subXvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v2));
     prntNl();
 }
@@ -3388,9 +3532,9 @@ test "XMTX: tmsXvec test" {
     std.debug.print("\ntmsXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("tmsXvec", elapsed1);
 
-    prntXvec(&v1);
-    prntXvec(&v2);
-    prntXvec(&v3);
+    prntXvecNl(&v1);
+    prntXvecNl(&v2);
+    prntXvecNl(&v3);
     try std.testing.expectEqual(true, equXvec(&exp, &v3));
     prntNl();
 }
@@ -3423,14 +3567,14 @@ pub fn tmsXmtx(mtxL: []f32, colsL: usize, mtxR: []f32, colsR: usize, ret: []f32,
     const rowsMtxRet: usize = ret.len / colsRet;
 
     if (colsL != rowsMtxR) {
-        std.debug.print("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}\n", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-        std.debug.print("!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!", .{});
+        std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+        std.debug.print("\n!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!", .{});
         return false;
     }
 
     if (rowsMtxRet != rowsMtxL) {
-        std.debug.print("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}\n", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-        std.debug.print("!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!", .{});
+        std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+        std.debug.print("\n!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!", .{});
         return false;
     }
 
@@ -3440,12 +3584,12 @@ pub fn tmsXmtx(mtxL: []f32, colsL: usize, mtxR: []f32, colsR: usize, ret: []f32,
             std.debug.print("!! Warning tmsXmtx expects the return matrix to be square !!", .{});
             return false;
         } else if (colsL != colsR or colsL != colsRet) {
-            std.debug.print("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}\n", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-            std.debug.print("!! Warning tmsXmtx expects the matrix columns to match when working with square matrices !!", .{});
+            std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+            std.debug.print("\n!! Warning tmsXmtx expects the matrix columns to match when working with square matrices !!", .{});
             return false;
         } else if (rowsMtxL != rowsMtxR or rowsMtxL != rowsMtxRet) {
-            std.debug.print("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}\n", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-            std.debug.print("!! Warning tmsXmtx expects the matrix rows to match when working with square matrices !!", .{});
+            std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+            std.debug.print("\n!! Warning tmsXmtx expects the matrix rows to match when working with square matrices !!", .{});
             return false;
         }
     }
@@ -3483,8 +3627,8 @@ test "XMTX: tmsXmtx test" {
     const cols: f32 = 3;
     var b: bool = false;
 
-    std.debug.print("tmsXmtx test: initial matrix\n", .{});
-    prntXmtx(&m1, 4);
+    std.debug.print("\ntmsXmtx test: initial matrix", .{});
+    prntXmtxNl(&m1, 4);
 
     var sclr: f32 = 0.0;
     b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
@@ -3496,8 +3640,8 @@ test "XMTX: tmsXmtx test" {
     try std.testing.expectEqual(true, isDiagXmtx(&m2, 3));
     try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 
-    std.debug.print("Clean Short Answer:\n", .{});
-    prntXmtx(&m2, 3);
+    std.debug.print("\nClean Short Answer:", .{});
+    prntXmtxNl(&m2, 3);
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
 
@@ -3540,7 +3684,7 @@ test "XMTX: sum1Xvec test" {
     std.debug.print("\nsum1Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("sum1Xvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
     prntNl();
 }
@@ -3574,7 +3718,7 @@ test "XMTX: sum2Xvec test" {
     std.debug.print("\nsum2Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("sum2Xvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
     prntNl();
 }
@@ -3605,7 +3749,7 @@ test "XMTX: diff1Xvec test" {
     std.debug.print("\ndiff1Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("diff1Xvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
     prntNl();
 }
@@ -3639,7 +3783,7 @@ test "XMTX: diff2Xvec test" {
     std.debug.print("\ndiff2Xvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("diff2Xvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, equXvec(&v1, &v3));
     prntNl();
 }
@@ -3665,7 +3809,15 @@ pub fn prntXmtx(mtx: []f32, cols: usize) void {
 
 test "XMTX: prntXmtx test" {
     var v1: [9]f32 = .{ 3, 3, 3, 0, 0, 0, 1, 1, 1 };
+
+    const start = try Instant.now();
     prntXmtx(&v1, 3);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprntXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("prntXmtx", elapsed1);
+
+    prntNl();
 }
 
 ///Prints the matrix, following a new line, with the specified number of columns.
@@ -3689,7 +3841,15 @@ pub fn prntXmtxNl(mtx: []f32, cols: usize) void {
 
 test "XMTX: prntXmtxNl test" {
     var v1: [9]f32 = .{ 3, 3, 3, 0, 0, 0, 1, 1, 1 };
+
+    const start = try Instant.now();
     prntXmtxNl(&v1, 3);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprntXmtxNl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("prntXmtxNl", elapsed1);
+
+    prntNl();
 }
 
 ///Prints the specified vector.
@@ -3719,7 +3879,15 @@ pub fn prntXvec(vec: []f32) void {
 
 test "XMTX: prntXvec test" {
     var v1: [3]f32 = .{ 3, 3, 3 };
-    prntXvec(&v1);
+
+    const start = try Instant.now();
+    prntXvecNl(&v1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprntXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("prntXvec", elapsed1);
+
+    prntNl();
 }
 
 ///Prints the specified vector starting on a new line.
@@ -3749,7 +3917,15 @@ pub fn prntXvecNl(vec: []f32) void {
 
 test "XMTX: prntXvecNl test" {
     var v1: [3]f32 = .{ 3, 3, 3 };
+
+    const start = try Instant.now();
     prntXvecNl(&v1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprntXvecNl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("prntXvecNl", elapsed1);
+
+    prntNl();
 }
 
 ///Calculates the angle between the two provided vectors.
@@ -3772,18 +3948,19 @@ pub fn aglBtwnXvec(vecL: []f32, vecR: []f32) f32 {
 test "XMTX: aglBtwnXvec test" {
     var v1: [3]f32 = .{ 1, 0, 0 };
     var v2: [3]f32 = .{ 0, 0, 1 };
+    var angle: f32 = -1.0;
 
     const start = try Instant.now();
-    const angle: f32 = aglBtwnXvec(&v1, &v2);
+    angle = aglBtwnXvec(&v1, &v2);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\naglBtwnXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("aglBtwnXvec", elapsed1);
 
     const exp: f32 = 1.57079625e+00;
-    prntXvec(&v1);
-    std.debug.print("Angle RAD: {}\n", .{angle});
-    std.debug.print("Angle DEG: {}\n", .{rad2Deg(angle)});
+    prntXvecNl(&v1);
+    std.debug.print("\nAngle RAD: {}", .{angle});
+    std.debug.print("\nAngle DEG: {}", .{rad2Deg(angle)});
     try std.testing.expectEqual(exp, angle);
     prntNl();
 }
@@ -3813,7 +3990,7 @@ test "XMTX: rad2Deg test" {
     const exp2: f32 = 90;
     const angleDeg: f32 = rad2Deg(angleRad);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     std.debug.print("\nAngle RAD: {}", .{angleRad});
     std.debug.print("\nAngle DEG: {}", .{angleDeg});
     try std.testing.expectEqual(exp1, angleRad);
@@ -3840,7 +4017,7 @@ test "XMTX: deg2Rad test" {
     const exp2: f32 = 90;
     const angleDeg: f32 = rad2Deg(angleRad);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     std.debug.print("\nAngle RAD: {}", .{angleRad});
     std.debug.print("\nAngle DEG: {}", .{angleDeg});
     try std.testing.expectEqual(exp1, angleRad);
@@ -3853,8 +4030,8 @@ test "XMTX: deg2Rad test" {
     std.debug.print("\ndeg2Rad: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("deg2Rad", elapsed1);
 
-    std.debug.print("Angle RAD: {}\n", .{angleRad});
-    std.debug.print("Angle RAD 2: {}\n", .{angleRad2});
+    std.debug.print("\nAngle RAD: {}", .{angleRad});
+    std.debug.print("\nAngle RAD 2: {}", .{angleRad2});
 
     try std.testing.expectEqual(true, isEquF32(angleRad2, angleRad, false));
     prntNl();
@@ -3884,7 +4061,7 @@ test "XMTX: equXmtx test" {
     std.debug.print("\nequXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("equXmtx", elapsed1);
 
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     try std.testing.expectEqual(true, b);
     prntNl();
 }
@@ -3913,7 +4090,7 @@ test "XMTX: equXvec test" {
     std.debug.print("\nequXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("equXvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, b);
     prntNl();
 }
@@ -3958,7 +4135,7 @@ test "XMTX: equXvecWrkr test" {
     std.debug.print("\nequXvecWrkr: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("equXvecWrkr", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(false, b);
 
     start = try Instant.now();
@@ -3968,7 +4145,7 @@ test "XMTX: equXvecWrkr test" {
     std.debug.print("\nequXvecWrkr: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("equXvecWrkr", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(true, b);
     prntNl();
 }
@@ -4044,7 +4221,7 @@ test "XMTX: nrmXvec test" {
     std.debug.print("\nnrmXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("nrmXvec", elapsed1);
 
-    prntXvec(&v1);
+    prntXvecNl(&v1);
     try std.testing.expectEqual(@as(f32, 2.67261236e-01), v1[0]);
     try std.testing.expectEqual(@as(f32, 5.34522473e-01), v1[1]);
     try std.testing.expectEqual(@as(f32, 8.01783740e-01), v1[2]);
@@ -4085,10 +4262,10 @@ test "XMTX: projXvec_VecP_Onto_VecQ test" {
     clnXmtx(ret);
     clnXmtx(&exp);
 
-    prntXvec(ret);
+    prntXvecNl(ret);
     prntNl();
 
-    prntXvec(&exp);
+    prntXvecNl(&exp);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(ret, &exp));
     prntNl();
@@ -4124,10 +4301,10 @@ test "XMTX: perpXvec_VecP_To_VecQ test" {
     clnXmtx(ret);
     clnXmtx(&exp);
 
-    prntXvec(ret);
+    prntXvecNl(ret);
     prntNl();
 
-    prntXvec(&exp);
+    prntXvecNl(&exp);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(ret, &exp));
     prntNl();
@@ -4154,8 +4331,8 @@ pub fn idnfXmtx(mtx: []f32, cols: usize, op: MTX_OPS) bool {
                 i += 1;
                 const vecR: []f32 = mtx[(i * cols)..((i * cols) + cols)];
                 if (!isLinIndXvec(vec, vecR)) {
-                    //prntXvec(vec);
-                    //prntXvec(vecR);
+                    //prntXvecNl(vec);
+                    //prntXvecNl(vecR);
                     //prntNl();
                     res = false;
                     break;
@@ -4164,8 +4341,8 @@ pub fn idnfXmtx(mtx: []f32, cols: usize, op: MTX_OPS) bool {
             } else {
                 const vecR: []f32 = mtx[0..cols];
                 if (!isLinIndXvec(vec, vecR)) {
-                    //prntXvec(vec);
-                    //prntXvec(vecR);
+                    //prntXvecNl(vec);
+                    //prntXvecNl(vecR);
                     //prntNl();
                     res = false;
                     break;
@@ -4232,7 +4409,7 @@ pub fn procXmtx(mtx: []f32, val: f32, cols: usize, op: MTX_OPS) void {
             subXvec(vec, val);
         } else if (op == MTX_OPS.MTX_PRNT) {
             std.debug.print("{}: ", .{i});
-            prntXvec(vec);
+            prntXvecNl(vec);
         } else if (op == MTX_OPS.MTX_NRM) {
             nrmXvec(vec);
         } else if (op == MTX_OPS.MTX_ABS) {
@@ -4407,31 +4584,31 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
 
     if (hasAug) {
         if (rows != (cols - diff)) {
-            std.debug.print("!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!\n", .{});
+            std.debug.print("\n!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!", .{});
             return false;
         }
     } else {
         if (rows != cols) {
-            std.debug.print("!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!\n", .{});
+            std.debug.print("\n!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!", .{});
             return false;
         }
     }
 
     if (hasIdtMtx) {
         if (idtRows != idtCols) {
-            std.debug.print("!!Warning rdcXmtxInl identity matrix should be square !!\n", .{});
+            std.debug.print("\n!!Warning rdcXmtxInl identity matrix should be square !!", .{});
             return false;
         }
     }
 
     if (verbose) {
-        std.debug.print("\nStart Mtx\n", .{});
-        prntXmtx(mtx, cols);
+        std.debug.print("\nStart Mtx", .{});
+        prntXmtxNl(mtx, cols);
         prntNl();
     }
 
     while (r < rows) : (r += 1) {
-        //std.debug.print("Row: {} StartingCol: {}\n", .{r, startingCol});
+        //std.debug.print("\nRow: {} StartingCol: {}", .{r, startingCol});
         c = startingCol;
 
         var fndRow: usize = 0;
@@ -4439,8 +4616,8 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
             fndRow = fndLgstRowAbsXmtx(mtx, cols, c, r);
             if (fndRow != r and fndRow != errRow) {
                 if (verbose) {
-                    //std.debug.print("{} Found abs row: {} on source row: {} with val: {}\n", .{c, fndRow, r, (mtx[(fndRow * cols) + c])});
-                    std.debug.print("Alternate row {} with {}\n", .{ fndRow, r });
+                    //std.debug.print("\n{} Found abs row: {} on source row: {} with val: {}", .{c, fndRow, r, (mtx[(fndRow * cols) + c])});
+                    std.debug.print("\nAlternate row {} with {}", .{ fndRow, r });
                 }
 
                 altXmtxRowsInl(fndRow, r, cols, mtx);
@@ -4449,14 +4626,14 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
                 }
 
                 if (verbose) {
-                    prntXmtx(mtx, cols);
+                    prntXmtxNl(mtx, cols);
                     prntNl();
                 }
             }
         }
 
         //if(mtx[(r * cols) + c] == std.math.nan(f32)) { //std.math.nan_f32) {
-        //    std.debug.print("Found Nan after altXmtxRowsInl alternating {} with {}\n", .{fndRow, r});
+        //    std.debug.print("\nFound Nan after altXmtxRowsInl alternating {} with {}", .{fndRow, r});
         //}
 
         var v: f32 = 0;
@@ -4468,7 +4645,7 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
                 sclMul *= v;
 
                 if (verbose) {
-                    std.debug.print("{} Scalar multiply row: {} by {}\n", .{ c, r, tmp });
+                    std.debug.print("\n{} Scalar multiply row: {} by {}", .{ c, r, tmp });
                 }
 
                 sclMulXmtxRowsInl(r, tmp, cols, mtx);
@@ -4478,13 +4655,13 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
             }
 
             if (verbose) {
-                prntXmtx(mtx, cols);
+                prntXmtxNl(mtx, cols);
                 prntNl();
             }
         }
 
         //if(mtx[(r * cols) + c] == std.math.nan(f32)) { //std.math.nan_f32) {
-        //    std.debug.print("Found Nan after sclMulXmtxRowsInl multiplying by {}\n", .{tmp});
+        //    std.debug.print("\nFound Nan after sclMulXmtxRowsInl multiplying by {}", .{tmp});
         //}
 
         //for other rows
@@ -4499,7 +4676,7 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
                 const tmp2: f32 = -1.0;
                 const tmp3: f32 = mtx[((z * cols) + c)] * tmp2;
                 if (verbose) {
-                    std.debug.print("{} Add scalar multiple row: {} to row {} val {}, {}, {}\n", .{ c, r, z, tmp3, mtx[((z * cols) + c)], ((z * cols) + c) });
+                    std.debug.print("\n{} Add scalar multiple row: {} to row {} val {}, {}, {}", .{ c, r, z, tmp3, mtx[((z * cols) + c)], ((z * cols) + c) });
                 }
 
                 addSclMulXmtxRowsInl(r, z, tmp3, cols, mtx);
@@ -4509,19 +4686,19 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
 
                 if (isZeroXvec(mtx[(z * cols)..((z * cols) + dim)])) {
                     if (hasAug == false or (hasAug == true and isEquF32(mtx[(z * cols) + (cols - 1)], 0, true) == false)) {
-                        std.debug.print("Found zero vector index start {} and stop {}", .{ (z * cols), ((z * cols) + cols - 1) });
-                        prntXvec(mtx[(z * cols)..((z * cols) + cols - 1)]);
+                        std.debug.print("\nFound zero vector index start {} and stop {}", .{ (z * cols), ((z * cols) + cols - 1) });
+                        prntXvecNl(mtx[(z * cols)..((z * cols) + cols - 1)]);
                         prntNl();
 
-                        std.debug.print("Matrix state:\n", .{});
-                        prntXmtx(mtx, cols);
+                        std.debug.print("\nMatrix state:", .{});
+                        prntXmtxNl(mtx, cols);
                         prntNl();
                         return false;
                     }
                 }
 
                 if (verbose) {
-                    prntXmtx(mtx, cols);
+                    prntXmtxNl(mtx, cols);
                     prntNl();
                 }
             }
@@ -4533,15 +4710,15 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
         }
 
         if (verbose) {
-            std.debug.print("Row {} Mtx\n", .{r});
-            prntXmtx(mtx, cols);
+            std.debug.print("\nRow {} Mtx", .{r});
+            prntXmtxNl(mtx, cols);
             prntNl();
         }
     }
 
     if (verbose) {
-        std.debug.print("Scalar Multiple: {}\n", .{sclMul});
-        prntXmtx(mtx, cols);
+        std.debug.print("\nScalar Multiple: {}", .{sclMul});
+        prntXmtxNl(mtx, cols);
         prntNl();
     }
 
@@ -4568,7 +4745,7 @@ test "XMTX: rdcXmtxInl test" {
     var retVal: bool = false;
 
     std.debug.print("\nrdcXmtxInl test: initial matrix", .{});
-    prntXmtx(&m1, 4);
+    prntXmtxNl(&m1, 4);
     var sclr: f32 = 0.0;
 
     var start = try Instant.now();
@@ -4584,9 +4761,9 @@ test "XMTX: rdcXmtxInl test" {
     try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 
     std.debug.print("\nFull Answer:", .{});
-    prntXmtx(&m1, 4);
+    prntXmtxNl(&m1, 4);
     std.debug.print("\nClean Short Answer:", .{});
-    prntXmtx(&m2, 3);
+    prntXmtxNl(&m2, 3);
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
     sclr = 0.0;
@@ -4602,13 +4779,13 @@ test "XMTX: rdcXmtxInl test" {
     clnXmtx(&idtM3);
     cpyXmtx(&m3, &m2);
     std.debug.print("\nInverse:", .{});
-    prntXmtx(&idtM3, 3);
+    prntXmtxNl(&idtM3, 3);
     prntNl();
 
     std.debug.print("\nTest:", .{});
     retVal = tmsXmtx(&origM3, 3, &idtM3, 3, &ret, 3);
     clnXmtx(&ret);
-    prntXmtx(&ret, 3);
+    prntXmtxNl(&ret, 3);
     prntNl();
     sclr = 0.0;
 
@@ -4620,14 +4797,14 @@ test "XMTX: rdcXmtxInl test" {
     addExecTime("rdcXmtxInl", elapsed1);
 
     std.debug.print("\nInverse 2:", .{});
-    prntXmtx(&idtM4, 3);
+    prntXmtxNl(&idtM4, 3);
     prntNl();
 
     ret = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     std.debug.print("\nTest 2:", .{});
     retVal = tmsXmtx(&origM4, 3, &idtM4, 3, &ret, 3);
     clnXmtx(&ret);
-    prntXmtx(&ret, 3);
+    prntXmtxNl(&ret, 3);
     prntNl();
 }
 
@@ -4668,7 +4845,7 @@ test "XMTX: rdcXmtx test" {
     _ = cols;
     var b: bool = false;
     std.debug.print("\nrdcXmtx test: initial matrix", .{});
-    prntXmtx(&m1, 4);
+    prntXmtxNl(&m1, 4);
     var sclr: f32 = 0.0;
 
     const start = try Instant.now();
@@ -4687,7 +4864,7 @@ test "XMTX: rdcXmtx test" {
     try std.testing.expectEqual(true, isIdtXmtx(&m2, 3));
 
     std.debug.print("\nClean Short Answer:", .{});
-    prntXmtx(&m2, 3);
+    prntXmtxNl(&m2, 3);
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
     prntNl();
@@ -4785,7 +4962,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v0 >= mtx.len) {
-        std.debug.print("No matching row found, v0\n", .{});
+        std.debug.print("\nNo matching row found, v0", .{});
     }
 
     start = try Instant.now();
@@ -4796,7 +4973,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v1 >= mtx.len) {
-        std.debug.print("No matching row found, v1\n", .{});
+        std.debug.print("\nNo matching row found, v1", .{});
     }
 
     start = try Instant.now();
@@ -4807,7 +4984,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v2 >= mtx.len) {
-        std.debug.print("No matching row found, v2\n", .{});
+        std.debug.print("\nNo matching row found, v2", .{});
     }
 
     start = try Instant.now();
@@ -4818,7 +4995,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v3 >= mtx.len) {
-        std.debug.print("No matching row found, v3\n", .{});
+        std.debug.print("\nNo matching row found, v3", .{});
     }
 
     start = try Instant.now();
@@ -4829,7 +5006,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v4 >= mtx.len) {
-        std.debug.print("No matching row found, v4\n", .{});
+        std.debug.print("\nNo matching row found, v4", .{});
     }
 
     start = try Instant.now();
@@ -4840,7 +5017,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v5 >= mtx.len) {
-        std.debug.print("No matching row found, v5\n", .{});
+        std.debug.print("\nNo matching row found, v5", .{});
     }
 
     start = try Instant.now();
@@ -4851,7 +5028,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v6 >= mtx.len) {
-        std.debug.print("No matching row found, v6\n", .{});
+        std.debug.print("\nNo matching row found, v6", .{});
     }
 
     start = try Instant.now();
@@ -4862,7 +5039,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v7 >= mtx.len) {
-        std.debug.print("No matching row found, v7\n", .{});
+        std.debug.print("\nNo matching row found, v7", .{});
     }
 
     start = try Instant.now();
@@ -4873,7 +5050,7 @@ test "XMTX: fndLgstRowAbsXmtx test" {
     addExecTime("fndLgstRowAbsXmtx", elapsed1);
 
     if (v8 >= mtx.len) {
-        std.debug.print("No matching row found, v8\n", .{});
+        std.debug.print("\nNo matching row found, v8", .{});
     }
 
     std.debug.print("\nv0: {} v1: {} v2: {} v3: {} v4: {} v5: {} v6: {} v7: {} v8: {}", .{ v0, v1, v2, v3, v4, v5, v6, v7, v8 });
@@ -4906,7 +5083,7 @@ pub fn isRdcFrmXmtx(mtx: []f32, cols: usize) bool {
     while (i < l) : (i += 1) {
         const row = i / cols;
         const col = i % cols;
-        //std.debug.print("Row: {} Col: {} Val: {}\n", .{row, col, mtx[i]});
+        //std.debug.print("\nRow: {} Col: {} Val: {}", .{row, col, mtx[i]});
         if (row > col) {
             if (mtx[i] != 0) {
                 return false;
@@ -4931,7 +5108,7 @@ pub fn isRdcFrmXmtx(mtx: []f32, cols: usize) bool {
 test "XMTX: isRdcFrmXmtx test" {
     var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     var b: bool = false;
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     var start = try Instant.now();
     b = isRdcFrmXmtx(&mtx, 3);
@@ -4942,7 +5119,7 @@ test "XMTX: isRdcFrmXmtx test" {
 
     try std.testing.expectEqual(true, b);
     mtx = .{ 1, 0, 0, 0, 1, 0, 0, 0, 0 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     start = try Instant.now();
     b = isRdcFrmXmtx(&mtx, 3);
@@ -4953,7 +5130,7 @@ test "XMTX: isRdcFrmXmtx test" {
 
     try std.testing.expectEqual(true, b);
     mtx = .{ 1, 0, 0, 0, 0, 0, 0, 0, 1 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     start = try Instant.now();
     b = isRdcFrmXmtx(&mtx, 3);
@@ -4987,7 +5164,7 @@ pub fn addSclMulXmtxRowsInl(srcRow: usize, dstRow: usize, mul: f32, cols: usize,
             const row: usize = i / cols;
             _ = row;
             const col: usize = i % cols;
-            //std.debug.print("{} {} {} {} Src row val {} multiplier {} dst row val {} final dst row val {}\n", .{i, col, cols, row, mtx[((srcRow * cols) + col)], mul, mtx[i], (mtx[i] + (mtx[((srcRow * cols) + col)] * mul)) });
+            //std.debug.print("\n{} {} {} {} Src row val {} multiplier {} dst row val {} final dst row val {}", .{i, col, cols, row, mtx[((srcRow * cols) + col)], mul, mtx[i], (mtx[i] + (mtx[((srcRow * cols) + col)] * mul)) });
             mtx[i] += (mtx[((srcRow * cols) + col)] * mul);
             if (i == ((dstRow * cols) + cols - 1)) {
                 break;
@@ -5000,7 +5177,7 @@ pub fn addSclMulXmtxRowsInl(srcRow: usize, dstRow: usize, mul: f32, cols: usize,
 test "XMTX: addSclMulXmtxRowsInl test" {
     var mtx: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 3, 3, 3 };
     var exp: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 7, 7, 7 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     addSclMulXmtxRowsInl(1, 2, 2, 3, &mtx);
@@ -5009,7 +5186,7 @@ test "XMTX: addSclMulXmtxRowsInl test" {
     std.debug.print("\naddSclMulXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("addSclMulXmtxRowsInl", elapsed1);
 
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     prntNl();
 }
@@ -5037,7 +5214,7 @@ test "XMTX: addSclMulXmtxRows test" {
     var mtx: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 3, 3, 3 };
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var exp: [9]f32 = .{ 1, 1, 1, 2, 2, 2, 7, 7, 7 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     addSclMulXmtxRows(1, 2, 2, 3, &mtx, &res);
@@ -5046,7 +5223,7 @@ test "XMTX: addSclMulXmtxRows test" {
     std.debug.print("\naddSclMulXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("addSclMulXmtxRows", elapsed1);
 
-    prntXmtx(&res, 3);
+    prntXmtxNl(&res, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &res));
     prntNl();
 }
@@ -5066,7 +5243,7 @@ pub fn sclMulXmtxRowsInl(srcRow: usize, mul: f32, cols: usize, mtx: []f32) void 
     var i: usize = (srcRow * cols);
     while (i < l) {
         if (i >= (srcRow * cols) and i < ((srcRow * cols) + cols)) {
-            //std.debug.print("{} times {} = {}\n", .{mtx[i], mul, (mtx[i] * mul)});
+            //std.debug.print("\n{} times {} = {}", .{mtx[i], mul, (mtx[i] * mul)});
             mtx[i] *= mul;
             if (i == ((srcRow * cols) + cols - 1)) {
                 break;
@@ -5079,7 +5256,7 @@ pub fn sclMulXmtxRowsInl(srcRow: usize, mul: f32, cols: usize, mtx: []f32) void 
 test "XMTX: sclMulXmtxRowsInl test" {
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var exp: [9]f32 = .{ 3, 3, 3, 1, 1, 1, 1, 1, 1 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     sclMulXmtxRowsInl(0, 3, 3, &mtx);
@@ -5088,7 +5265,7 @@ test "XMTX: sclMulXmtxRowsInl test" {
     std.debug.print("\nsclMulXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("sclMulXmtxRowsInl", elapsed1);
 
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     prntNl();
 }
@@ -5114,7 +5291,7 @@ test "XMTX: sclMulXmtxRows test" {
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var exp: [9]f32 = .{ 3, 3, 3, 1, 1, 1, 1, 1, 1 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     sclMulXmtxRows(0, 3, 3, &mtx, &res);
@@ -5123,7 +5300,7 @@ test "XMTX: sclMulXmtxRows test" {
     std.debug.print("\nsclMulXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("sclMulXmtxRows", elapsed1);
 
-    prntXmtx(&res, 3);
+    prntXmtxNl(&res, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &res));
     prntNl();
 }
@@ -5143,7 +5320,7 @@ pub fn addSclXmtxRowsInl(srcRow: usize, amt: f32, cols: usize, mtx: []f32) void 
     var i: usize = (srcRow * cols);
     while (i < l) {
         if (i >= (srcRow * cols) and i < ((srcRow * cols) + cols)) {
-            //std.debug.print("{} times {} = {}\n", .{mtx[i], mul, (mtx[i] * mul)});
+            //std.debug.print("\n{} times {} = {}", .{mtx[i], mul, (mtx[i] * mul)});
             mtx[i] += amt;
             if (i == ((srcRow * cols) + cols - 1)) {
                 break;
@@ -5156,7 +5333,7 @@ pub fn addSclXmtxRowsInl(srcRow: usize, amt: f32, cols: usize, mtx: []f32) void 
 test "XMTX: addSclXmtxRowsInl test" {
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var exp: [9]f32 = .{ 4, 4, 4, 1, 1, 1, 1, 1, 1 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     addSclXmtxRowsInl(0, 3, 3, &mtx);
@@ -5165,7 +5342,7 @@ test "XMTX: addSclXmtxRowsInl test" {
     std.debug.print("\naddSclXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("addSclXmtxRowsInl", elapsed1);
 
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     prntNl();
 }
@@ -5191,7 +5368,7 @@ test "XMTX: addSclXmtxRows test" {
     var mtx: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var exp: [9]f32 = .{ 4, 4, 4, 1, 1, 1, 1, 1, 1 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     addSclXmtxRows(0, 3, 3, &mtx, &res);
@@ -5200,7 +5377,7 @@ test "XMTX: addSclXmtxRows test" {
     std.debug.print("\naddSclXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("addSclXmtxRows", elapsed1);
 
-    prntXmtx(&res, 3);
+    prntXmtxNl(&res, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &res));
     prntNl();
 }
@@ -5237,7 +5414,7 @@ pub fn altXmtxRowsInl(srcRow: usize, dstRow: usize, cols: usize, mtx: []f32) voi
 test "XMTX: altXmtxRowsInl test" {
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 7, 8, 9, 4, 5, 6, 1, 2, 3 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     altXmtxRowsInl(0, 2, 3, &mtx);
@@ -5246,7 +5423,7 @@ test "XMTX: altXmtxRowsInl test" {
     std.debug.print("\naltXmtxRowsInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("altXmtxRowsInl", elapsed1);
 
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     prntNl();
 }
@@ -5272,7 +5449,7 @@ test "XMTX: altXmtxRows test" {
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 7, 8, 9, 4, 5, 6, 1, 2, 3 };
     var alt: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     altXmtxRows(0, 2, 3, &mtx, &alt);
@@ -5281,7 +5458,7 @@ test "XMTX: altXmtxRows test" {
     std.debug.print("\naltXmtxRows: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("altXmtxRows", elapsed1);
 
-    prntXmtx(&alt, 3);
+    prntXmtxNl(&alt, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &alt));
     prntNl();
 }
@@ -5304,7 +5481,7 @@ pub fn trnXmtxInl(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !voi
 test "XMTX: trnXmtxInl test" {
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 1, 4, 7, 2, 5, 8, 3, 6, 9 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
     const alloc: std.mem.Allocator = std.testing.allocator;
 
     const start = try Instant.now();
@@ -5314,7 +5491,7 @@ test "XMTX: trnXmtxInl test" {
     std.debug.print("\ntrnXmtxInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("trnXmtxInl", elapsed1);
 
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &mtx));
     prntNl();
 }
@@ -5335,7 +5512,7 @@ test "XMTX: trnXmtx test" {
     var mtx: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var exp: [9]f32 = .{ 1, 4, 7, 2, 5, 8, 3, 6, 9 };
     var trn: [9]f32 = .{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    prntXmtx(&mtx, 3);
+    prntXmtxNl(&mtx, 3);
 
     const start = try Instant.now();
     trnXmtx(&mtx, 3, &trn);
@@ -5344,7 +5521,7 @@ test "XMTX: trnXmtx test" {
     std.debug.print("\ntrnXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("trnXmtx", elapsed1);
 
-    prntXmtx(&trn, 3);
+    prntXmtxNl(&trn, 3);
     try std.testing.expectEqual(true, equXvec(&exp, &trn));
     prntNl();
 }
@@ -5382,15 +5559,15 @@ test "XMTX: trnXmtxRect test" {
     var bT: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
     var expBt: [6]f32 = .{ 3, 2, 3, 1, -1, 0 };
 
-    prntXmtx(&a, 3);
+    prntXmtxNl(&a, 3);
     prntNl();
 
     trnXmtx(&a, 3, &aT);
-    prntXmtx(&aT, 3);
+    prntXmtxNl(&aT, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&aT, &expAt));
 
-    prntXmtx(&b, 2);
+    prntXmtxNl(&b, 2);
     prntNl();
 
     const start = try Instant.now();
@@ -5400,7 +5577,7 @@ test "XMTX: trnXmtxRect test" {
     std.debug.print("\ntrnXmtxRect: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("trnXmtxRect", elapsed1);
 
-    prntXmtx(&bT, 3);
+    prntXmtxNl(&bT, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&bT, &expBt));
     prntNl();
@@ -5423,8 +5600,8 @@ pub fn isSqrXmtx(mtx: []f32, cols: usize) bool {
 test "XMTX: isSqrXmtx test" {
     var mtx1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var mtx2: [12]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1 };
-    prntXmtx(&mtx1, 3);
-    prntXmtx(&mtx2, 3);
+    prntXmtxNl(&mtx1, 3);
+    prntXmtxNl(&mtx2, 3);
 
     var start = try Instant.now();
     const b1: bool = isSqrXmtx(&mtx1, 3);
@@ -5471,8 +5648,8 @@ pub fn isDiagXmtx(mtx: []f32, cols: usize) bool {
 test "XMTX: isDiagXmtx test" {
     var mtx1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var mtx2: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    prntXmtx(&mtx1, 3);
-    prntXmtx(&mtx2, 3);
+    prntXmtxNl(&mtx1, 3);
+    prntXmtxNl(&mtx2, 3);
 
     var start = try Instant.now();
     const b1: bool = isDiagXmtx(&mtx1, 3);
@@ -5523,8 +5700,8 @@ pub fn isIdtXmtx(mtx: []f32, cols: usize) bool {
 test "XMTX: isIdtXmtx test" {
     var mtx1: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     var mtx2: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    prntXmtx(&mtx1, 3);
-    prntXmtx(&mtx2, 3);
+    prntXmtxNl(&mtx1, 3);
+    prntXmtxNl(&mtx2, 3);
 
     var start = try Instant.now();
     const b1: bool = isIdtXmtx(&mtx1, 3);
@@ -5567,12 +5744,12 @@ pub fn cofXmtx(mtx: []f32, cols: usize, cofR: usize, cofC: usize, ret: []f32, co
     const rowsRet: usize = ret.len / colsRet;
 
     if (rowsRet != (rows - 1)) {
-        std.debug.print("!!Warning cofXmtx matrix should have 1 less than the matrix rows !!\n", .{});
+        std.debug.print("\n!!Warning cofXmtx matrix should have 1 less than the matrix rows !!", .{});
         return false;
     }
 
     if (colsRet != (cols - 1)) {
-        std.debug.print("!!Warning cofXmtx matrix should have 1 less than the matrix columns !!\n", .{});
+        std.debug.print("\n!!Warning cofXmtx matrix should have 1 less than the matrix columns !!", .{});
         return false;
     }
 
@@ -5627,7 +5804,7 @@ test "XMTX: cofXmtx test" {
     std.debug.print("\ncofXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("cofXmtx", elapsed1);
 
-    prntXmtx(&res, resCols);
+    prntXmtxNl(&res, resCols);
     prntNl();
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(cofA[0], (detXmtx2(&res) * cofXmtxSign(0, 0, true)));
@@ -5639,7 +5816,7 @@ test "XMTX: cofXmtx test" {
     std.debug.print("\ncofXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("cofXmtx", elapsed1);
 
-    prntXmtx(&res, resCols);
+    prntXmtxNl(&res, resCols);
     prntNl();
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(cofA[1], (detXmtx2(&res) * cofXmtxSign(0, 1, true)));
@@ -5752,8 +5929,8 @@ test "XMTX: rmvRowColXmtx4 test" {
     std.debug.print("\nrmvRowColXmtx4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("rmvRowColXmtx4", elapsed1);
 
-    std.debug.print("rmvRowColXmtx4:\n", .{});
-    prntXmtx(&res, 2);
+    std.debug.print("\nrmvRowColXmtx4:", .{});
+    prntXmtxNl(&res, 2);
     try std.testing.expectEqual(true, equXmtx(&expA, &res));
     prntNl();
 }
@@ -5816,8 +5993,8 @@ test "XMTX: rmvRowColXmtx3 test" {
     std.debug.print("\nrmvRowColXmtx3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("rmvRowColXmtx3", elapsed1);
 
-    std.debug.print("rmvRowColXmtx3:\n", .{});
-    prntXmtx(&res, 2);
+    std.debug.print("\nrmvRowColXmtx3:", .{});
+    prntXmtxNl(&res, 2);
     try std.testing.expectEqual(true, equXmtx(&expA, &res));
     prntNl();
 }
@@ -5889,12 +6066,12 @@ test "XMTX: adjXmtx3 test" {
 pub fn cofXmtx4(mtx: *[16]f32) [16]f32 {
     var mnr = mnrXmtx4(mtx);
 
-    //std.debug.print("111 cofXmtx4 test\n", .{});
+    //std.debug.print("\n111 cofXmtx4 test", .{});
     //prntXmtx(&mnr, 4);
 
     const cofSgn = cofXmtxSign4();
 
-    //std.debug.print("222 cofXmtx4 test\n", .{});
+    //std.debug.print("\n222 cofXmtx4 test", .{});
     //prntXmtx(&cofSgn, 4);
 
     var i: usize = 0;
@@ -5925,15 +6102,15 @@ test "XMTX: cofXmtx4 test" {
 
     std.debug.print("\nAAA cofXmtx4 test", .{});
     clnXmtx(&cof);
-    prntXmtx(&cof, 4);
+    prntXmtxNl(&cof, 4);
 
     std.debug.print("\nBBB cofXmtx4 test", .{});
-    prntXmtx(&exp, 4);
+    prntXmtxNl(&exp, 4);
     const b: bool = equXmtx(&cof, &exp);
 
     std.debug.print("\nCCC cofXmtx4: {}", .{b});
     std.debug.print("\nDDD cofXmtx4 test", .{});
-    prntXmtx(&A, 4);
+    prntXmtxNl(&A, 4);
 
     try std.testing.expectEqual(true, b);
     prntNl();
@@ -5974,9 +6151,9 @@ test "XMTX: cofXmtx3 test" {
     addExecTime("cofXmtx3", elapsed1);
 
     std.debug.print("\nAAA cofXmtx3 test", .{});
-    prntXmtx(&cof, 3);
+    prntXmtxNl(&cof, 3);
     std.debug.print("\nBBB cofXmtx3 test", .{});
-    prntXmtx(&exp, 3);
+    prntXmtxNl(&exp, 3);
 
     const b: bool = equXmtx(&cof, &exp);
     std.debug.print("\nCCC cofXmtx3: {}", .{b});
@@ -6714,7 +6891,7 @@ test "XMTX: detTriangXmtx test" {
     std.debug.print("\ndetTriangXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("detTriangXmtx", elapsed1);
 
-    std.debug.print("detA: {} detB: {}\n", .{ detA, detB });
+    std.debug.print("\ndetA: {} detB: {}", .{ detA, detB });
     try std.testing.expectEqual(true, isEquF32(detA, 8.0, true));
     try std.testing.expectEqual(true, isEquF32(detB, 81.0, true));
     prntNl();
@@ -6764,7 +6941,7 @@ test "XMTX: detDiagXmtx test" {
     std.debug.print("\ndetTriangXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("detTriangXmtx", elapsed1);
 
-    std.debug.print("detA: {} detB: {}\n", .{ detA, detB });
+    std.debug.print("\ndetA: {} detB: {}", .{ detA, detB });
     try std.testing.expectEqual(true, isEquF32(detA, 8.0, true));
     try std.testing.expectEqual(true, isEquF32(detB, 81.0, true));
     prntNl();
@@ -6796,7 +6973,7 @@ pub fn detXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator, cofR: u
         //a b
         //c d
         //ad - bc
-        //std.debug.print("({} * {}) - ({} * {}) times = {}:\n", .{mtx[0], mtx[3], mtx[1], mtx[2], (((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]))) });
+        //std.debug.print("\n({} * {}) - ({} * {}) times = {}:", .{mtx[0], mtx[3], mtx[1], mtx[2], (((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]))) });
         return ((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]));
     } else {
         var tot: f32 = 0;
@@ -6818,8 +6995,8 @@ pub fn detXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator, cofR: u
                 tot += (a * nv);
             }
 
-            //std.debug.print("a {} times nv {} {} res[0] = {}:\n", .{a, nv, (a * nv), tot});
-            //prntXmtx(res, resCols);
+            //std.debug.print("\na {} times nv {} {} res[0] = {}:", .{a, nv, (a * nv), tot});
+            //prntXmtxNl(res, resCols);
             //prntNl();
         }
 
@@ -6848,7 +7025,7 @@ test "XMTX: detXmtx test" {
     addExecTime("detXmtx", elapsed1);
 
     var exp: f32 = -3.0;
-    std.debug.print("Found detXmtx 2x2 value: {}\n", .{v});
+    std.debug.print("\nFound detXmtx 2x2 value: {}", .{v});
     try std.testing.expectEqual(exp, v);
     var m3: [9]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     cols = 3;
@@ -6861,7 +7038,7 @@ test "XMTX: detXmtx test" {
     addExecTime("detXmtx", elapsed1);
 
     exp = 0;
-    std.debug.print("Found detXmtx 3x3 value: {}\n", .{v});
+    std.debug.print("\nFound detXmtx 3x3 value: {}", .{v});
     try std.testing.expectEqual(exp, v);
     var m4: [16]f32 = .{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
     cols = 4;
@@ -6874,7 +7051,7 @@ test "XMTX: detXmtx test" {
     addExecTime("detXmtx", elapsed1);
 
     exp = 0;
-    std.debug.print("Found detXmtx 4x4 value: {}\n", .{v});
+    std.debug.print("\nFound detXmtx 4x4 value: {}", .{v});
     try std.testing.expectEqual(exp, v);
     prntNl();
 }
@@ -6891,10 +7068,10 @@ test "XMTX: detXmtx test" {
 ///
 pub fn getInvFromDet1(mtx: []f32, det: f32, ret: []f32) bool {
     if (mtx.len != 1) {
-        std.debug.print("!! Warning getInvFromDet2 requires 1x1 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet2 requires 1x1 matrices !!", .{});
         return false;
     } else if (ret.len != 1) {
-        std.debug.print("!! Warning getInvFromDet2 requires 1x1 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet2 requires 1x1 matrices !!", .{});
         return false;
     }
 
@@ -6920,11 +7097,11 @@ test "XMTX: getInvFromDet1 test" {
     clnXmtx(&invM1);
 
     prntNlStr("Res:");
-    prntXmtx(&res, 1);
+    prntXmtxNl(&res, 1);
     prntNl();
 
     prntNlStr("invM1:");
-    prntXmtx(&invM1, 1);
+    prntXmtxNl(&invM1, 1);
     prntNl();
 
     try std.testing.expectEqual(true, b);
@@ -6944,10 +7121,10 @@ test "XMTX: getInvFromDet1 test" {
 ///
 pub fn getInvFromDet2(mtx: []f32, det: f32, ret: []f32) bool {
     if (mtx.len != 4) {
-        std.debug.print("!! Warning getInvFromDet2 requires 2x2 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet2 requires 2x2 matrices !!", .{});
         return false;
     } else if (ret.len != 4) {
-        std.debug.print("!! Warning getInvFromDet2 requires 2x2 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet2 requires 2x2 matrices !!", .{});
         return false;
     }
 
@@ -6991,10 +7168,10 @@ test "XMTX: getInvFromDet2 test" {
 ///
 pub fn getInvFromDet3(mtx: []f32, det: f32, ret: []f32) bool {
     if (mtx.len != 9) {
-        std.debug.print("!! Warning getInvFromDet3 requires 3x3 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet3 requires 3x3 matrices !!", .{});
         return false;
     } else if (ret.len != 9) {
-        std.debug.print("!! Warning getInvFromDet3 requires 3x3 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet3 requires 3x3 matrices !!", .{});
         return false;
     }
 
@@ -7076,10 +7253,10 @@ test "XMTX: getInvFromDet3 test" {
 ///
 pub fn getInvFromDet4(mtx: []f32, det: f32, ret: []f32) bool {
     if (mtx.len != 16) {
-        std.debug.print("!! Warning getInvFromDet4 requires 4x4 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet4 requires 4x4 matrices !!", .{});
         return false;
     } else if (ret.len != 16) {
-        std.debug.print("!! Warning getInvFromDet4 requires 4x4 matrices !!\n", .{});
+        std.debug.print("\n!! Warning getInvFromDet4 requires 4x4 matrices !!", .{});
         return false;
     }
 
@@ -7345,7 +7522,7 @@ pub fn getInvFromDet4(mtx: []f32, det: f32, ret: []f32) bool {
     - (mtx[(0 * cols) + 0] * mtx[(1 * cols) + 2] * mtx[(2 * cols) + 1]));
 
     prntNl();
-    prntXmtx(ret, 4);
+    prntXmtxNl(ret, 4);
     prntNl();
 
     mulXvec(ret, (1.0 / det));
@@ -7368,12 +7545,12 @@ test "XMTX: getInvFromDet4 test" {
     addExecTime("getInvFromDet4", elapsed1);
 
     const cols: usize = 4;
-    std.debug.print("getInvFromDet4 det: {} expDet: {}\n", .{ det, expDet });
-    prntXmtx(&ret, cols);
+    std.debug.print("\ngetInvFromDet4 det: {} expDet: {}", .{ det, expDet });
+    prntXmtxNl(&ret, cols);
     prntNl();
 
-    std.debug.print("getInvFromDet4 det:\n", .{});
-    prntXmtx(&expMtx, cols);
+    std.debug.print("\ngetInvFromDet4 det:", .{});
+    prntXmtxNl(&expMtx, cols);
     prntNl();
 
     try std.testing.expectEqual(true, b);
@@ -7402,17 +7579,17 @@ pub fn getCramerSupportXmtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usiz
     const l: usize = mtx.len;
     const rows: usize = l / cols;
     if (rows >= cols) {
-        std.debug.print("!! Warning getCramerSupportMtx requires the augmented matrix, mtx, should have one more column than rows. !!\n", .{});
+        std.debug.print("\n!! Warning getCramerSupportMtx requires the augmented matrix, mtx, should have one more column than rows. !!", .{});
         return false;
     }
 
     if (srcCol != cols - 1) {
-        std.debug.print("!! Warning getCramerSupportMtx requires augmented matrix, mtx, specify constants, cols - 1, to create the necessary support matrix. !!\n", .{});
+        std.debug.print("\n!! Warning getCramerSupportMtx requires augmented matrix, mtx, specify constants, cols - 1, to create the necessary support matrix. !!", .{});
         return false;
     }
 
     if (dstCol < 0 or dstCol >= cols - 1) {
-        std.debug.print("!! Warning getCramerSupportMtx requires return matrix, ret, should have column count, (cols - 1). !!\n", .{});
+        std.debug.print("\n!! Warning getCramerSupportMtx requires return matrix, ret, should have column count, (cols - 1). !!", .{});
         return false;
     }
 
@@ -7420,16 +7597,16 @@ pub fn getCramerSupportXmtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usiz
     var j: usize = 0;
     const dstCols: usize = (cols - 1);
     const dstRows: usize = ret.len / dstCols;
-    //std.debug.print("Rows: {} Cols: {} DstRows: {} DstCols: {}\n", .{rows, cols, dstRows, dstCols});
+    //std.debug.print("\nRows: {} Cols: {} DstRows: {} DstCols: {}", .{rows, cols, dstRows, dstCols});
 
     while (i < dstCols) : (i += 1) {
         j = 0;
         while (j < dstRows) : (j += 1) {
             if (i == dstCol) {
-                //std.debug.print("Setting Idx: {} From Idx: {}\n", .{((j * dstCols) + i), ((j * cols) + srcCol)});
+                //std.debug.print("\nSetting Idx: {} From Idx: {}", .{((j * dstCols) + i), ((j * cols) + srcCol)});
                 ret[(j * dstCols) + i] = mtx[(j * cols) + srcCol];
             } else {
-                //std.debug.print("Setting Idx: {} From Idx: {}\n", .{((j * dstCols) + i), ((j * cols) + i)});
+                //std.debug.print("\nSetting Idx: {} From Idx: {}", .{((j * dstCols) + i), ((j * cols) + i)});
                 ret[(j * dstCols) + i] = mtx[(j * cols) + i];
             }
         }
@@ -7458,9 +7635,9 @@ test "XMTX: getCramerSupportMtx test" {
     addExecTime("getCramerSupportMtx", elapsed1);
 
     std.debug.print("\nMatrix A{}:", .{dstCol});
-    prntXmtx(&A1, 3);
+    prntXmtxNl(&A1, 3);
     std.debug.print("\nMatrix Exp A{}:", .{dstCol});
-    prntXmtx(&expA1, 3);
+    prntXmtxNl(&expA1, 3);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&A1, &expA1));
     dstCol = 1;
@@ -7474,9 +7651,9 @@ test "XMTX: getCramerSupportMtx test" {
     addExecTime("getCramerSupportMtx", elapsed1);
 
     std.debug.print("\nMatrix A{}:", .{dstCol});
-    prntXmtx(&A1, 3);
+    prntXmtxNl(&A1, 3);
     std.debug.print("\nMatrix Exp A{}:", .{dstCol});
-    prntXmtx(&expA1, 3);
+    prntXmtxNl(&expA1, 3);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&A1, &expA2));
     dstCol = 2;
@@ -7490,9 +7667,9 @@ test "XMTX: getCramerSupportMtx test" {
     addExecTime("getCramerSupportMtx", elapsed1);
 
     std.debug.print("\nMatrix A{}:", .{dstCol});
-    prntXmtx(&A1, 3);
+    prntXmtxNl(&A1, 3);
     std.debug.print("\nMatrix Exp A{}:", .{dstCol});
-    prntXmtx(&expA1, 3);
+    prntXmtxNl(&expA1, 3);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&A1, &expA3));
     prntNl();
@@ -7520,7 +7697,7 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
     const l: usize = mtx.len;
     const rows: usize = l / cols;
     if (rows >= cols) {
-        std.debug.print("!! Warning rslvCramersRule requires the augmented matrix, mtx, should have one more column than rows. !!\n", .{});
+        std.debug.print("\n!! Warning rslvCramersRule requires the augmented matrix, mtx, should have one more column than rows. !!", .{});
         return false;
     }
 
@@ -7542,11 +7719,11 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
     } else if (rowsA == 4) {
         detA = detXmtx4(@as(*[16]f32, @ptrCast(mtxA)));
     } else {
-        std.debug.print("!! Warning rslvCramersRule this function only supports matrix dimensions of 1, 2, 3, 4 for argument mtxA. !!\n", .{});
+        std.debug.print("\n!! Warning rslvCramersRule this function only supports matrix dimensions of 1, 2, 3, 4 for argument mtxA. !!", .{});
         return false;
     }
 
-    //std.debug.print("detA: {}\n", .{detA});
+    //std.debug.print("\ndetA: {}", .{detA});
 
     var b: bool = false;
     var i: usize = 0;
@@ -7554,7 +7731,7 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
         //create cramer support matrix Ai
         b = getCramerSupportXmtx(mtx, cols, (cols - 1), i, mtxAi);
         if (!b) {
-            std.debug.print("!! Warning rslvCramersRule could not populate the Cramer's rule support matrix for column {}. !!\n", .{i});
+            std.debug.print("\n!! Warning rslvCramersRule could not populate the Cramer's rule support matrix for column {}. !!", .{i});
             return false;
         }
 
@@ -7567,11 +7744,11 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
         } else if (rowsA == 4) {
             detAi = detXmtx4(@as(*[16]f32, @ptrCast(mtxAi)));
         } else {
-            std.debug.print("!! Warning rslvCramersRule This function only supports matrix dimensions of 1, 2, 3, 4 for Cramer's rule support matrix, mtxAi. !!\n", .{});
+            std.debug.print("\n!! Warning rslvCramersRule This function only supports matrix dimensions of 1, 2, 3, 4 for Cramer's rule support matrix, mtxAi. !!", .{});
             return false;
         }
 
-        //std.debug.print("DetAI:{} DetA:{} RowsA:{}\n", .{detAi, detA, rowsA});
+        //std.debug.print("\nDetAI:{} DetA:{} RowsA:{}", .{detAi, detA, rowsA});
         ret[i] = detAi / detA;
     }
 
@@ -7602,8 +7779,8 @@ test "XMTX: rslvCramersRule test" {
     const expY: f32 = -3.0 / 2.0;
     const expZ: f32 = -8.0 / 5.0;
 
-    std.debug.print("Cramer's Rule Return {} {} {}:\n", .{ expX, expY, expZ });
-    prntXvec(&ret);
+    std.debug.print("\nCramer's Rule Return {} {} {}:", .{ expX, expY, expZ });
+    prntXvecNl(&ret);
     prntNl();
 
     try std.testing.expectEqual(true, isEquF32(ret[0], expX, true));
@@ -7641,7 +7818,7 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
     _ = isStd;
 
     if (cols != chgCols) {
-        std.debug.print("!! Warning expected column counts to match !!\n", .{});
+        std.debug.print("\n!! Warning expected column counts to match !!", .{});
         return false;
     }
 
@@ -7650,35 +7827,35 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
         b = true;
 
         if (verbose) {
-            std.debug.print("chgVecBasis:change basis is identity so conversion matrix = basis {}\n", .{b});
+            std.debug.print("\nchgVecBasis:change basis is identity so conversion matrix = basis {}", .{b});
         }
     } else {
         b = getBasisCnvXmtx(basis, cols, chgBasis, chgCols, ret, verbose);
 
         if (verbose) {
-            std.debug.print("chgVecBasis:getBasisCnvMtx {}\n", .{b});
+            std.debug.print("\nchgVecBasis:getBasisCnvMtx {}", .{b});
         }
     }
 
     if (verbose) {
-        prntXmtx(basis, cols);
+        prntXmtxNl(basis, cols);
         prntNl();
 
-        prntXmtx(ret, cols);
+        prntXmtxNl(ret, cols);
         prntNl();
 
-        prntXmtx(vec, 1);
+        prntXmtxNl(vec, 1);
         prntNl();
     }
 
     if (!b) { // or equXmtx(ret, idtMtx) == false) {}
-        std.debug.print("!! Warning matrix reduction failed !!\n", .{});
+        std.debug.print("\n!! Warning matrix reduction failed !!", .{});
         return false;
     }
 
     b = tmsXmtx(basis, cols, vec, 1, nvec, 1);
     if (!b) {
-        std.debug.print("!! Warning matrix multiplication failed !!\n", .{});
+        std.debug.print("\n!! Warning matrix multiplication failed !!", .{});
         return false;
     }
     return true;
@@ -7719,15 +7896,15 @@ test "XMTX: chgXvecBasis test" {
 
     try std.testing.expectEqual(true, b);
     std.debug.print("\nchgXvecBasis ret {}", .{b});
-    prntXmtx(&ret, cols);
+    prntXmtxNl(&ret, cols);
     prntNl();
 
     std.debug.print("\nchgXvecBasis B", .{});
-    prntXmtx(&B, cols);
+    prntXmtxNl(&B, cols);
     prntNl();
 
     std.debug.print("\nchgXvecBasis nvec", .{});
-    prntXmtx(&nvec, 1);
+    prntXmtxNl(&nvec, 1);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&exp, &nvec));
@@ -7750,7 +7927,7 @@ test "XMTX: chgXvecBasis test" {
 ///
 pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) bool {
     if (cols != chgCols) {
-        std.debug.print("!! Warning expected column counts to match !!\n", .{});
+        std.debug.print("\n!! Warning expected column counts to match !!", .{});
         return false;
     }
 
@@ -7774,13 +7951,13 @@ pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usiz
     b = rdcXmtx(chgBasis, chgCols, hasAug, ret, hasIdtMtx, basis, dim, triagRdcOnly, &sclr);
 
     if (verbose) {
-        std.debug.print("getBasisCnvMtx:rdcXmtx {}\n", .{b});
-        prntXmtx(ret, cols);
+        std.debug.print("\ngetBasisCnvMtx:rdcXmtx {}", .{b});
+        prntXmtxNl(ret, cols);
         prntNl();
     }
 
     if (!b) {
-        std.debug.print("!! Warning could not reduce the transfomation matrix !!\n", .{});
+        std.debug.print("\n!! Warning could not reduce the transfomation matrix !!", .{});
         return false;
     }
 
@@ -7814,12 +7991,12 @@ test "XMTX: getBasisCnvXmtx test" {
     addExecTime("getBasisCnvXmtx", elapsed1);
 
     try std.testing.expectEqual(true, b);
-    std.debug.print("getBasisCnvMtx test:getBasisCnvMtx ret {}\n", .{b});
-    prntXmtx(&ret, cols);
+    std.debug.print("\ngetBasisCnvMtx test:getBasisCnvMtx ret {}", .{b});
+    prntXmtxNl(&ret, cols);
     prntNl();
 
-    std.debug.print("getBasisCnvMtx test:getBasisCnvMtx B\n", .{});
-    prntXmtx(&B, cols);
+    std.debug.print("\ngetBasisCnvMtx test:getBasisCnvMtx B", .{});
+    prntXmtxNl(&B, cols);
     prntNl();
 
     var exp: [9]f32 = .{ -1, 4, 2, 3, -7, -3, 1, -2, -1 };
@@ -7833,11 +8010,11 @@ test "XMTX: getBasisCnvXmtx test" {
 ///
 ///  cols = The number of columns in the matrix mtx.
 ///
-///  ret = An empty matrix the same siz as mtx used to hold return information from the reduce matrix call.
+///  ret = An empty matrix the same size as mtx used to hold return information from the reduce matrix call.
 ///
 ///  idtMtx = An identity matrix with the same dimensions as the mtx matrix.
 ///
-///  trnMtx = An empty matrix the same siz as mtx used to hold transpose matrix information.
+///  trnMtx = An empty matrix the same size as mtx used to hold transpose matrix information.
 ///
 ///  return = A Boolean value indicating if mtx is orthogonal or not.
 ///
@@ -8142,17 +8319,15 @@ test "XMTX: getBasisHndXmtx3Ret test" {
     prntNl();
 }
 
-//fn eqlFncName(a: []const u8, b: []const u8) bool {
-//    return std.mem.eql(u8, a, b);
-//}
+//TODO DOCS
+pub fn isRghtHandedXmtx3(mtx: *const [9]f32, cols: usize) bool {
+    if (getBasisHndXmtx3(mtx, cols) == BASIS_HAND.RIGHT) {
+        return true;
+    }
+    return false;
+}
 
-//fn ltFncName(a: []const u8, b: []const u8) bool {
-//    return std.mem.lessThan(u8, a, b);
-//}
-
-//fn gtFncName(a: []const u8, b: []const u8) bool {
-//    return !std.mem.lessThan(u8, a, b);
-//}
+//TODO TEST
 
 fn cmpFncName(a: []const u8, b: []const u8) f32 {
     const alen = a.len;
@@ -8440,10 +8615,10 @@ test "XMTX: MF3D - Lengyel: Theorem 2.5 test" {
     Q = .{ 6, 9 }; //Q
     var R: [2]f32 = .{ 1, 1 };
     cpyXvec(&P, &R); //R = P
-    prntXvec(&R);
+    prntXvecNl(&R);
     mulXvec(&R, a); //a * P
     dotP1 = dotPrdXvec(&R, &Q); //dotProd(a*P, Q)
-    prntXvec(&R);
+    prntXvecNl(&R);
     std.debug.print("dotProd(a*P, Q): {}\n", .{dotP1});
     std.debug.print("dotProd(P, Q):: {}\n", .{dotPrdXvec(&P, &Q)});
     dotP2 = (a * dotPrdXvec(&P, &Q));
@@ -8521,8 +8696,8 @@ test "XMTX: MF3D - Lengyel: Theorem 2.9 test" {
     var v5: [3]f32 = crsPrdXvec(&v1, &v2);
     var v6: [3]f32 = crsPrdXvec(&v1, &v3);
     sum1Xvec(&v5, &v6);
-    prntXvec(&v4);
-    prntXvec(&v5);
+    prntXvecNl(&v4);
+    prntXvecNl(&v5);
     std.debug.print("P X (Q + R) = (P X Q) + (P X R):\n", .{});
     try std.testing.expectEqual(true, equXvec(&v4, &v5));
 
@@ -8751,18 +8926,18 @@ test "XMTX: MF3D - Lengyel: Theorem 3.9 test" {
 
     idtM1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     b = isZeroXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
     sclr = 0.0;
     b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
     b = isIdtXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 }
@@ -8781,18 +8956,18 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     cpyXmtx(&trnM1, &m1);
     idtM1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     b = isZeroXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
     var sclr: f32 = 0.0;
     b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
     b = isIdtXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
@@ -8800,18 +8975,18 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     cpyXmtx(&origM1, &m1);
     idtM1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     b = isZeroXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
     sclr = 0.0;
     b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
     b = isIdtXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
@@ -8828,18 +9003,18 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     cpyXmtx(&trnM1, &m1);
     idtM1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     b = isZeroXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
     sclr = 0.0;
     b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
     b = isIdtXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
@@ -8847,18 +9022,18 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     cpyXmtx(&origM1, &m1);
     idtM1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     b = isZeroXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
     sclr = 0.0;
     b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
     b = isIdtXmtx(&m1, 3);
-    prntXmtx(&m1, 3);
+    prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 }
@@ -8883,27 +9058,27 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
 
     b = tmsXmtx(&F, 3, &G, 3, &FG, 3);
     std.debug.print("BBB FG\n", .{});
-    prntXmtx(&FG, 3);
+    prntXmtxNl(&FG, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
     var sclr: f32 = 0.0;
     b = rdcXmtxInl(&FG, 3, false, true, &invFG, 3, false, &sclr);
     std.debug.print("BBB Reduced FG\n", .{});
-    prntXmtx(&FG, 3);
+    prntXmtxNl(&FG, 3);
     prntNl();
     std.debug.print("BBB invFG\n", .{});
-    prntXmtx(&invFG, 3);
+    prntXmtxNl(&invFG, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
     sclr = 0.0;
     b = rdcXmtxInl(&F, 3, false, true, &invF, 3, false, &sclr);
     std.debug.print("CCC Reduced F\n", .{});
-    prntXmtx(&F, 3);
+    prntXmtxNl(&F, 3);
     prntNl();
     std.debug.print("CCC invF\n", .{});
-    prntXmtx(&invF, 3);
+    prntXmtxNl(&invF, 3);
     prntNl();
     cpyXmtx(&origF, &F);
     try std.testing.expectEqual(true, b);
@@ -8911,10 +9086,10 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
     sclr = 0.0;
     b = rdcXmtxInl(&G, 3, false, true, &invG, 3, false, &sclr);
     std.debug.print("DDD Reduced G\n", .{});
-    prntXmtx(&G, 3);
+    prntXmtxNl(&G, 3);
     prntNl();
     std.debug.print("DDD invG\n", .{});
-    prntXmtx(&invG, 3);
+    prntXmtxNl(&invG, 3);
     prntNl();
     cpyXmtx(&origG, &G);
     try std.testing.expectEqual(true, b);
@@ -8922,7 +9097,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
     clrXmtx(&invGinvF);
     b = tmsXmtx(&invG, 3, &invF, 3, &invGinvF, 3);
     std.debug.print("EEE invG * invF\n", .{});
-    prntXmtx(&invGinvF, 3);
+    prntXmtxNl(&invGinvF, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
@@ -8931,10 +9106,10 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
 
     //if F and G are n X n invertible matrices then (F * G) is invertible and (F * G) ^ (-1) = G^(-1) * F^(-1)
     std.debug.print("FIN invFG\n", .{});
-    prntXmtx(&invFG, 3);
+    prntXmtxNl(&invFG, 3);
     prntNl();
     std.debug.print("FIN invGinvF\n", .{});
-    prntXmtx(&invGinvF, 3);
+    prntXmtxNl(&invGinvF, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&invFG, &invGinvF));
 }
@@ -8954,10 +9129,10 @@ test "XMTX: MF3D - Lengyel: Theorem 3.15 test" {
     var sclr: f32 = 0.0;
     b = rdcXmtxInl(&M, 3, false, true, &invM, 3, false, &sclr);
     std.debug.print("AAA Reduced M\n", .{});
-    prntXmtx(&M, 3);
+    prntXmtxNl(&M, 3);
     prntNl();
     std.debug.print("AAA invM\n", .{});
-    prntXmtx(&invM, 3);
+    prntXmtxNl(&invM, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
 
@@ -8979,10 +9154,10 @@ test "XMTX: MF3D - Lengyel: Theorem 3.15 test" {
     sclr = 0.0;
     b = rdcXmtxInl(&M, 3, false, true, &invM, 3, false, &sclr);
     std.debug.print("BBB Reduced M\n", .{});
-    prntXmtx(&M, 3);
+    prntXmtxNl(&M, 3);
     prntNl();
     std.debug.print("BBB invM\n", .{});
-    prntXmtx(&invM, 3);
+    prntXmtxNl(&invM, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 
@@ -9076,10 +9251,10 @@ test "XMTX: MF3D - Lengyel: Theorem 3.19 test" {
     try std.testing.expectEqual(true, b);
 
     prntNl();
-    prntXmtx(&m2, 2);
+    prntXmtxNl(&m2, 2);
 
     clnXmtx(&m2);
-    prntXmtx(&m2, 2);
+    prntXmtxNl(&m2, 2);
 
     b = isIdtXmtx(&m2, 2);
     try std.testing.expectEqual(true, b);
@@ -9122,7 +9297,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
     std.debug.print("F Matrix:\n", .{});
     clnXmtx(&F);
-    prntXmtx(&F, cols);
+    prntXmtxNl(&F, cols);
 
     const detF = try detXmtx(&F, cols, &alloc, 0);
     std.debug.print("detF = {}\n", .{detF});
@@ -9135,12 +9310,12 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
     std.debug.print("Calculated inverse F (should be identity matrix):\n", .{});
     clnXmtx(&F);
-    prntXmtx(&F, cols);
+    prntXmtxNl(&F, cols);
     try std.testing.expectEqual(true, isIdtXmtx(&F, cols));
 
     std.debug.print("Calculated inverse F (should be inverse matrix):\n", .{});
     clnXmtx(&idtF);
-    prntXmtx(&idtF, cols);
+    prntXmtxNl(&idtF, cols);
 
     F = .{ 5, 6, 8, 9 };
     b = getInvFromDet2(&F, detF, &invF);
@@ -9148,7 +9323,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
     std.debug.print("Generated inverse from detF (should be inverse matrix):\n", .{});
     clnXmtx(&invF);
-    prntXmtx(&invF, cols);
+    prntXmtxNl(&invF, cols);
     try std.testing.expectEqual(true, equXmtx(&idtF, &invF));
 
     std.debug.print("Test 2:\n", .{});
@@ -9158,7 +9333,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
     std.debug.print("F2 Matrix:\n", .{});
     clnXmtx(&F2);
-    prntXmtx(&F2, cols);
+    prntXmtxNl(&F2, cols);
 
     const detF2 = try detXmtx(&F2, cols, &alloc, 0);
     std.debug.print("detF2 = {}\n", .{detF2});
@@ -9171,12 +9346,12 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
     std.debug.print("Calculated inverse F2 (should be identity matrix):\n", .{});
     clnXmtx(&F2);
-    prntXmtx(&F2, cols);
+    prntXmtxNl(&F2, cols);
     try std.testing.expectEqual(true, isIdtXmtx(&F2, cols));
 
     std.debug.print("Calculated inverse F2 (should be inverse matrix):\n", .{});
     clnXmtx(&idtF2);
-    prntXmtx(&idtF2, cols);
+    prntXmtxNl(&idtF2, cols);
 
     F2 = .{ 2, 3, 8, 6, 0, -3, -1, 3, 2 };
     b = getInvFromDet3(&F2, detF2, &invF2);
@@ -9184,7 +9359,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
     std.debug.print("Generated inverse from detF2 (should be inverse matrix):\n", .{});
     clnXmtx(&invF2);
-    prntXmtx(&invF2, cols);
+    prntXmtxNl(&invF2, cols);
     try std.testing.expectEqual(true, equXmtx(&idtF2, &invF2));
 }
 
@@ -9236,21 +9411,21 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 3 test" {
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
     clnXmtx(&idtM1);
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
     try std.testing.expectEqual(true, isIdtXmtx(&idtM1, dim));
 }
@@ -9271,20 +9446,20 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 4 test" {
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     clnXmtx(&idtM1);
     prntNl();
     try std.testing.expectEqual(true, isIdtXmtx(&idtM1, dim));
@@ -9306,15 +9481,15 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 6 test" {
     try std.testing.expectEqual(false, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, cols);
+    prntXmtxNl(&idtM1, cols);
     prntNl();
 
     try std.testing.expectEqual(false, isIdtXmtx(&m1, cols));
@@ -9336,20 +9511,20 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 7 test" {
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     clnXmtx(&idtM1);
     prntNl();
     try std.testing.expectEqual(true, isIdtXmtx(&idtM1, dim));
@@ -9371,20 +9546,20 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 8 test" {
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     clnXmtx(&idtM1);
     prntNl();
     try std.testing.expectEqual(true, isIdtXmtx(&idtM1, dim));
@@ -9406,20 +9581,20 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 9 test" {
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     clnXmtx(&idtM1);
     prntNl();
     try std.testing.expectEqual(true, isIdtXmtx(&idtM1, dim));
@@ -9441,20 +9616,20 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Problem 19 test" {
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     clnXmtx(&idtM1);
     prntNl();
     try std.testing.expectEqual(true, isIdtXmtx(&idtM1, dim));
@@ -9476,20 +9651,20 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Problem 20 test" {
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
-    prntXmtx(&m1, cols);
+    prntXmtxNl(&m1, cols);
     prntNl();
 
     std.debug.print("Matrix Ret:\n", .{});
-    prntXmtx(&retM1, cols);
+    prntXmtxNl(&retM1, cols);
     prntNl();
 
     std.debug.print("Matrix Inv:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     prntNl();
 
     cpyLessXmtx(&retM1, &idtM1, cols, dim);
     std.debug.print("Copy Matrix M1:\n", .{});
-    prntXmtx(&idtM1, dim);
+    prntXmtxNl(&idtM1, dim);
     clnXmtx(&idtM1);
     prntNl();
     try std.testing.expectEqual(false, isIdtXmtx(&idtM1, dim));
@@ -9583,13 +9758,13 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" {
     std.debug.print("\nQuestion D:\n", .{});
     b = tmsXmtx(&m5, 3, &m6, 1, &ret3, 1);
 
-    prntXmtx(&m5, 3);
+    prntXmtxNl(&m5, 3);
     prntNl();
 
-    prntXmtx(&m6, 1);
+    prntXmtxNl(&m6, 1);
     prntNl();
 
-    prntXmtx(&ret3, 1);
+    prntXmtxNl(&ret3, 1);
     prntNl();
 
     try std.testing.expectEqual(true, b);
@@ -9603,13 +9778,13 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" {
     std.debug.print("\nQuestion E:\n", .{});
     b = tmsXmtx(&m6, 1, &m5, 3, &ret4, 3);
 
-    prntXmtx(&m5, 3);
+    prntXmtxNl(&m5, 3);
     prntNl();
 
-    prntXmtx(&m6, 1);
+    prntXmtxNl(&m6, 1);
     prntNl();
 
-    prntXmtx(&ret4, 3);
+    prntXmtxNl(&ret4, 3);
     prntNl();
 
     try std.testing.expectEqual(true, b);
@@ -9626,18 +9801,18 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 6 test" {
     var sclr: f32 = 0.0;
     b = rdcXmtx(&m1, 4, true, &ret, false, &idtM1, 2, false, &sclr);
 
-    prntXmtx(&m1, 4);
+    prntXmtxNl(&m1, 4);
     prntNl();
 
-    prntXmtx(&ret, 4);
+    prntXmtxNl(&ret, 4);
     prntNl();
 
-    prntXmtx(&idtM1, 2);
+    prntXmtxNl(&idtM1, 2);
     prntNl();
 
     cpyLessXmtx(&ret, &m2, 4, 2);
 
-    prntXmtx(&m2, 2);
+    prntXmtxNl(&m2, 2);
     prntNl();
 
     try std.testing.expectEqual(true, b);
@@ -9663,10 +9838,10 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Problem 1 test" {
     exp = .{ -1, 0, 3, -9 };
     diff2Xvec(&aPb, &a, &b);
 
-    prntXmtx(&aPb, 2);
+    prntXmtxNl(&aPb, 2);
     prntNl();
 
-    prntXmtx(&exp, 2);
+    prntXmtxNl(&exp, 2);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&aPb, &exp));
 
@@ -9704,10 +9879,10 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Problem 3 test" {
     exp = .{ 5, -5, 3, -1, -4, -5 };
     diff2Xvec(&aPb, &a, &b);
 
-    prntXmtx(&aPb, 2);
+    prntXmtxNl(&aPb, 2);
     prntNl();
 
-    prntXmtx(&exp, 2);
+    prntXmtxNl(&exp, 2);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&aPb, &exp));
 
@@ -9760,10 +9935,10 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 1 test" {
     sum2Xvec(&m0, &m3, &m4);
     var exp: [3]f32 = .{ 2, -1, 1 };
 
-    prntXmtx(&m0, 3);
+    prntXmtxNl(&m0, 3);
     prntNl();
 
-    prntXmtx(&exp, 3);
+    prntXmtxNl(&exp, 3);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&m0, &exp));
@@ -9778,10 +9953,10 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 2 test" {
     diff1Xvec(&b, &a);
     mulXvec(&b, (1.0 / 3.0));
 
-    prntXmtx(&b, 2);
+    prntXmtxNl(&b, 2);
     prntNl();
 
-    prntXmtx(&exp, 2);
+    prntXmtxNl(&exp, 2);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&b, &exp));
@@ -9801,16 +9976,16 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 3 test" {
     res = tmsXmtx(&a, 2, &b, 3, &ret1, 3);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret1, 2);
+    prntXmtxNl(&ret1, 2);
     prntNl();
 
     res = tmsXmtx(&ret1, 3, &c, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret2, 2);
+    prntXmtxNl(&ret2, 2);
     prntNl();
 
-    prntXmtx(&exp, 2);
+    prntXmtxNl(&exp, 2);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&ret2, &exp));
@@ -9830,13 +10005,13 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 4 test" {
     res = tmsXmtx(&a, 2, &b, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret1, 2);
+    prntXmtxNl(&ret1, 2);
     prntNl();
 
     res = tmsXmtx(&b, 2, &a, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret2, 2);
+    prntXmtxNl(&ret2, 2);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&ret1, &exp1));
@@ -9863,13 +10038,13 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 5 test" {
     res = tmsXmtx(&a, 2, &c, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret1, 2);
+    prntXmtxNl(&ret1, 2);
     prntNl();
 
     res = tmsXmtx(&b, 2, &c, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret2, 2);
+    prntXmtxNl(&ret2, 2);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&ret1, &exp));
@@ -9890,7 +10065,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 6 test" {
     res = tmsXmtx(&a, 2, &b, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret1, 2);
+    prntXmtxNl(&ret1, 2);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&ret1, &exp1));
     try std.testing.expectEqual(true, equXmtx(&a, &exp1));
@@ -9907,7 +10082,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 6 test" {
     res = tmsXmtx(&c, 3, &d, 1, &ret2, 1);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&ret2, 3);
+    prntXmtxNl(&ret2, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&ret2, &exp2));
     try std.testing.expectEqual(true, equXmtx(&d, &exp2));
@@ -9926,19 +10101,19 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 7 test" {
     res = tmsXmtx(&a, 2, &a, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&a, 2);
+    prntXmtxNl(&a, 2);
     prntNl();
 
-    prntXmtx(&ret1, 2);
+    prntXmtxNl(&ret1, 2);
     prntNl();
 
     res = tmsXmtx(&ret1, 2, &a, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&a, 2);
+    prntXmtxNl(&a, 2);
     prntNl();
 
-    prntXmtx(&ret2, 2);
+    prntXmtxNl(&ret2, 2);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&ret2, &exp));
@@ -9983,10 +10158,10 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 8 test" {
     trnXmtxRect(&m3, 3, &r3, 3);
     trnXmtxRect(&m4, 2, &r4, 3);
 
-    prntXmtx(&m4, 2);
+    prntXmtxNl(&m4, 2);
     prntNl();
 
-    prntXmtx(&r4, 3);
+    prntXmtxNl(&r4, 3);
     prntNl();
 
     try std.testing.expectEqual(true, equXmtx(&r1, &e1));
@@ -10027,27 +10202,27 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 9 test" {
     res = tmsXmtx(&a, 3, &b, 2, &ab, 2);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&a, 3);
+    prntXmtxNl(&a, 3);
     prntNl();
 
-    prntXmtx(&b, 2);
+    prntXmtxNl(&b, 2);
     prntNl();
 
-    prntXmtx(&ab, 2);
+    prntXmtxNl(&ab, 2);
     prntNl();
 
-    prntXmtx(&expAb, 2);
+    prntXmtxNl(&expAb, 2);
     prntNl();
     try std.testing.expectEqual(true, res);
     try std.testing.expectEqual(true, equXmtx(&ab, &expAb));
 
     trnXmtx(&a, 3, &aT);
-    prntXmtx(&aT, 3);
+    prntXmtxNl(&aT, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&aT, &expAt));
 
     trnXmtxRect(&b, 2, &bT, 3);
-    prntXmtx(&bT, 3);
+    prntXmtxNl(&bT, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&bT, &expBt));
 
@@ -10055,7 +10230,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 9 test" {
     try std.testing.expectEqual(true, equXmtx(&abT, &expAbt));
 
     res = tmsXmtx(&bT, 3, &aT, 3, &btAt, 3);
-    prntXmtx(&btAt, 3);
+    prntXmtxNl(&btAt, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&btAt, &expBtAt));
 }
@@ -10207,10 +10382,10 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 2 test" {
     res = rdcXmtx(&A, 2, false, &B, true, &I, 2, false, &sclr);
     try std.testing.expectEqual(true, res);
 
-    prntXmtx(&B, 2);
+    prntXmtxNl(&B, 2);
     prntNl();
 
-    prntXmtx(&I, 2);
+    prntXmtxNl(&I, 2);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&exp, &I));
 }
@@ -10231,10 +10406,10 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 3 test" {
     var sclr: f32 = 0.0;
     b = rdcXmtx(&A, 3, false, &R, true, &I, 3, false, &sclr);
 
-    prntXmtx(&A, 3);
+    prntXmtxNl(&A, 3);
     prntNl();
 
-    prntXmtx(&I, 3);
+    prntXmtxNl(&I, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&exp, &I));
@@ -10255,10 +10430,10 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 4 test" {
     var sclr: f32 = 0.0;
     b = rdcXmtx(&A, 3, false, &R, true, &I, 3, false, &sclr);
 
-    prntXmtx(&A, 3);
+    prntXmtxNl(&A, 3);
     prntNl();
 
-    prntXmtx(&I, 3);
+    prntXmtxNl(&I, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
 }
@@ -10285,10 +10460,10 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 5 test" {
     b = rdcXmtx(&B, 2, false, &bI, true, &I2, 2, false, &sclr);
     try std.testing.expectEqual(false, b);
 
-    prntXmtx(&A, 2);
+    prntXmtxNl(&A, 2);
     prntNl();
 
-    prntXmtx(&I1, 2);
+    prntXmtxNl(&I1, 2);
     prntNl();
 
     clnXmtx(&I1);
@@ -10321,9 +10496,9 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 6 test" {
 
     clnXmtx(&I);
     clnXmtx(&invA);
-    prntXmtx(&I, 2);
+    prntXmtxNl(&I, 2);
     prntNl();
-    prntXmtx(&invA, 2);
+    prntXmtxNl(&invA, 2);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&expInvA, &I));
 
@@ -10411,15 +10586,15 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
 
     prntNl();
     std.debug.print("XMTX: A\n", .{});
-    prntXmtx(&A, cols);
+    prntXmtxNl(&A, cols);
 
     prntNl();
     std.debug.print("XMTX: TMP\n", .{});
-    prntXmtx(&tmp, cols);
+    prntXmtxNl(&tmp, cols);
 
     prntNl();
     std.debug.print("XMTX: invA\n", .{});
-    prntXmtx(&invA, cols);
+    prntXmtxNl(&invA, cols);
 
     try std.testing.expectEqual(true, equXmtx(&idtA, &tmp));
 
@@ -10429,7 +10604,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
     try std.testing.expectEqual(true, b);
     prntNl();
     std.debug.print("XMTX: a:\n", .{});
-    prntXmtx(&sD, 1);
+    prntXmtxNl(&sD, 1);
     try std.testing.expectEqual(true, equXmtx(&exp, &sD));
 
     exp = .{ 4, 1, -7 };
@@ -10437,7 +10612,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
     try std.testing.expectEqual(true, b);
     prntNl();
     std.debug.print("XMTX: b:\n", .{});
-    prntXmtx(&sD, 1);
+    prntXmtxNl(&sD, 1);
     try std.testing.expectEqual(true, equXmtx(&exp, &sD));
 
     exp = .{ 0, 0, 0 };
@@ -10445,7 +10620,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
     try std.testing.expectEqual(true, b);
     prntNl();
     std.debug.print("XMTX: c:\n", .{});
-    prntXmtx(&sD, 1);
+    prntXmtxNl(&sD, 1);
     try std.testing.expectEqual(true, equXmtx(&exp, &sD));
 }
 
@@ -10517,7 +10692,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test" {
 
     prntNl();
     std.debug.print("XMTX: A:\n", .{});
-    prntXmtx(&idt2, 2);
+    prntXmtxNl(&idt2, 2);
 
     idt2 = .{ 1, 0, 0, 1 };
     sclr = 0.0;
@@ -10527,7 +10702,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test" {
 
     prntNl();
     std.debug.print("XMTX: B:\n", .{});
-    prntXmtx(&idt2, 2);
+    prntXmtxNl(&idt2, 2);
 
     sclr = 0.0;
     b = rdcXmtx(&C, 3, false, &tmp3, true, &idt3, 3, false, &sclr);
@@ -10536,7 +10711,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test" {
 
     prntNl();
     std.debug.print("XMTX: C:\n", .{});
-    prntXmtx(&idt3, 3);
+    prntXmtxNl(&idt3, 3);
 }
 
 test "XMTX: ELA - Larson, Edwards: 2.4 Example 3 test" {
@@ -10555,15 +10730,15 @@ test "XMTX: ELA - Larson, Edwards: 2.4 Example 3 test" {
 
     prntNl();
     std.debug.print("XMTX: A:\n", .{});
-    prntXmtx(&A, 3);
+    prntXmtxNl(&A, 3);
 
     prntNl();
     std.debug.print("XMTX: TMP3:\n", .{});
-    prntXmtx(&tmp3, 3);
+    prntXmtxNl(&tmp3, 3);
 
     prntNl();
     std.debug.print("XMTX: IDT3:\n", .{});
-    prntXmtx(&idt3, 3);
+    prntXmtxNl(&idt3, 3);
 }
 
 test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
@@ -10612,15 +10787,15 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: A:\n", .{});
-    prntXmtx(&A, 3);
+    prntXmtxNl(&A, 3);
 
     prntNl();
     std.debug.print("XMTX: TMP3:\n", .{});
-    prntXmtx(&tmp3, 3);
+    prntXmtxNl(&tmp3, 3);
 
     prntNl();
     std.debug.print("XMTX: IDT3:\n", .{});
-    prntXmtx(&idt3, 3);
+    prntXmtxNl(&idt3, 3);
 
     A = .{ 1, -2, 2, -1, 1, 3, 1, -1, -4 };
 
@@ -10630,11 +10805,11 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: W1:\n", .{});
-    prntXmtx(&w1, 3);
+    prntXmtxNl(&w1, 3);
 
     prntNl();
     std.debug.print("XMTX: ENC_W1:\n", .{});
-    prntXmtx(&eW1, 3);
+    prntXmtxNl(&eW1, 3);
 
     //Encode word 2
     b = tmsXmtx(&w2, 3, &A, 3, &eW2, 3);
@@ -10642,11 +10817,11 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: W2:\n", .{});
-    prntXmtx(&w2, 3);
+    prntXmtxNl(&w2, 3);
 
     prntNl();
     std.debug.print("XMTX: ENC_W2:\n", .{});
-    prntXmtx(&eW2, 3);
+    prntXmtxNl(&eW2, 3);
 
     //Encode word 3
     b = tmsXmtx(&w3, 3, &A, 3, &eW3, 3);
@@ -10654,11 +10829,11 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: W3:\n", .{});
-    prntXmtx(&w3, 3);
+    prntXmtxNl(&w3, 3);
 
     prntNl();
     std.debug.print("XMTX: ENC_W3:\n", .{});
-    prntXmtx(&eW3, 3);
+    prntXmtxNl(&eW3, 3);
 
     //Encode word 4
     b = tmsXmtx(&w4, 3, &A, 3, &eW4, 3);
@@ -10666,11 +10841,11 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: W4:\n", .{});
-    prntXmtx(&w4, 3);
+    prntXmtxNl(&w4, 3);
 
     prntNl();
     std.debug.print("XMTX: ENC_W4:\n", .{});
-    prntXmtx(&eW4, 3);
+    prntXmtxNl(&eW4, 3);
 
     //Encode word 5
     b = tmsXmtx(&w5, 3, &A, 3, &eW5, 3);
@@ -10678,11 +10853,11 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: W5:\n", .{});
-    prntXmtx(&w5, 3);
+    prntXmtxNl(&w5, 3);
 
     prntNl();
     std.debug.print("XMTX: ENC_W5:\n", .{});
-    prntXmtx(&eW5, 3);
+    prntXmtxNl(&eW5, 3);
 
     //Decode word 1
     b = tmsXmtx(&eW1, 3, &idt3, 3, &cW1, 3);
@@ -10690,7 +10865,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: DEC_W1:\n", .{});
-    prntXmtx(&cW1, 3);
+    prntXmtxNl(&cW1, 3);
 
     //Decode word 2
     b = tmsXmtx(&eW2, 3, &idt3, 3, &cW2, 3);
@@ -10698,7 +10873,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: DEC_W2:\n", .{});
-    prntXmtx(&cW2, 3);
+    prntXmtxNl(&cW2, 3);
 
     //Decode word 3
     b = tmsXmtx(&eW3, 3, &idt3, 3, &cW3, 3);
@@ -10706,7 +10881,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: DEC_W3:\n", .{});
-    prntXmtx(&cW3, 3);
+    prntXmtxNl(&cW3, 3);
 
     //Decode word 4
     b = tmsXmtx(&eW4, 3, &idt3, 3, &cW4, 3);
@@ -10714,7 +10889,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: DEC_W4:\n", .{});
-    prntXmtx(&cW4, 3);
+    prntXmtxNl(&cW4, 3);
 
     //Decode word 5
     b = tmsXmtx(&eW5, 3, &idt3, 3, &cW5, 3);
@@ -10722,7 +10897,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     prntNl();
     std.debug.print("XMTX: DEC_W5:\n", .{});
-    prntXmtx(&cW5, 3);
+    prntXmtxNl(&cW5, 3);
 
     try std.testing.expectEqual(true, equXmtx(&w1, &cW1));
     try std.testing.expectEqual(true, equXmtx(&w2, &cW2));
@@ -10950,10 +11125,10 @@ test "XMTX: ELA - Larson, Edwards: 3.1 Example 1, 2, 3, 4, 5 test" {
             try std.testing.expectEqual(true, b);
 
             std.debug.print("XMTX: B:\n", .{});
-            prntXmtx(&B, cols);
+            prntXmtxNl(&B, cols);
 
             std.debug.print("XMTX: retB:\n", .{});
-            prntXmtx(&retB, 2);
+            prntXmtxNl(&retB, 2);
 
             cofB[(row * cols) + col] = detXmtx2(&retB) * cofSign[(row * cols) + col];
             std.debug.print("Sign: {} Val: {}\n", .{ cofSign[(row * cols) + col], cofB[(row * cols) + col] });
@@ -11049,7 +11224,7 @@ test "XMTX: ELA - Larson, Edwards: 3.1 Problem 13, 15 test" {
             //prntXmtx(&B, 3);
 
             std.debug.print("XMTX: retB:\n", .{});
-            prntXmtx(&retB, 2);
+            prntXmtxNl(&retB, 2);
 
             cofB[(row * cols) + col] = detXmtx1(&retB) * cofSignB[(row * cols) + col];
             std.debug.print("SignB: {} Val: {}\n", .{ cofSignB[(row * cols) + col], cofB[(row * cols) + col] });
@@ -11086,7 +11261,7 @@ test "XMTX: ELA - Larson, Edwards: 3.1 Problem 13, 15 test" {
             //prntXmtx(&C, 3);
 
             std.debug.print("XMTX: retC:\n", .{});
-            prntXmtx(&retC, 2);
+            prntXmtxNl(&retC, 2);
 
             cofC[(row * cols) + col] = detXmtx2(&retC) * cofSignC[(row * cols) + col];
             std.debug.print("SignC: {} Val: {}\n", .{ cofSignC[(row * cols) + col], cofC[(row * cols) + col] });
@@ -11156,7 +11331,7 @@ test "XMTX: ELA - Larson, Edwards: 3.2 Example 1, 2, 3 test" {
     b = rdcXmtx(&G, 3, false, &retG, true, &idtG, 3, true, &sclr);
     try std.testing.expectEqual(true, b);
     var detG: f32 = detTriangXmtx(&retG, 3);
-    prntXmtx(&retG, 3);
+    prntXmtxNl(&retG, 3);
     std.debug.print("AAA STOP DetG: {}\n", .{detG * sclr});
     exp = -7.0; //CHECK THIS why is it 1.0 and not -7.0
     try std.testing.expectEqual(true, isEquF32(exp, (detG * sclr), true));
@@ -11364,7 +11539,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" {
     b = fndEigVal2(&mtx, &evs2);
     try std.testing.expectEqual(true, b);
     std.debug.print("Found Eigen Values:\n", .{});
-    prntXvec(&evs2.eignVals);
+    prntXvecNl(&evs2.eignVals);
     try std.testing.expectEqual(true, isEquF32(expEv1, evs2.eignVals[0], true));
     try std.testing.expectEqual(true, isEquF32(expEv2, evs2.eignVals[1], true));
 
@@ -11376,11 +11551,11 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" {
 
     adjA = adjXmtx3(&A);
     std.debug.print("Matrix A:\n", .{});
-    prntXmtx(&A, 3);
+    prntXmtxNl(&A, 3);
     std.debug.print("Matrix adjA:\n", .{});
-    prntXmtx(&adjA, 3);
+    prntXmtxNl(&adjA, 3);
     std.debug.print("Matrix Expected adjA:\n", .{});
-    prntXmtx(&expAdjA, 3);
+    prntXmtxNl(&expAdjA, 3);
     try std.testing.expectEqual(true, equXmtx(&adjA, &expAdjA));
 
     //Example 5: pg. 144
@@ -11397,7 +11572,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" {
     b = rslvCramersRule(&B, cols, &BA, colsA, &BAi, &Bret);
     try std.testing.expectEqual(true, b);
     std.debug.print("Found Cramer's Rule Return Values:\n", .{});
-    prntXvec(&Bret);
+    prntXvecNl(&Bret);
     try std.testing.expectEqual(true, isEquF32(expX1, Bret[0], true));
     try std.testing.expectEqual(true, isEquF32(expX2, Bret[1], true));
 }
@@ -11422,7 +11597,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Theorem 10 test" {
     try std.testing.expectEqual(true, equXmtx(&adjA, &expA));
 
     std.debug.print("Adjoint Matrix Test:\n", .{});
-    prntXmtx(&invA, 3);
+    prntXmtxNl(&invA, 3);
     try std.testing.expectEqual(true, equXmtx(&invA, &expInvA));
 }
 
@@ -11448,7 +11623,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Theorem 11 test" {
     const expZ: f32 = -8.0 / 5.0;
 
     std.debug.print("Cramer's Rule Return {} {} {}:\n", .{ expX, expY, expZ });
-    prntXvec(&ret);
+    prntXvecNl(&ret);
     prntNl();
     try std.testing.expectEqual(true, isEquF32(ret[0], expX, true));
     try std.testing.expectEqual(true, isEquF32(ret[1], expY, true));
@@ -11493,7 +11668,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     b = fndEigVal3(&A2, &evs2, &factors);
     try std.testing.expectEqual(true, b);
     std.debug.print("Problem 3: pg. 150 Eigen Values:\n", .{});
-    prntXvec(&evs2.eignVals);
+    prntXvecNl(&evs2.eignVals);
     try std.testing.expectEqual(true, isEquF32(l2, evs2.eignVals[1], true));
 
     //A2 * xi2 = l2 * xi2
@@ -11522,7 +11697,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     std.debug.print("Problem 5: pg. 150 a) Characteristic Equation:\n", .{});
     prntPolyExp(&evs3.polyExp);
     std.debug.print("Problem 5: pg. 150 b) Eigen Values:\n", .{});
-    prntXvec(&evs3.eignVals);
+    prntXvecNl(&evs3.eignVals);
     try std.testing.expectEqual(true, isEquF32(l3a, evs3.eignVals[0], true));
     try std.testing.expectEqual(true, isEquF32(l3b, evs3.eignVals[1], true));
 
@@ -11562,7 +11737,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     std.debug.print("Problem 7: pg. 150 a) Characteristic Equation:\n", .{});
     prntPolyExp(&evs4.polyExp);
     std.debug.print("Problem 7: pg. 150 b) Eigen Values:\n", .{});
-    prntXvec(&evs4.eignVals);
+    prntXvecNl(&evs4.eignVals);
     try std.testing.expectEqual(true, isEquF32(l4a, evs4.eignVals[0], true));
     try std.testing.expectEqual(true, isEquF32(l4b, evs4.eignVals[1], true));
 
@@ -11642,7 +11817,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 15, 17, 29, 31 test" {
     const expB: [2]f32 = .{ 1, 2 };
     b = rslvCramersRule(&B, colsB, &BA, colsBA, &BAi, &retB);
     std.debug.print("Problem 29: pg. 151 Values:\n", .{});
-    prntXvec(&retB);
+    prntXvecNl(&retB);
     try std.testing.expectEqual(true, isEquF32(expB[0], retB[0], true));
     try std.testing.expectEqual(true, isEquF32(expB[1], retB[1], true));
 
@@ -11660,7 +11835,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 15, 17, 29, 31 test" {
     const expC: [2]f32 = .{ 2, -2 };
     b = rslvCramersRule(&C, colsC, &CA, colsCA, &CAi, &retC);
     std.debug.print("Problem 31: pg. 151 Values:\n", .{});
-    prntXvec(&retC);
+    prntXvecNl(&retC);
     try std.testing.expectEqual(true, isEquF32(expC[0], retC[0], true));
     try std.testing.expectEqual(true, isEquF32(expC[1], retC[1], true));
 }
@@ -12086,7 +12261,7 @@ test "XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test" {
     b = rdcXmtx(&mtx, cols, hasAug, &ret, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
     try std.testing.expectEqual(true, b);
     std.debug.print("RdcMtx Result Example 8: {}\n", .{b});
-    prntXmtx(&ret, 4);
+    prntXmtxNl(&ret, 4);
     prntNl();
 
     //Example 9: pg. 192
@@ -12110,7 +12285,7 @@ test "XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test" {
     b = rdcXmtx(&mtx, cols, hasAug, &ret, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
     try std.testing.expectEqual(true, b);
     std.debug.print("RdcMtx Result Example 9: {}\n", .{b});
-    prntXmtx(&ret, 4);
+    prntXmtxNl(&ret, 4);
     prntNl();
 
     //Example 10: pg. 193
@@ -12138,7 +12313,7 @@ test "XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test" {
     b = rdcXmtx(&mtxB, cols, hasAug, &retB, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
     try std.testing.expectEqual(false, b);
     std.debug.print("RdcMtx Result Example 10: {}\n", .{b});
-    prntXmtx(&ret, 4);
+    prntXmtxNl(&ret, 4);
     prntNl();
 }
 
@@ -12166,13 +12341,13 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     b = chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 2 ret {}\n", .{b});
-    prntXmtx(&ret, cols);
+    prntXmtxNl(&ret, cols);
     prntNl();
     std.debug.print("4.7 Example 2 B\n", .{});
-    prntXmtx(&B, cols);
+    prntXmtxNl(&B, cols);
     prntNl();
     std.debug.print("4.7 Example 2 nvec\n", .{});
-    prntXmtx(&nvec, 1);
+    prntXmtxNl(&nvec, 1);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&exp, &nvec));
 
@@ -12205,13 +12380,13 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     b = chgXvecBasis(&vec3, &B3, cols3, true, &Bp3, colsp3, false, &idtMtx3, &ret3, &nvec3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 3 ret3 {}\n", .{b});
-    prntXmtx(&ret3, cols3);
+    prntXmtxNl(&ret3, cols3);
     prntNl();
     std.debug.print("4.7 Example 3 B3\n", .{});
-    prntXmtx(&B3, cols3);
+    prntXmtxNl(&B3, cols3);
     prntNl();
     std.debug.print("4.7 Example 3 nvec3\n", .{});
-    prntXmtx(&nvec3, 1);
+    prntXmtxNl(&nvec3, 1);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&exp3, &nvec3));
 
@@ -12238,13 +12413,13 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     b = getBasisCnvXmtx(&B3, cols3, &Bp3, colsp3, &ret3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 4 ret3 {}\n", .{b});
-    prntXmtx(&ret3, cols3);
+    prntXmtxNl(&ret3, cols3);
     prntNl();
     std.debug.print("4.7 Example 4 B3\n", .{});
-    prntXmtx(&B3, cols3);
+    prntXmtxNl(&B3, cols3);
     prntNl();
     std.debug.print("4.7 Example 4 nvec\n", .{});
-    prntXmtx(&nvec3, 1);
+    prntXmtxNl(&nvec3, 1);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&B3, &expB3));
 
@@ -12270,13 +12445,13 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 5 ret5 {}\n", .{b});
-    prntXmtx(&ret, cols);
+    prntXmtxNl(&ret, cols);
     prntNl();
     std.debug.print("4.7 Example 5 B\n", .{});
-    prntXmtx(&B, cols);
+    prntXmtxNl(&B, cols);
     prntNl();
     std.debug.print("4.7 Example 5 nvec\n", .{});
-    prntXmtx(&nvec, 1);
+    prntXmtxNl(&nvec, 1);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&B, &expB));
 }
@@ -12302,13 +12477,13 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     b = chgXvecBasis(&vec2, &B2, cols2, false, &Bp2, cols2, true, &idtMtx2, &ret2, &nvec2, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 1 ret2 {}\n", .{b});
-    prntXmtx(&ret2, cols2);
+    prntXmtxNl(&ret2, cols2);
     prntNl();
     std.debug.print("4.7 Problem 1 B2\n", .{});
-    prntXmtx(&B2, cols2);
+    prntXmtxNl(&B2, cols2);
     prntNl();
     std.debug.print("4.7 Problem 1 nvec2\n", .{});
-    prntXmtx(&nvec2, 1);
+    prntXmtxNl(&nvec2, 1);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&exp2, &nvec2));
 
@@ -12327,13 +12502,13 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     b = chgXvecBasis(&vec3, &B3, cols3, false, &Bp3, cols3, true, &idtMtx3, &ret3, &nvec3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 3 ret3 {}\n", .{b});
-    prntXmtx(&ret3, cols3);
+    prntXmtxNl(&ret3, cols3);
     prntNl();
     std.debug.print("4.7 Problem 3 B3\n", .{});
-    prntXmtx(&B3, cols3);
+    prntXmtxNl(&B3, cols3);
     prntNl();
     std.debug.print("4.7 Problem 3 nvec3\n", .{});
-    prntXmtx(&nvec3, 1);
+    prntXmtxNl(&nvec3, 1);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&exp3, &nvec3));
 
@@ -12352,13 +12527,13 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     b = chgXvecBasis(&vec4, &B4, cols4, false, &Bp4, cols4, true, &idtMtx4, &ret4, &nvec4, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 5 ret4 {}\n", .{b});
-    prntXmtx(&ret4, cols4);
+    prntXmtxNl(&ret4, cols4);
     prntNl();
     std.debug.print("4.7 Problem 5 B4\n", .{});
-    prntXmtx(&B4, cols4);
+    prntXmtxNl(&B4, cols4);
     prntNl();
     std.debug.print("4.7 Problem 5 nvec4\n", .{});
-    prntXmtx(&nvec4, 1);
+    prntXmtxNl(&nvec4, 1);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&exp4, &nvec4));
 }
