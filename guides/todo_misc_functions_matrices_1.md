@@ -8,35 +8,49 @@ There are a number of miscellaneous matrix functions that you can use for variou
     <li>Adjoint Functions</li>
     <li>adjXmtx3</li>
     <li>adjXmtx4</li>
-    <li><br></li>
+</ul>
+
+<ul>
     <li>Cofactor Functions</li>
     <li>cofXmtx</li>
     <li>cofXmtx3</li>
     <li>cofXmtx4</li>
-    <li><br></li>
+</ul>
+
+<ul>
     <li>Cofactor Sign Functions</li>    
     <li>cofXmtxSign</li>
     <li>cofXmtxSign2, cofXmtxSign2Ret</li>
     <li>cofXmtxSign3, cofXmtxSign3Ret</li>
     <li>cofXmtxSign4, cofXmtxSign4Ret</li>
-    <li><br></li>
+</ul>
+
+<ul>
     <li>Basis Functions</li>
     <li>getBasisCnvXmtx</li>
     <li>getBasisHndXmtx3, getBasisHndXmtx3Ret</li>
-    <li><br></li>
+</ul>
+
+<ul>
     <li>Other Functions</li>
     <li>fndLgstRowAbsXmtx</li>
     <li>getCramerSupportXmtx</li>
-    <li><br></li>
+</ul>
+
+<ul>
     <li>Matrix Processing</li>
     <li>idnfXmtx</li>
     <li>procXmtx</li>
-    <li><br></li>
+</ul>
+
+<ul>
     <li>Minor Functions</li>
     <li>mnrXmtx2, mnrXmtx2Ret</li>
     <li>mnrXmtx3, mnrXmtx3Ret</li>
     <li>mnrXmtx4, mnrXmtx4Ret</li>
-    <li><br></li>
+</ul>
+
+<ul>
     <li>Remove Row/Column Functions</li>    
     <li>rmvRowColXmtx3</li>
     <li>rmvRowColXmtx4</li>
@@ -194,6 +208,175 @@ A demonstration of using the direct, 3x3 matrix version of the function, <b>cofX
 
 <li>Basis Functions</li>
 <li>getBasisCnvXmtx</li>
+
+test "XMTX: getBasisCnvXmtx test" {
+    //B = {(1,0,0), (0, 1, 0), (0, 0, 1)};
+    //B' = {(1,0,1), (0, -1, 2), (2, 3, -5)};
+
+    //B = | 1  0  0|
+    //    | 0  1  0|
+    //    | 0  0  1|
+    const vbose: bool = false;
+    var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
+    var B: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    const cols: usize = 3;
+
+    //B' = | 1  0  2|
+    //     | 0 -1  3|
+    //     | 1  2 -5|
+    var Bp: [9]f32 = .{ 1, 0, 2, 0, -1, 3, 1, 2, -5 };
+    const colsp: usize = 3;
+    var b: bool = false;
+
+    b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
+    try std.testing.expectEqual(true, b);
+
+    std.debug.print("\ngetBasisCnvMtx test:getBasisCnvMtx ret {}", .{b});
+    prntXmtxNl(&ret, cols);
+    prntNl();
+
+    std.debug.print("\ngetBasisCnvMtx test:getBasisCnvMtx B", .{});
+    prntXmtxNl(&B, cols);
+    prntNl();
+
+    var exp: [9]f32 = .{ -1, 4, 2, 3, -7, -3, 1, -2, -1 };
+    try std.testing.expectEqual(true, equXmtx(&exp, &B));
+    prntNl();
+}
+
+
 <li>getBasisHndXmtx3, getBasisHndXmtx3Ret</li>
+
+test "XMTX: getBasisHndXmtx3 test" {
+    prntNlStr("XMTX: getBasisHndXmtx3 test");
+    var m1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
+    var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
+
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    try std.testing.expectEqual(expResHnd, resHnd);
+    m1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, -1 };
+    expResHnd = BASIS_HAND.LEFT;
+    resHnd = BASIS_HAND.ERROR_ZERO;
+
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    try std.testing.expectEqual(expResHnd, resHnd);
+    m1 = .{ 0, 0, 0, 0, 0, 0, 0, 0, -1 };
+    expResHnd = BASIS_HAND.ERROR_ZERO;
+    resHnd = BASIS_HAND.LEFT;
+
+    resHnd = getBasisHndXmtx3(&m1, 3);
+    try std.testing.expectEqual(expResHnd, resHnd);
+    prntNl();
+}
+
+<li>Other Functions</li>
+<li>fndLgstRowAbsXmtx</li>
+
+test "XMTX: fndLgstRowAbsXmtx test" {
+    var mtx: [12]f32 = .{ 1, -3, 21, -10, 3, 6, 7, -13, 5, 0, 0, 0 };
+    const exp: [9]usize = .{ 1, 1, 2, 2, 0, 1, 12, 12, 12 };
+
+    const v0: usize = fndLgstRowAbsXmtx(&mtx, 3, 0, 0);
+    if (v0 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v0", .{});
+    }
+
+    const v1: usize = fndLgstRowAbsXmtx(&mtx, 3, 0, 1);
+    if (v1 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v1", .{});
+    }
+
+    const v2: usize = fndLgstRowAbsXmtx(&mtx, 3, 1, 0);
+    if (v2 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v2", .{});
+    }
+
+    const v3: usize = fndLgstRowAbsXmtx(&mtx, 3, 1, 1);
+    if (v3 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v3", .{});
+    }
+
+    const v4: usize = fndLgstRowAbsXmtx(&mtx, 3, 2, 0);
+    if (v4 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v4", .{});
+    }
+
+    const v5: usize = fndLgstRowAbsXmtx(&mtx, 3, 2, 1);
+    if (v5 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v5", .{});
+    }
+
+    const v6: usize = fndLgstRowAbsXmtx(&mtx, 3, 3, 0);
+    if (v6 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v6", .{});
+    }
+
+    const v7: usize = fndLgstRowAbsXmtx(&mtx, 3, 3, 1);
+    if (v7 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v7", .{});
+    }
+
+    const v8: usize = fndLgstRowAbsXmtx(&mtx, 3, 3, 2);
+    if (v8 >= mtx.len) {
+        std.debug.print("\nNo matching row found, v8", .{});
+    }
+
+    std.debug.print("\nv0: {} v1: {} v2: {} v3: {} v4: {} v5: {} v6: {} v7: {} v8: {}", .{ v0, v1, v2, v3, v4, v5, v6, v7, v8 });
+    try std.testing.expectEqual(exp[0], v0);
+    try std.testing.expectEqual(exp[1], v1);
+    try std.testing.expectEqual(exp[2], v2);
+    try std.testing.expectEqual(exp[3], v3);
+    try std.testing.expectEqual(exp[4], v4);
+    try std.testing.expectEqual(exp[5], v5);
+    try std.testing.expectEqual(exp[6], v6);
+    try std.testing.expectEqual(exp[7], v7);
+    try std.testing.expectEqual(exp[8], v8);
+    prntNl();
+}
+
+<li>getCramerSupportXmtx</li>
+
+test "XMTX: getCramerSupportMtx test" {
+    //A = -1  2 -3  1
+    //     2  0  1  0
+    //     3 -4  4  2
+    var A: [12]f32 = .{ -1, 2, -3, 1, 2, 0, 1, 0, 3, -4, 4, 2 };
+    var A1: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    var b: bool = false;
+    const cols: usize = 4;
+    const srcCol: usize = 3;
+    var dstCol: usize = 0;
+    var expA1: [9]f32 = .{ 1, 2, -3, 0, 0, 1, 2, -4, 4 };
+
+    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
+    std.debug.print("\nMatrix A{}:", .{dstCol});
+    prntXmtxNl(&A1, 3);
+    std.debug.print("\nMatrix Exp A{}:", .{dstCol});
+    prntXmtxNl(&expA1, 3);
+    try std.testing.expectEqual(true, b);
+    try std.testing.expectEqual(true, equXmtx(&A1, &expA1));
+    dstCol = 1;
+    var expA2: [9]f32 = .{ -1, 1, -3, 2, 0, 1, 3, 2, 4 };
+
+    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
+    std.debug.print("\nMatrix A{}:", .{dstCol});
+    prntXmtxNl(&A1, 3);
+    std.debug.print("\nMatrix Exp A{}:", .{dstCol});
+    prntXmtxNl(&expA1, 3);
+    try std.testing.expectEqual(true, b);
+    try std.testing.expectEqual(true, equXmtx(&A1, &expA2));
+    dstCol = 2;
+    var expA3: [9]f32 = .{ -1, 2, 1, 2, 0, 0, 3, -4, 2 };
+
+    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
+    std.debug.print("\nMatrix A{}:", .{dstCol});
+    prntXmtxNl(&A1, 3);
+    std.debug.print("\nMatrix Exp A{}:", .{dstCol});
+    prntXmtxNl(&expA1, 3);
+    try std.testing.expectEqual(true, b);
+    try std.testing.expectEqual(true, equXmtx(&A1, &expA3));
+    prntNl();
+}
 
 -->
