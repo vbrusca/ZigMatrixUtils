@@ -1,4 +1,4 @@
-# Miscellaneous Methods for Vectors
+# Miscellaneous Functions for Vectors
 
 There are a few vector based miscellaneous function that you can use for various calculations. The functions are as follows.
 
