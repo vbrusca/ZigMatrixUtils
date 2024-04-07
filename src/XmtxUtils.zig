@@ -3130,64 +3130,120 @@ test "XMTX: isLinIndXvec test" {
 ///
 ///  mtx = The matrix to use to test for linear independence.
 ///
-///  cols = The number of columns in the matrix, mtx.
+///  cols = The number of columns in the matrix, mtx, and the vectors vecL and vecR.
+///
+///  alloc = The memory allocator used to create vectors to hold the left and right comparison of matrix rows.
 ///
 ///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors.
 ///
-pub fn isLinIndXmtx(mtx: []f32, cols: usize) bool {
+pub fn isLinIndXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) bool {
+    var vecL: []f32 = undefined;
+    var vecR: []f32 = undefined;
+
+    vecL = crtXvec(cols, alloc) catch |err| {
+        std.debug.print("\nisLinIndXmtx: Error creating new vector vecL: {}", .{err});
+        return false;
+    };
+
+    vecR = crtXvec(cols, alloc) catch |err| {
+        std.debug.print("\nisLinIndXmtx: Error creating new vector vecR: {}", .{err});
+        alloc.*.free(vecL);
+        return false;
+    };
+
+    const b: bool = isLinIndXmtxRef(mtx, vecL, vecR, cols);
+
+    alloc.free(vecL);
+    alloc.free(vecR);
+    return b;
+}
+
+test "XMTX: isLinIndXmtx test" {
+    const alloc: std.mem.Allocator = std.testing.allocator;
+    var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var b: bool = false;
+
+    const start = try Instant.now();
+    b = isLinIndXmtx(&mtx, 3, &alloc);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+    prntNl();
+}
+
+///Returns true if the vectors of the given matrix, mtx, are linearly independent when tested in series.
+///
+///  mtx = The matrix to use to test for linear independence.
+///
+///  vecL = The vector that holds the left comparison row.
+///
+///  vecR = The vector that holds the right comparison row.
+///
+///  cols = The number of columns in the matrix, mtx, and the vectors vecL and vecR.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors.
+///
+pub fn isLinIndXmtxRef(mtx: []f32, vecL: []f32, vecR: []f32, cols: usize) bool {
     const llen: usize = mtx.len;
     const rows: usize = llen / cols;
     var i: usize = 0;
-    var vecZ: [128]f32 = std.mem.zeroes([128]f32);
-    var vecL: []f32 = undefined;
-    var vecR: []f32 = undefined;
     var vecLset: bool = false;
     var vecRset: bool = false;
     var lind: bool = false;
 
     while (i < rows) {
         if (vecLset == false) {
-            vecL = vecZ[(i * cols)..((i * cols) + cols)];
             cpyLessColRowXmtx(mtx, vecL, 0, cols, i, i + 1, cols, cols);
             vecLset = true;
         } else if (vecRset == false) {
-            vecR = vecZ[(i * cols)..((i * cols) + cols)];
             cpyLessColRowXmtx(mtx, vecR, 0, cols, i, i + 1, cols, cols);
             vecRset = true;
         }
 
         if (vecLset and vecRset) {
+            if (VERBOSE) {
+                prntNlStr("\nisLinIndXmtx: Compare L and R:");
+                prntXvecNl(vecL);
+                prntNl();
+                prntXvecNl(vecR);
+                prntNl();
+            }
+
             lind = isLinIndXvec(vecL, vecR);
+            if (!lind) {
+                return false;
+            } else if (lind) {
+                cpyXvec(vecR, vecL);
+                clrXvec(vecR);
+                vecLset = true;
+                vecRset = false;
+            }
         } else {
             lind = false;
         }
 
-        if (vecLset and vecRset) {
-            if (!lind) {
-                return false;
-            } else if (lind) {
-                vecL = vecR;
-                vecLset = true;
-                vecR = undefined;
-                vecRset = false;
-            }
-        }
-
         i += 1;
     }
+
     return true;
 }
 
-test "XMTX: isLinIndXmtx test" {
+test "XMTX: isLinIndXmtxRef test" {
     var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var vecL: [3]f32 = .{ 0, 0, 0 };
+    var vecR: [3]f32 = .{ 0, 0, 0 };
+    const cols: usize = 3;
     var b: bool = false;
 
     const start = try Instant.now();
-    b = isLinIndXmtx(&mtx, 3);
+    b = isLinIndXmtxRef(&mtx, &vecL, &vecR, cols);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
-    std.debug.print("\nisLinIndXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
-    addExecTime("isLinIndXmtx", elapsed1);
+    std.debug.print("\nisLinIndXmtxRef: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXmtxRef", elapsed1);
 
     try std.testing.expectEqual(true, b);
     prntNl();

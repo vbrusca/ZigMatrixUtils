@@ -129,18 +129,18 @@ To determine if a matrix is the identity matrix use the <b>isIdtXmtx</b> functio
 18 prntNl();
 </pre>
 
-To determine if a pair of vectors is linealy independent you can use the <b>isLinIndXmtx</b> function which returns a Boolean indicating if the vectors of the matrix, when compared in order 2 at a time, are linearly independent.
+To determine if a pair of vectors is linealy independent you can use the <b>isLinIndXmtx</b> function which returns a Boolean indicating if the vectors of the matrix, when compared in order 2 at a time, are linearly independent. The version of the function shown below will allocate the memory necessary for the vecL and vecR comparison vectors.
 
 <!-- //"XMTX: isLinIndXmtx test" -->
 <pre>
-01 var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-02 var b: bool = false;
-03 
-04 b = isLinIndXmtx(&mtx, 3);
-05 try std.testing.expectEqual(true, b);
-06 prntNl();
+01 const alloc: std.mem.Allocator = std.testing.allocator;
+02 var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+03 var b: bool = false;
+04 
+05 b = isLinIndXmtx(&mtx, 3, &alloc);
+06 try std.testing.expectEqual(true, b);
+07 prntNl();
 </pre>
-<!-- //TODO: implement this test -->
 
 To determine if a matrix is orthogonal use the <b>isOrthXmtx</b> function. This function returns a Boolean value indicating if the <b>mtx</b> argument is an orthogonal matrix. The function takes the following arguments.
 
