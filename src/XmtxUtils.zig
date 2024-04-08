@@ -8281,7 +8281,6 @@ pub fn getBasisHndXmtx3(mtx: *const [9]f32, cols: usize) BASIS_HAND {
 }
 
 test "XMTX: getBasisHndXmtx3 test" {
-    prntNlStr("XMTX: getBasisHndXmtx3 test");
     var m1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     var expResHnd: BASIS_HAND = BASIS_HAND.RIGHT;
     var resHnd: BASIS_HAND = BASIS_HAND.ERROR_ZERO;
@@ -8375,7 +8374,7 @@ test "XMTX: getBasisHndXmtx3Ret test" {
     prntNl();
 }
 
-//TODO DOCS
+//TODO docs
 pub fn isRghtHandedXmtx3(mtx: *const [9]f32, cols: usize) bool {
     if (getBasisHndXmtx3(mtx, cols) == BASIS_HAND.RIGHT) {
         return true;
@@ -8383,8 +8382,9 @@ pub fn isRghtHandedXmtx3(mtx: *const [9]f32, cols: usize) bool {
     return false;
 }
 
-//TODO TEST
+//TODO tests
 
+//TODO docs
 fn cmpFncName(a: []const u8, b: []const u8) f32 {
     const alen = a.len;
     const blen = b.len;
@@ -8414,6 +8414,8 @@ fn cmpFncName(a: []const u8, b: []const u8) f32 {
         return 0;
     }
 }
+
+//TODO tests
 
 test "XMTX: sortExecTimeList process" {
     //collapse exec time entries into a string hashmap
