@@ -29,13 +29,13 @@ You can run the unit tests from inside the project with the following command.<b
 <pre>
 zig test ./src/XmtxUtils.zig
 </pre>
-There are over 180 test ran to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on certain terminals.
+There are over 180 test ran to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on DOS terminals.
 <pre>
 zig test ./src/XmtxUtils.zig > all_test_output.txt 2>&1
 </pre>
 
 ## Project Build Commands
-How to build an exe (NOT USED).
+How to build an exe (NOT USED). There is no real main code for this librar currently.
 <pre>
 zig build-exe -femit-docs ./src/main.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/bin/main.exe"
 </pre>
@@ -58,7 +58,7 @@ zig build-lib -femit-docs ./src/XmtxUtils.zig -lc -dynamic -isystem -fstrip -fsi
 ## Guides
 
 You can look into specific use cases for the library in the "Guides" section.
-**Please note that the guides may be slightly out of sync with regard to the latest version of the library as it develops. Those gaps will be closed periodically over time and as a better way of tracking the guides associated with code changes evolves.
+**Please note that the guides may be slightly out of sync with regard to the latest version of the library as it develops. Those gaps will be closed periodically over time and as a better way of tracking the guides associated with code changes evolves. The guides associate library functions with vector and matrix actions etc. You can use them as a loose example of how to use the library.
 
 [Guides](https://github.com/vbrusca/ZigMatrixUtils/tree/main/guides)
 
