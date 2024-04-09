@@ -4950,16 +4950,19 @@ test "XMTX: prntNlStr test" {
 }
 
 ///Prints a new line followed by the given string formatted with the given args.
-pub fn prntNlStrArgs(comptime s: []const u8, args: anytype) !void {
+pub fn prntNlStrArgs(comptime s: []const u8, args: anytype) void {
     const test_allocator = std.testing.allocator;
-    const str = try std.fmt.allocPrint(test_allocator, s, args);
+    const str = std.fmt.allocPrint(test_allocator, s, args) catch |err| {
+        std.debug.print("prntNlStrArgs: Exception caught: {}", .{err});
+        return;
+    };
     std.debug.print("\n {s}", .{str});
     test_allocator.free(str);
 }
 
 test "XMTX: prntNlStrArgs test" {
     const start = try Instant.now();
-    try prntNlStrArgs("prntNlStrArgs: {}", .{0});
+    prntNlStrArgs("prntNlStrArgs: {}", .{0});
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nprntNlStrArgs: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8407,7 +8410,7 @@ pub fn isRghtHandedXmtx3(mtx: *const [9]f32, cols: usize) bool {
 ///
 ///  return = A number indicating the alphabetical relationship between the two strings.
 ///
-fn cmpFncName(a: []const u8, b: []const u8) f32 {
+pub fn cmpFncName(a: []const u8, b: []const u8) f32 {
     const alen = a.len;
     const blen = b.len;
     var l: usize = 0;
@@ -8439,6 +8442,87 @@ fn cmpFncName(a: []const u8, b: []const u8) f32 {
 
 //TODO tests
 
+//TODO docs
+pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) bool {
+    if (u == null or v == null or w == null) {
+        prntNlStrArgs("isInrPrdctSpc: test -1 u, v, and w can't be null.", .{});
+        return false;
+    }
+
+    if (u.len != v.len or u.len != w.len or v.len != w.len) {
+        prntNlStrArgs("isInrPrdctSpc: test 0 u, v, and w must have the same number of components.", .{});
+        return false;
+    }
+
+    const v1: f32 = inrPrdct(u, v, prdct);
+    const v2: f32 = inrPrdct(v, u, prdct);
+    if (v1 != v2) {
+        prntNlStrArgs("isInrPrdctSpc: test 1 (<u,v> = <v,u>) failed {} != {}", .{ v1, v2 });
+        return false;
+    }
+
+    const t: []f32 = alloc.*.alloc(f32, u.len);
+    cpyXvec(w, t);
+    sum2Xvec(t, v, w);
+
+    const v3: f32 = inrPrdct(u, t, prdct);
+    const v4: f32 = inrPrdct(u, w, prdct);
+    const v5: f32 = (v1 + v4);
+
+    if (v3 != v5) {
+        prntNlStrArgs("isInrPrdctSpc: test 2 (<u, v+w> = <u,v> + <u,w>) failed {} != {}", .{ v3, v5 });
+        return false;
+    }
+
+    clrXvec(t);
+    cpyXvec(u, t);
+    mulXvec(t, c);
+    const v6: f32 = (c * v1);
+    const v7: f32 = inrPrdct(t, v, prdct);
+
+    if (v6 != v7) {
+        prntNlStrArgs("isInrPrdctSpc: test 3 (c<u,v> = <cu,v>) failed {} != {}", .{ v6, v7 });
+        return false;
+    }
+
+    const v8: f32 = inrPrdct(v, v, prdct);
+    clrXvec(t);
+    const v9: f32 = inrPrdct(t, t, prdct);
+
+    if (v8 < 0) {
+        prntNlStrArgs("isInrPrdctSpc: test 4 (<v,v> > 0) failed {} != {}", .{ v8, 0 });
+        return false;
+    }
+
+    if (v9 != 0) {
+        prntNlStrArgs("isInrPrdctSpc: test 5 (<v,v> = 0 iff v = 0) failed {} != {}", .{ v9, 0 });
+        return false;
+    }
+
+    return true;
+}
+
+//TODO tests
+
+///Calculates the general inner product given vectors u, v, and a function pointer prdt.
+///
+///  u = A vector used to calculate the inner product space.
+///
+///  v = A vector used to calculate the inner product space.
+///
+///  prdct = A function that takes two vector arguments and returns an f32 value.
+///
+///  returns = A f32 value that is the calculated general innter product space for the given vectors u and v.
+///
+pub fn inrPrdct(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32) f32 {
+    return prdct(u, v);
+}
+
+//TODO tests
+
+//TODO finish docs and unit tests
+
+//Compile function execution summary
 test "XMTX: sortExecTimeList process" {
     //collapse exec time entries into a string hashmap
     var t1: ?ExecTime = null;
@@ -8473,7 +8557,7 @@ test "XMTX: sortExecTimeList process" {
             .fncAvg = execTime.value_ptr.*.fncAvg,
         };
         klen += 1;
-        //try prntNlStrArgs("MapList: {s}: {} {d:.3}ms {d:.3}ns", .{ execTime.key_ptr.*, execTime.value_ptr.*.fncCnt, execTime.value_ptr.*.fncAvg / time.ns_per_ms, execTime.value_ptr.*.fncAvg });
+        //prntNlStrArgs("MapList: {s}: {} {d:.3}ms {d:.3}ns", .{ execTime.key_ptr.*, execTime.value_ptr.*.fncCnt, execTime.value_ptr.*.fncAvg / time.ns_per_ms, execTime.value_ptr.*.fncAvg });
     }
     prntNl();
 
@@ -8484,9 +8568,9 @@ test "XMTX: sortExecTimeList process" {
     //const aa1: f32 = cmpFncName(tt1, tt2);
     //const aa2: f32 = cmpFncName(tt1, tt3);
     //const aa3: f32 = cmpFncName(tt3, tt1);
-    //try prntNlStrArgs("Answer1: {}", .{aa1});
-    //try prntNlStrArgs("Answer2: {}", .{aa2});
-    //try prntNlStrArgs("Answer3: {}", .{aa3});
+    //prntNlStrArgs("Answer1: {}", .{aa1});
+    //prntNlStrArgs("Answer2: {}", .{aa2});
+    //prntNlStrArgs("Answer3: {}", .{aa3});
 
     //sot exec times
     const n: usize = klen;
@@ -8505,7 +8589,7 @@ test "XMTX: sortExecTimeList process" {
     //List exec times
     prntNlStr("Function Execution Times List:");
     for (0..klen) |i| {
-        try prntNlStrArgs("{s}:\tCount: {}\tAvg: {d:.3}ms {d:.3}ns", .{ keys[i].fncName, keys[i].fncCnt, keys[i].fncAvg / time.ns_per_ms, keys[i].fncAvg });
+        prntNlStrArgs("{s}:\tCount: {}\tAvg: {d:.3}ms {d:.3}ns", .{ keys[i].fncName, keys[i].fncCnt, keys[i].fncAvg / time.ns_per_ms, keys[i].fncAvg });
     }
     prntNl();
 
@@ -8513,7 +8597,7 @@ test "XMTX: sortExecTimeList process" {
     //var avg: f64 = 0.0;
     //var cnt: f64 = 1.0;
     //var crntFncName: []u8 = @constCast(execTimes[0].fncName);
-    //try prntNlStrArgs("{s}: {d:.3}ms {d:.3}ns", .{ execTimes[0].fncName, execTimes[0].fncTime / time.ns_per_ms, execTimes[0].fncTime });
+    //prntNlStrArgs("{s}: {d:.3}ms {d:.3}ns", .{ execTimes[0].fncName, execTimes[0].fncTime / time.ns_per_ms, execTimes[0].fncTime });
     //for (1..execTimesCnt) |i| {
     //    const execTime = execTimes[i];
     //    if (eqlFncName(execTime.fncName, crntFncName)) {
@@ -8521,14 +8605,14 @@ test "XMTX: sortExecTimeList process" {
     //        cnt += 1.0;
     //    } else {
     //        avg = sum / cnt;
-    //        try prntNlStrArgs("AVG: {s}: {} {d:.3}ms {d:.3}ns", .{ crntFncName, cnt, avg / time.ns_per_ms, avg });
+    //        prntNlStrArgs("AVG: {s}: {} {d:.3}ms {d:.3}ns", .{ crntFncName, cnt, avg / time.ns_per_ms, avg });
     //
     //        crntFncName = @constCast(execTime.fncName);
     //        sum = execTime.fncTime;
     //        cnt = 1.0;
     //        avg = 0.0;
     //    }
-    //    try prntNlStrArgs("{s}: {d:.3}ms {d:.3}ns", .{ execTime.fncName, execTime.fncTime / time.ns_per_ms, execTime.fncTime });
+    //    prntNlStrArgs("{s}: {d:.3}ms {d:.3}ns", .{ execTime.fncName, execTime.fncTime / time.ns_per_ms, execTime.fncTime });
     //}
 }
 
