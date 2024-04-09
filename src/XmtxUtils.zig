@@ -3190,42 +3190,50 @@ pub fn isLinIndXmtxRef(mtx: []f32, vecL: []f32, vecR: []f32, cols: usize) bool {
     const llen: usize = mtx.len;
     const rows: usize = llen / cols;
     var i: usize = 0;
+    var j: i64 = -1;
     var vecLset: bool = false;
     var vecRset: bool = false;
     var lind: bool = false;
 
-    while (i < rows) {
-        if (vecLset == false) {
-            cpyLessColRowXmtx(mtx, vecL, 0, cols, i, i + 1, cols, cols);
-            vecLset = true;
-        } else if (vecRset == false) {
-            cpyLessColRowXmtx(mtx, vecR, 0, cols, i, i + 1, cols, cols);
-            vecRset = true;
-        }
+    while (j < (rows - 1)) {
+        i = @as(usize, @intCast((j + 1)));
+        vecLset = false;
+        vecRset = false;
 
-        if (vecLset and vecRset) {
-            if (VERBOSE) {
+        while (i < (rows - 1)) {
+            if (vecLset == false) {
+                cpyLessColRowXmtx(mtx, vecL, 0, cols, i, i + 1, cols, cols);
+                vecLset = true;
+            } else if (vecRset == false) {
+                cpyLessColRowXmtx(mtx, vecR, 0, cols, i, i + 1, cols, cols);
+                vecRset = true;
+            }
+
+            if (vecLset and vecRset) {
+                //if (VERBOSE) {
                 prntNlStr("\nisLinIndXmtx: Compare L and R:");
                 prntXvecNl(vecL);
                 prntNl();
                 prntXvecNl(vecR);
                 prntNl();
+                //}
+
+                lind = isLinIndXvec(vecL, vecR);
+                if (!lind) {
+                    return false;
+                } else if (lind) {
+                    cpyXvec(vecR, vecL);
+                    clrXvec(vecR);
+                    vecLset = true;
+                    vecRset = false;
+                }
+            } else {
+                lind = false;
             }
 
-            lind = isLinIndXvec(vecL, vecR);
-            if (!lind) {
-                return false;
-            } else if (lind) {
-                cpyXvec(vecR, vecL);
-                clrXvec(vecR);
-                vecLset = true;
-                vecRset = false;
-            }
-        } else {
-            lind = false;
+            i += 1;
         }
-
-        i += 1;
+        j += 1;
     }
 
     return true;
@@ -8374,7 +8382,14 @@ test "XMTX: getBasisHndXmtx3Ret test" {
     prntNl();
 }
 
-//TODO docs
+///Returns a Boolean indicating if a 3x3 matrix is right handed or not.
+///
+///  mtx = The matrix to check handedness for.
+///
+///  cols = The numbers of columns in mtx.
+///
+///  returns = A Boolean indicating if mtx is right handed.
+///
 pub fn isRghtHandedXmtx3(mtx: *const [9]f32, cols: usize) bool {
     if (getBasisHndXmtx3(mtx, cols) == BASIS_HAND.RIGHT) {
         return true;
@@ -8384,7 +8399,14 @@ pub fn isRghtHandedXmtx3(mtx: *const [9]f32, cols: usize) bool {
 
 //TODO tests
 
-//TODO docs
+///Compares two function names, []const u8, and returns a number indicating their alphabetical relationship, -1 if a < b, 0 if a = b, 1 if a > b.
+///
+///  a = The left-hand function name to compare.
+///
+///  b = The right-hand function name to compare.
+///
+///  return = A number indicating the alphabetical relationship between the two strings.
+///
 fn cmpFncName(a: []const u8, b: []const u8) f32 {
     const alen = a.len;
     const blen = b.len;
