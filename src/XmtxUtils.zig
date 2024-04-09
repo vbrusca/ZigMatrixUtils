@@ -8442,7 +8442,20 @@ pub fn cmpFncName(a: []const u8, b: []const u8) f32 {
 
 //TODO tests
 
-//TODO docs
+///Determines if the vectors u, v, and w are members of a general inner product space.
+///
+///  u = A vector used to determine if there's an inner product space.
+///
+///  v = A vector used to determine if there's an inner product space.
+///
+///  w = A vector used to determine if there's an inner product space.
+///
+///  c = A scalar used to determine if there's an inner product space.
+///
+///  prdct = A function that takes two vector arguments and returns an f32 value.
+///
+///  returns = A Boolean value indicating that prdct creates an inner product space.
+///
 pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) bool {
     if (u == null or v == null or w == null) {
         prntNlStrArgs("isInrPrdctSpc: test -1 u, v, and w can't be null.", .{});
@@ -8504,7 +8517,7 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
 
 //TODO tests
 
-///Calculates the general inner product given vectors u, v, and a function pointer prdt.
+///Calculates the general inner product given vectors u, v, and a function pointer, prdct.
 ///
 ///  u = A vector used to calculate the inner product space.
 ///
