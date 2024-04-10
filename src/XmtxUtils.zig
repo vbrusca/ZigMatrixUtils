@@ -716,7 +716,7 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     try std.testing.expectEqual(pexp[1], retPoly2Exp[1]);
     try std.testing.expectEqual(pexp[2], retPoly2Exp[2]);
 
-    //TODO
+    //TODO: add more tests
     //Possible second test
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
 
@@ -763,7 +763,7 @@ test "XMTX: synthDivPoly1IntoPoly3Ret test" {
     try std.testing.expectEqual(pexp[1], retPoly2Exp[1]);
     try std.testing.expectEqual(pexp[2], retPoly2Exp[2]);
 
-    //TODO
+    //TODO: add more tests
     //Possible second test
     //(x + 2) div 3, 1, 1, -5 result => 3, -5, 11, -27
 
@@ -3210,13 +3210,13 @@ pub fn isLinIndXmtxRef(mtx: []f32, vecL: []f32, vecR: []f32, cols: usize) bool {
             }
 
             if (vecLset and vecRset) {
-                //if (VERBOSE) {
-                prntNlStr("\nisLinIndXmtx: Compare L and R:");
-                prntXvecNl(vecL);
-                prntNl();
-                prntXvecNl(vecR);
-                prntNl();
-                //}
+                if (VERBOSE) {
+                    prntNlStr("\nisLinIndXmtx: Compare L and R:");
+                    prntXvecNl(vecL);
+                    prntNl();
+                    prntXvecNl(vecR);
+                    prntNl();
+                }
 
                 lind = isLinIndXvec(vecL, vecR);
                 if (!lind) {
@@ -7625,7 +7625,7 @@ test "XMTX: getInvFromDet4 test" {
     try std.testing.expectEqual(true, equXmtx(&expMtx, &ret));
     prntNl();
 
-    //TODO ADD MORE TESTS
+    //TODO: add more tests
 }
 
 ///Creates a Cramer's Rule support matrix based on the provided augmented matrix, mtx, and other arguments.
@@ -8400,7 +8400,45 @@ pub fn isRghtHandedXmtx3(mtx: *const [9]f32, cols: usize) bool {
     return false;
 }
 
-//TODO tests
+test "XMTX: isRghtHandedXmtx3 test" {
+    var m1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var expResHnd: bool = true;
+    var resHnd: bool = false;
+
+    var start = try Instant.now();
+    resHnd = isRghtHandedXmtx3(&m1, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisRghtHandedXmtx3 #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isRghtHandedXmtx3", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
+    m1 = .{ 1, 0, 0, 0, 1, 0, 0, 0, -1 };
+    expResHnd = false;
+    resHnd = false;
+
+    start = try Instant.now();
+    resHnd = isRghtHandedXmtx3(&m1, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisRghtHandedXmtx3 #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isRghtHandedXmtx3", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
+    m1 = .{ 0, 0, 0, 0, 0, 0, 0, 0, -1 };
+    expResHnd = false;
+    resHnd = false;
+
+    start = try Instant.now();
+    resHnd = isRghtHandedXmtx3(&m1, 3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisRghtHandedXmtx3 #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isRghtHandedXmtx3", elapsed1);
+
+    try std.testing.expectEqual(expResHnd, resHnd);
+    prntNl();
+}
 
 ///Compares two function names, []const u8, and returns a number indicating their alphabetical relationship, -1 if a < b, 0 if a = b, 1 if a > b.
 ///
@@ -8440,7 +8478,30 @@ pub fn cmpFncName(a: []const u8, b: []const u8) f32 {
     }
 }
 
-//TODO tests
+test "XMTX: cmpFncName test" {
+    const a: []const u8 = "testing";
+    const b: []const u8 = "example";
+    var res: f32 = -3.0;
+    var exp: f32 = 1.0;
+
+    var start = try Instant.now();
+    res = cmpFncName(a, b);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncmpFncName #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cmpFncName", elapsed1);
+
+    exp = -1.0;
+    start = try Instant.now();
+    res = cmpFncName(b, a);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ncmpFncName #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cmpFncName", elapsed1);
+
+    try std.testing.expectEqual(exp, res);
+    prntNl();
+}
 
 ///Determines if the vectors u, v, and w are members of a general inner product space.
 ///
@@ -8456,12 +8517,7 @@ pub fn cmpFncName(a: []const u8, b: []const u8) f32 {
 ///
 ///  returns = A Boolean value indicating that prdct creates an inner product space.
 ///
-pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) bool {
-    if (u == null or v == null or w == null) {
-        prntNlStrArgs("isInrPrdctSpc: test -1 u, v, and w can't be null.", .{});
-        return false;
-    }
-
+pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
     if (u.len != v.len or u.len != w.len or v.len != w.len) {
         prntNlStrArgs("isInrPrdctSpc: test 0 u, v, and w must have the same number of components.", .{});
         return false;
@@ -8474,8 +8530,10 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
         return false;
     }
 
-    const t: []f32 = alloc.*.alloc(f32, u.len);
-    cpyXvec(w, t);
+    const t: []f32 = try alloc.*.alloc(f32, u.len);
+    defer alloc.*.free(t);
+    //cpyXvec(w, t);
+    clrXvec(t);
     sum2Xvec(t, v, w);
 
     const v3: f32 = inrPrdct(u, t, prdct);
@@ -8495,6 +8553,7 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
 
     if (v6 != v7) {
         prntNlStrArgs("isInrPrdctSpc: test 3 (c<u,v> = <cu,v>) failed {} != {}", .{ v6, v7 });
+        //alloc.*.free(t);
         return false;
     }
 
@@ -8504,18 +8563,41 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
 
     if (v8 < 0) {
         prntNlStrArgs("isInrPrdctSpc: test 4 (<v,v> > 0) failed {} != {}", .{ v8, 0 });
+        //alloc.*.free(t);
         return false;
     }
 
     if (v9 != 0) {
         prntNlStrArgs("isInrPrdctSpc: test 5 (<v,v> = 0 iff v = 0) failed {} != {}", .{ v9, 0 });
+        //alloc.*.free(t);
         return false;
     }
 
+    //alloc.*.free(t);
     return true;
 }
 
-//TODO tests
+test "XMTX: isInrPrdctSpc test" {
+    var u: [3]f32 = .{ 1, 0, 0 };
+    var v: [3]f32 = .{ 0, 1, 0 };
+    var w: [3]f32 = .{ 0, 0, 1 };
+    const c: f32 = 3.0;
+    var b: bool = false;
+    const alloc = std.testing.allocator;
+    const exp: bool = true;
+
+    const start = try Instant.now();
+    b = try isInrPrdctSpc(&u, &v, &w, c, dotPrdXvec, &alloc);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisInrPrdctSpc: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isInrPrdctSpc", elapsed1);
+
+    prntNlStrArgs("isInrPrdctSpc: b: {}", .{b});
+    prntNlStrArgs("isInrPrdctSpc: exp: {}", .{exp});
+    try std.testing.expectEqual(exp, b);
+    prntNl();
+}
 
 ///Calculates the general inner product given vectors u, v, and a function pointer, prdct.
 ///
@@ -8531,9 +8613,24 @@ pub fn inrPrdct(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32) f
     return prdct(u, v);
 }
 
-//TODO tests
+test "XMTX: inrPrdct test" {
+    const u: [3]f32 = .{ 1, 0, 0 };
+    const v: [3]f32 = .{ 0, 1, 0 };
+    var b: f32 = -1000.00;
+    const exp: f32 = 0;
 
-//TODO finish docs and unit tests
+    const start = try Instant.now();
+    b = inrPrdct(@constCast(&u), @constCast(&v), dotPrdXvec);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ninrPrdct: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("inrPrdct", elapsed1);
+
+    prntNlStrArgs("inrPrdct: b: {}", .{b});
+    prntNlStrArgs("inrPrdct: exp: {}", .{exp});
+    try std.testing.expectEqual(exp, b);
+    prntNl();
+}
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
@@ -9563,6 +9660,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 //--------------------------------------------------------------------------------------
 //START PROBLEMS
 //Elementary Linear Algebra - Larson, Edwards- 4th Edition
+//Chapters 1.0 - 5.1
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

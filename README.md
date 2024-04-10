@@ -25,9 +25,9 @@ This project was built using the following books as a basis.<br>
 5. ST: Version 0.55: Add execution time tracking to the remaining unit tests.
 
 ## Running Unit Tests
-You can run the unit tests from inside the project with the following command.<br>
+You can run the full set of unit tests from inside the project with the following command.<br>
 <pre>
-zig test ./src/XmtxUtils.zig
+zig test ./src/main.zig
 </pre>
 There are over 180 test ran to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on DOS terminals.
 <pre>
