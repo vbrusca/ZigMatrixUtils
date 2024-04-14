@@ -385,6 +385,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Example 10 test" {
     //Finding orthogonal projection in R^3
     //Use the Euclidean inner product in R^3 to find the orthogonal projection of u=(6, 2, 4)
     //onto v=(1, 2, 0)
+    //version 1
     const u: [3]f32 = .{ 6, 2, 4 };
     const v: [3]f32 = .{ 1, 2, 0 };
     const exp: [3]f32 = .{ 2, 4, 0 };
@@ -400,6 +401,71 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Example 10 test" {
 
     try std.testing.expectEqual(true, xmu.equXvec(projUontoV, @constCast(&exp)));
     xmu.prntNl();
+
+    //version 2
+    var lu2 = [3]f32{ 6, 2, 4 };
+    var lv2 = [3]f32{ 1, 2, 0 };
+    var lprojUontoV: []f32 = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(@constCast(&lu2), @constCast(&lv2), xmu.dotPrdXvec);
+    try std.testing.expectEqual(true, xmu.equXvec(lprojUontoV, @constCast(&exp)));
+    xmu.prntNl();
+
+    lprojUontoV = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(lu2[0..3], lv2[0..3], xmu.dotPrdXvec);
+    try std.testing.expectEqual(true, xmu.equXvec(lprojUontoV, @constCast(&exp)));
+    xmu.prntNl();
+
+    const llu2: []f32 = lu2[0..3];
+    const llv2: []f32 = lv2[0..3];
+    lprojUontoV = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(llu2, llv2, xmu.dotPrdXvec);
+    try std.testing.expectEqual(true, xmu.equXvec(lprojUontoV, @constCast(&exp)));
+    xmu.prntNl();
+
+    var lllu2: []f32 = lu2[0..3];
+    var lllv2: []f32 = lv2[0..3];
+    lprojUontoV = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(lllu2, lllv2, xmu.dotPrdXvec);
+    try std.testing.expectEqual(true, xmu.equXvec(lprojUontoV, @constCast(&exp)));
+    xmu.prntNl();
+
+    lllu2 = lu2[0..3];
+    lllv2 = lv2[0..3];
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Theorem 5.9 test" {
+    //Theorem 5.9: pg 273
+    //Let u and v be two vectors in an inner product space V, such that v != 0 vector. Then...
+    //d(u, projUontoV) < d(u, c*v), iff c != <u,v>/<v,v>
+
+    var u = [3]f32{ 6, 2, 4 };
+    var v = [3]f32{ 1, 2, 0 };
+    var cv = [3]f32{ 1, 2, 0 };
+    const n = xmu.dotPrdXvec(&u, &v);
+    const d = xmu.dotPrdXvec(&v, &v);
+    const c = n / d;
+
+    xmu.prntNlStrArgs("Found c: {}", .{c});
+
+    const alloc = std.testing.allocator;
+    const projUontoV = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(&u, &v, xmu.dotPrdXvec);
+    xmu.mulXvec(&cv, c);
+
+    xmu.prntNlStr("Found cv:");
+    xmu.prntXmtxNl(&cv, 3);
+
+    const v1 = xmu.dstInrPrdctSpcXvec(&u, @constCast(projUontoV), xmu.dotPrdXvec, &alloc);
+    const v2 = xmu.dstInrPrdctSpcXvec(&u, &cv, xmu.dotPrdXvec, &alloc);
+
+    xmu.prntNlStrArgs("Found v1: {}", .{v1});
+    xmu.prntNlStrArgs("Found v2: {}", .{v2});
+
+    try std.testing.expectEqual(v1, v2);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
+    //Chapter 5: Section 5.2: Problem 1, 3, 5, 7: pg 274
+    //Find a) <u,v>, b) ||u||, and c) d(u, v) for the given inner product defined in R^n.
+
+    //1. u = (3, 4), v = (5, -12), <u,v> = dotPrdXvec(u, v)
+    //TODO tests
 }
 
 //--------------------------------------------------------------------------------------

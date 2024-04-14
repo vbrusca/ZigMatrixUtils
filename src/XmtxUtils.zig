@@ -8542,17 +8542,22 @@ pub fn magInrPrdctSpcXvec(vec: []f32, prdct: *const fn (l: []f32, r: []f32) f32)
 ///
 ///  prdct = A function that takes two vectors as an argument and returns a f32 value determining the general inner product space.
 ///
-///  returns = An f32 value representing the distance between two vectors in a general inner product space.
+///  returns = An f32 value representing the distance between two vectors in a general inner product space or -1.0 if there's an error.
 ///
-pub fn dstInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, r: []f32) f32) f32 {
+pub fn dstInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) f32 {
     if (vecL.len != vecR.len) {
-        prntNlStr("dstInrPrdctSpc: Error, vectors u and v must be the same size.");
+        prntNlStr("dstInrPrdctSpc: Error, vectors u and v must be the same size, returning -1.0.");
         return -1.0;
     }
 
-    var t: [vecL.len]f32 = std.mem.zeroes(vecL.len);
-    diff2Xvec(&t, &vecL, &vecR);
-    return magInrPrdctSpcXvec(&t, prdct);
+    const t: []f32 = alloc.*.alloc(f32, vecL.len) catch |err| {
+        prntNlStrArgs("dstInrPrdctSpcXvec: Error allocating memory {}, returning a -1.0.", .{err});
+        return -1.0;
+    };
+    defer alloc.*.free(t);
+
+    diff2Xvec(@constCast(t), vecL, vecR);
+    return magInrPrdctSpcXvec(@constCast(t), prdct);
 }
 
 //TODO: tests
