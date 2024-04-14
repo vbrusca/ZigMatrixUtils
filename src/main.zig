@@ -405,7 +405,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Example 10 test" {
     //version 2
     var lu2 = [3]f32{ 6, 2, 4 };
     var lv2 = [3]f32{ 1, 2, 0 };
-    var lprojUontoV: []f32 = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(@constCast(&lu2), @constCast(&lv2), xmu.dotPrdXvec);
+    var lprojUontoV: []f32 = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(&lu2, &lv2, xmu.dotPrdXvec);
     try std.testing.expectEqual(true, xmu.equXvec(lprojUontoV, @constCast(&exp)));
     xmu.prntNl();
 
@@ -462,10 +462,38 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Theorem 5.9 test" {
 
 test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     //Chapter 5: Section 5.2: Problem 1, 3, 5, 7: pg 274
-    //Find a) <u,v>, b) ||u||, and c) d(u, v) for the given inner product defined in R^n.
+    //Find (a) <u,v>, (b) ||u||, and (c) d(u, v) for the given inner product defined in R^n.
+    const alloc = std.testing.allocator;
 
     //1. u = (3, 4), v = (5, -12), <u,v> = dotPrdXvec(u, v)
-    //TODO tests
+    //Exp: (a) -33, (b) 5, (c) 2 * sqrt(65)
+    //(a)
+    var u: [2]f32 = .{ 3, 4 };
+    var v: [2]f32 = .{ 5, -12 };
+    var val: f32 = xmu.inrPrdct(&u, &v, xmu.dotPrdXvec);
+    var exp: f32 = -33.0;
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    val = xmu.magInrPrdctSpcXvec(&u, xmu.dotPrdXvec);
+    exp = 5.0;
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(c)
+    val = xmu.dstInrPrdctSpcXvec(&u, &v, xmu.dotPrdXvec, &alloc);
+    exp = (2.0 * std.math.sqrt(65.0));
+
+    xmu.prntNlStrArgs("Found val: {}", .{val});
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Found exp: {}", .{exp});
+    xmu.prntNl();
+
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //3. TODO
 }
 
 //--------------------------------------------------------------------------------------
