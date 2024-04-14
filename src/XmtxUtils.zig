@@ -4298,7 +4298,7 @@ test "XMTX: nrmXvec test" {
 ///
 ///  vecQ = The vector to be projected on.
 ///
-///  returns = The parameter of the vector P that projects onto Q.
+///  returns = The parameters of the vector P that projects onto Q.
 ///
 pub fn projXvec_VecP_Onto_VecQ(vecP: []f32, vecQ: []f32) []f32 {
     const dotProd: f32 = dotPrdXvec(vecP, vecQ);
@@ -4334,6 +4334,25 @@ test "XMTX: projXvec_VecP_Onto_VecQ test" {
     try std.testing.expectEqual(true, equXmtx(ret, &exp));
     prntNl();
 }
+
+///Projects vector P onto vector unit vector Q.
+///
+///  vecP = The vector to project onto.
+///
+///  vecQ = The unit vector to be projected on.
+///
+///  returns = The parameters of the vector P that projects onto Q.
+///
+//progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1,
+//which simplifies the formula to <u,v>v
+pub fn projUnitXvec_VecP_Onto_VecQ(vecP: []f32, vecQ: []f32) []f32 {
+    //Larson, Edwards: Chapter 5: remark: pg 272
+    const dotProd: f32 = dotPrdXvec(vecP, vecQ);
+    mulXvec(vecQ, dotProd);
+    return vecQ;
+}
+
+//TODO tests
 
 ///Finds the vector perpendicular to vectors P and Q.
 ///
@@ -7742,8 +7761,6 @@ test "XMTX: getCramerSupportMtx test" {
     prntNl();
 }
 
-//current page here
-
 ///Applies Cramer's rule to the given matrix, mtx, with mtxA represented the unaugmented version of matrix mtx, and mtxAi representing Cramer's rule's supporting matrix.
 ///
 ///  mtx = The augmented matrix to apply Cramer's rule to.
@@ -8503,6 +8520,65 @@ test "XMTX: cmpFncName test" {
     prntNl();
 }
 
+///Calculates the magnitude of a vector in a general inner product space.
+///
+///  vec = The vector to calculate the inner product for.
+///
+///  prdct = A function that takes two vectors as an argument and returns a f32 value determining the general inner product space.
+///
+///  returns = An f32 value representing the magnitude of vector vec in the general inner product space.
+///
+pub fn magInrPrdctSpcXvec(vec: []f32, prdct: *const fn (l: []f32, r: []f32) f32) f32 {
+    return std.math.sqrt(prdct(vec, vec));
+}
+
+//TODO: tests
+
+///Calculates the distance of two vectors in a general inner product spaces.
+///
+///  vecL = The left hand vector in the inner product distance calculation, vecL - vecR.
+///
+///  vecR = The right hand vector in the inner product distance calculation, vecL - vecR.
+///
+///  prdct = A function that takes two vectors as an argument and returns a f32 value determining the general inner product space.
+///
+///  returns = An f32 value representing the distance between two vectors in a general inner product space.
+///
+pub fn dstInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, r: []f32) f32) f32 {
+    if (vecL.len != vecR.len) {
+        prntNlStr("dstInrPrdctSpc: Error, vectors u and v must be the same size.");
+        return -1.0;
+    }
+
+    var t: [vecL.len]f32 = std.mem.zeroes(vecL.len);
+    diff2Xvec(&t, &vecL, &vecR);
+    return magInrPrdctSpcXvec(&t, prdct);
+}
+
+//TODO: tests
+
+///Calculates the angle in radians between two vectors in a general inner product space.
+///
+///  vecL = The left-hand vector to use in the angle calculation.
+///
+///  vecR = The right-hand vector to use in the angle calculation.
+///
+///  prdct = A function that takes two vectors as an argument and returns a f32 value determining the general inner product space.
+///
+///  returns = The angle between vecL and vecR in radians.
+///
+pub fn aglBtwnInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, r: []f32) f32) f32 {
+    const dotP = prdct(vecL, vecR);
+    const mag1 = magInrPrdctSpcXvec(vecL, prdct);
+    const mag2 = magInrPrdctSpcXvec(vecR, prdct);
+    const cosA: f32 = (dotP / (mag1 * mag2));
+    const arcCosA = std.math.acos(cosA);
+    prntNlStrArgs("aglBtwnInrPrdctSpcXvec: Found cosA: {} arcCosA: {}", .{ cosA, arcCosA });
+    return arcCosA;
+}
+
+//TODO: tests
+
 ///Determines if the vectors u, v, and w are members of a general inner product space.
 ///
 ///  u = A vector used to determine if there's an inner product space.
@@ -8523,8 +8599,8 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
         return false;
     }
 
-    const v1: f32 = inrPrdct(u, v, prdct);
-    const v2: f32 = inrPrdct(v, u, prdct);
+    const v1: f32 = prdct(u, v);
+    const v2: f32 = prdct(v, u);
     if (v1 != v2) {
         prntNlStrArgs("isInrPrdctSpc: test 1 (<u,v> = <v,u>) failed {} != {}", .{ v1, v2 });
         return false;
@@ -8536,8 +8612,8 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
     clrXvec(t);
     sum2Xvec(t, v, w);
 
-    const v3: f32 = inrPrdct(u, t, prdct);
-    const v4: f32 = inrPrdct(u, w, prdct);
+    const v3: f32 = prdct(u, t);
+    const v4: f32 = prdct(u, w);
     const v5: f32 = (v1 + v4);
 
     if (v3 != v5) {
@@ -8549,7 +8625,7 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
     cpyXvec(u, t);
     mulXvec(t, c);
     const v6: f32 = (c * v1);
-    const v7: f32 = inrPrdct(t, v, prdct);
+    const v7: f32 = prdct(t, v);
 
     if (v6 != v7) {
         prntNlStrArgs("isInrPrdctSpc: test 3 (c<u,v> = <cu,v>) failed {} != {}", .{ v6, v7 });
@@ -8557,9 +8633,9 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
         return false;
     }
 
-    const v8: f32 = inrPrdct(v, v, prdct);
+    const v8: f32 = prdct(v, v);
     clrXvec(t);
-    const v9: f32 = inrPrdct(t, t, prdct);
+    const v9: f32 = prdct(t, t);
 
     if (v8 < 0) {
         prntNlStrArgs("isInrPrdctSpc: test 4 (<v,v> > 0) failed {} != {}", .{ v8, 0 });
@@ -8631,6 +8707,71 @@ test "XMTX: inrPrdct test" {
     try std.testing.expectEqual(exp, b);
     prntNl();
 }
+
+///Projects vector P onto vector Q in a general inner product space.
+///
+///  vecP = The vector to project onto.
+///
+///  vecQ = The vector to be projected on.
+///
+///  prdct = A function that takes two vector arguments and returns an f32 value.
+///
+///  returns = The parameter of the vector P that projects onto Q.
+///
+pub fn projXvec_VecP_Onto_VecQ_InrPrdctSpc(vecP: []f32, vecQ: []f32, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
+    //Larson, Edwards: Chapter 5: Definition of Orthogonal projection: pg 272
+    const dotProd: f32 = prdct(vecP, vecQ);
+    const mag: f32 = magXvec(vecQ);
+    const magSqr: f32 = (mag * mag);
+    const mul: f32 = (dotProd / magSqr);
+    mulXvec(vecQ, mul);
+    return vecQ;
+}
+
+test "XMTX: projXvec_VecP_Onto_VecQQ_InrPrdctSpc test" {
+    //Q = 2 2 1
+    //P = 1 -2 0
+    var Q: [3]f32 = .{ 2, 2, 1 };
+    var P: [3]f32 = .{ 1, -2, 0 };
+    var exp: [3]f32 = .{ (-4.0 / 9.0), (-4.0 / 9.0), (-2.0 / 9.0) };
+
+    const start = try Instant.now();
+    const ret: []f32 = projXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprojXvec_VecP_Onto_VecQ_InrPrdctSpc: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("projXvec_VecP_Onto_VecQ_InrPrdctSpc", elapsed1);
+
+    clnXmtx(ret);
+    clnXmtx(&exp);
+
+    prntXvecNl(ret);
+    prntNl();
+
+    prntXvecNl(&exp);
+    prntNl();
+    try std.testing.expectEqual(true, equXmtx(ret, &exp));
+    prntNl();
+}
+
+///Projects vector P onto vector unit vector Q in a general inner product space.
+///
+///  vecP = The vector to project onto.
+///
+///  vecQ = The unit vector to be projected on.
+///
+///  returns = The parameters of the vector P that projects onto Q.
+///
+//progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1,
+//which simplifies the formula to <u,v>v
+pub fn projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc(vecP: []f32, vecQ: []f32, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
+    //Larson, Edwards: Chapter 5: remark: pg 272
+    const dotProd: f32 = prdct(vecP, vecQ);
+    mulXvec(vecQ, dotProd);
+    return vecQ;
+}
+
+//TODO tests
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
