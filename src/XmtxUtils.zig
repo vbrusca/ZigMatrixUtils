@@ -23,6 +23,11 @@
 //!
 
 const std = @import("std");
+
+comptime {
+    @setFloatMode(std.builtin.FloatMode.Optimized);
+}
+
 const len = std.mem.len;
 const time = std.time;
 const Instant = time.Instant;

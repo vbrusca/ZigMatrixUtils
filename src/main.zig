@@ -1,5 +1,12 @@
+//! The main execution point for running unit tests. This isn't used by the library
+//! except for unit testing.
+
 const std = @import("std");
 const xmu = @import("./XmtxUtils.zig");
+
+comptime {
+    @setFloatMode(std.builtin.FloatMode.Optimized);
+}
 
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
@@ -460,12 +467,17 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Theorem 5.9 test" {
     xmu.prntNl();
 }
 
+fn _diffInrPrdPrdctProblem3(u: []f32, v: []f32) f32 {
+    return ((3 * u[0] * v[0]) + (u[1] * v[1]));
+}
+
 test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     //Chapter 5: Section 5.2: Problem 1, 3, 5, 7: pg 274
     //Find (a) <u,v>, (b) ||u||, and (c) d(u, v) for the given inner product defined in R^n.
     const alloc = std.testing.allocator;
 
     //1. u = (3, 4), v = (5, -12), <u,v> = dotPrdXvec(u, v)
+    //Find (a) <u,v>, (b) ||u||, and (c) d(u, v)
     //Exp: (a) -33, (b) 5, (c) 2 * sqrt(65)
     //(a)
     var u: [2]f32 = .{ 3, 4 };
@@ -484,16 +496,37 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     //(c)
     val = xmu.dstInrPrdctSpcXvec(&u, &v, xmu.dotPrdXvec, &alloc);
     exp = (2.0 * std.math.sqrt(65.0));
-
     xmu.prntNlStrArgs("Found val: {}", .{val});
     xmu.prntNl();
     xmu.prntNlStrArgs("Found exp: {}", .{exp});
     xmu.prntNl();
-
     try std.testing.expectEqual(val, exp);
     xmu.prntNl();
 
-    //3. TODO
+    //3. u=(-4, 3), v=(0,5), <u,v>=(3*u1*v1) + (u2*v2)
+    //Find (a) <u,v>, (b) ||u||, and (c) d(u, v)
+    //Exp: (a)-15, (b) sqrt(57), (c) 2*sqrt(13)
+    //(a)
+    u = [2]f32{ -4, 3 };
+    v = [2]f32{ 0, 5 };
+    val = xmu.inrPrdct(&u, &v, _diffInrPrdPrdctProblem3);
+    exp = 15.0;
+    xmu.prntNlStrArgs("Found val: {}", .{val});
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Found exp: {}", .{exp});
+    xmu.prntNl();
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    val = xmu.magInrPrdctSpcXvec(&u, _diffInrPrdPrdctProblem3);
+    exp = std.math.sqrt(57.0);
+    xmu.prntNlStrArgs("Found val: {}", .{val});
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Found exp: {}", .{exp});
+    xmu.prntNl();
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
 }
 
 //--------------------------------------------------------------------------------------
