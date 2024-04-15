@@ -471,62 +471,140 @@ fn _diffInrPrdPrdctProblem3(u: []f32, v: []f32) f32 {
     return ((3 * u[0] * v[0]) + (u[1] * v[1]));
 }
 
+fn _diffInrPrdPrdctProblem7(u: []f32, v: []f32) f32 {
+    return ((u[0] * v[0]) + (2.0 * u[1] * v[1]) + (u[2] * v[2]));
+}
+
 test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     //Chapter 5: Section 5.2: Problem 1, 3, 5, 7: pg 274
     //Find (a) <u,v>, (b) ||u||, and (c) d(u, v) for the given inner product defined in R^n.
     const alloc = std.testing.allocator;
 
-    //1. u = (3, 4), v = (5, -12), <u,v> = dotPrdXvec(u, v)
-    //Find (a) <u,v>, (b) ||u||, and (c) d(u, v)
+    //1: u=(3, 4), v=(5, -12), <u,v>=(dotPrdXvec(u, v))
+    //Find: (a) <u,v>, (b) ||u||, (c) d(u, v)
     //Exp: (a) -33, (b) 5, (c) 2 * sqrt(65)
     //(a)
     var u: [2]f32 = .{ 3, 4 };
     var v: [2]f32 = .{ 5, -12 };
     var val: f32 = xmu.inrPrdct(&u, &v, xmu.dotPrdXvec);
     var exp: f32 = -33.0;
+    xmu.prntNlStrArgs("1a Found val: {}", .{val});
+    xmu.prntNlStrArgs("1a Found exp: {}", .{exp});
     try std.testing.expectEqual(val, exp);
     xmu.prntNl();
 
     //(b)
     val = xmu.magInrPrdctSpcXvec(&u, xmu.dotPrdXvec);
     exp = 5.0;
+    xmu.prntNlStrArgs("1b Found val: {}", .{val});
+    xmu.prntNlStrArgs("1b Found exp: {}", .{exp});
     try std.testing.expectEqual(val, exp);
     xmu.prntNl();
 
     //(c)
     val = xmu.dstInrPrdctSpcXvec(&u, &v, xmu.dotPrdXvec, &alloc);
     exp = (2.0 * std.math.sqrt(65.0));
-    xmu.prntNlStrArgs("Found val: {}", .{val});
-    xmu.prntNl();
-    xmu.prntNlStrArgs("Found exp: {}", .{exp});
-    xmu.prntNl();
+    xmu.prntNlStrArgs("1c Found val: {}", .{val});
+    xmu.prntNlStrArgs("1c Found exp: {}", .{exp});
     try std.testing.expectEqual(val, exp);
     xmu.prntNl();
 
-    //3. u=(-4, 3), v=(0,5), <u,v>=(3*u1*v1) + (u2*v2)
-    //Find (a) <u,v>, (b) ||u||, and (c) d(u, v)
+    //3: u=(-4, 3), v=(0,5), <u,v>=((3*u1*v1) + (u2*v2))
+    //Find: (a) <u,v>, (b) ||u||, and (c) d(u, v)
     //Exp: (a)-15, (b) sqrt(57), (c) 2*sqrt(13)
     //(a)
     u = [2]f32{ -4, 3 };
     v = [2]f32{ 0, 5 };
     val = xmu.inrPrdct(&u, &v, _diffInrPrdPrdctProblem3);
     exp = 15.0;
-    xmu.prntNlStrArgs("Found val: {}", .{val});
-    xmu.prntNl();
-    xmu.prntNlStrArgs("Found exp: {}", .{exp});
-    xmu.prntNl();
+    xmu.prntNlStrArgs("3a Found val: {}", .{val});
+    xmu.prntNlStrArgs("3a Found exp: {}", .{exp});
     try std.testing.expectEqual(val, exp);
     xmu.prntNl();
 
     //(b)
     val = xmu.magInrPrdctSpcXvec(&u, _diffInrPrdPrdctProblem3);
     exp = std.math.sqrt(57.0);
-    xmu.prntNlStrArgs("Found val: {}", .{val});
-    xmu.prntNl();
-    xmu.prntNlStrArgs("Found exp: {}", .{exp});
-    xmu.prntNl();
+    xmu.prntNlStrArgs("3b Found val: {}", .{val});
+    xmu.prntNlStrArgs("3b Found exp: {}", .{exp});
     try std.testing.expectEqual(val, exp);
     xmu.prntNl();
+
+    //(c)
+    val = xmu.dstInrPrdctSpcXvec(&u, &v, _diffInrPrdPrdctProblem3, &alloc);
+    exp = (2.0 * std.math.sqrt(13.0));
+    xmu.prntNlStrArgs("3c Found val: {}", .{val});
+    xmu.prntNlStrArgs("3c Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //5. u=(0,9,4), v=(9,-2,-4), <u,v>=(dotPrdXvec(u,v))
+    //Find: (a) <u,v>, (b) ||u||, (c) d(u, v)
+    //Exp: (a) -34, (b) sqrt(97), (c) sqrt(266)
+    //(a)
+    var lu3: [3]f32 = .{ 0, 9, 4 };
+    var lv3: [3]f32 = .{ 9, -2, -4 };
+    val = xmu.inrPrdct(&lu3, &lv3, xmu.dotPrdXvec);
+    exp = -34.0;
+    xmu.prntNlStrArgs("5a Found val: {}", .{val});
+    xmu.prntNlStrArgs("5a Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    val = xmu.magInrPrdctSpcXvec(&lu3, xmu.dotPrdXvec);
+    exp = std.math.sqrt(97.0);
+    xmu.prntNlStrArgs("5b Found val: {}", .{val});
+    xmu.prntNlStrArgs("5b Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(c)
+    val = xmu.dstInrPrdctSpcXvec(&lu3, &lv3, xmu.dotPrdXvec, &alloc);
+    exp = std.math.sqrt(266.0);
+    xmu.prntNlStrArgs("5c Found val: {}", .{val});
+    xmu.prntNlStrArgs("5c Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //7: u=(1,1,1), v=(2,5,2), <u,v>=((u1*v1) + (2*u2*v2) + (u3*v3))
+    //Find: (a) <u,v>, (b) ||u||, and (c) d(u, v)
+    //Exp: (a)14, (b) 2, (c) sqrt(34)
+    //(a)
+    lu3 = [3]f32{ 1, 1, 1 };
+    lv3 = [3]f32{ 2, 5, 2 };
+    val = xmu.inrPrdct(&lu3, &lv3, _diffInrPrdPrdctProblem7);
+    exp = 14.0;
+    xmu.prntNlStrArgs("7a Found val: {}", .{val});
+    xmu.prntNlStrArgs("7a Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    val = xmu.magInrPrdctSpcXvec(&lu3, _diffInrPrdPrdctProblem7);
+    exp = 2.0;
+    xmu.prntNlStrArgs("7b Found val: {}", .{val});
+    xmu.prntNlStrArgs("7b Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(c)
+    val = xmu.dstInrPrdctSpcXvec(&lu3, &lv3, _diffInrPrdPrdctProblem7, &alloc);
+    exp = std.math.sqrt(34.0);
+    xmu.prntNlStrArgs("7c Found val: {}", .{val});
+    xmu.prntNlStrArgs("7c Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 13 test" {
+    //Chapter 5: Section 5.2: Problem 13: pg 274
+    //<a,b>=((2.0*A11*B11) + (A12*B12) + (2.0*A22*B22))
+
+    //13: A=|-1  3|     B=|0 -2|
+    //      | 4 -2|       |1  1|
+    //Find: (a)<A,B>, (b)||A||, (c)d(A,B)
+    //Exp: (a) -6, (b) sqrt(35.0), (c) 3.0*sqrt(6.0)
 }
 
 //--------------------------------------------------------------------------------------

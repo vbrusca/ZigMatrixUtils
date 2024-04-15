@@ -10,7 +10,9 @@ Victor Brusca<br>
 Carlo Bruscani
 
 ## Documentation
-I'll provide a viewable but not 100% usable link to the Zig Matrix Utils documentation here. Links don't work but you can browse the functions and their signature. For proper use clone or download the repo and view the documentation site locally.<br> [Zig Generated API Docs](https://htmlpreview.github.io/?https://github.com/vbrusca/ZigMatrixUtils/blob/main/docs/index.html)
+I'll provide a viewable but not 100% usable link to the Zig Matrix Utils documentation here. Links don't work but you can browse the functions and their signature. For proper use clone or download the repo and view the documentation site locally.
+<br>
+[Zig Generated API Docs](https://htmlpreview.github.io/?https://github.com/vbrusca/ZigMatrixUtils/blob/main/docs/index.html)
 
 ## Source Material
 This project was built using the following books as a basis.<br>
@@ -30,11 +32,11 @@ You can run the full set of unit tests from inside the project with the followin
 <pre>
 zig test ./src/main.zig
 </pre>
-There are over 240 test ran to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on DOS terminals. You'll have to search around and find an equivalent command if you are on MacOS, Linux, or Unix for your respective shell.
+There are over 240 test run to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on DOS terminals. You'll have to search around and find an equivalent command if you are on MacOS, Linux, or Unix for your respective shell.
 <pre>
 zig test ./src/XmtxUtils.zig > all_test_output.txt 2>&1
 </pre>
-Currently the library sets each module to use fast floating point math. This has already shown an impact in the performance of different functions in the function execution time list. If there is some instability in floating point math just comment out this line in the header of main.zig and XmtxUtils.zip.
+Currently the library sets each module to use fast floating point math. This has already shown a positive impact in the performance of different functions in the function execution time list. If there is some instability in floating point math just comment out this line in the header of main.zig and XmtxUtils.zig.
 <pre>
 comptime {
     @setFloatMode(std.builtin.FloatMode.Optimized);
@@ -42,7 +44,7 @@ comptime {
 </pre>
 
 ## Project Build Commands
-How to build an exe (NOT USED). There is no real main code for this librar currently.
+How to build an exe (NOT USED). There is no real main code for this library currently.
 <pre>
 zig build-exe -femit-docs ./src/main.zig -O ReleaseSmall -fstrip -fsingle-threaded -femit-bin="zig-out/bin/main.exe"
 </pre>
@@ -65,7 +67,7 @@ zig build-lib -femit-docs ./src/XmtxUtils.zig -lc -dynamic -isystem -fstrip -fsi
 ## Guides
 
 You can look into specific use cases for the library in the "Guides" section.
-**Please note that the guides may be slightly out of sync with regard to the latest version of the library as it develops. Those gaps will be closed periodically over time and as a better way of tracking the guides associated with code changes evolves. The guides associate library functions with vector and matrix actions etc. You can use them as a loose example of how to use the library.
+**Please note that the guides may be slightly out of sync with regard to the latest version of the library as it develops. Those gaps will be closed periodically over time and as a better way of tracking the guides associated with code changes evolves. The guides associate library functions with vector and matrix actions etc. You can use them as a loose example of how to use the library. For more complex and comprehensive use cases check the unit tests for theorems, examples, and problems from the basis text books.
 
 [Guides](https://github.com/vbrusca/ZigMatrixUtils/tree/main/guides)
 
@@ -156,7 +158,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
 
 ## Execution Times
 
-Execution times are calculated after the last unit test that uses them. You can find the execution time summary in the test output by searching for the term "Function Execution Times List". An example of the execution time summary is shown below.
+Execution times are calculated after the last unit test that uses them. You can find the execution time summary in the test output by searching for the term "Function Execution Times List". An example of the execution time summary list is shown below.
 
 <pre>
 Function Execution Times List:
@@ -176,4 +178,4 @@ Function Execution Times List:
  ...
 </pre>
 
-You can see the function name, the usage count, and the average execution time in ms and ns. To effectively turn off this memory allocation set <b>MAX_EXEC_TIMES</b> equal to 1.
+You can see the function name, the usage count, and the average execution time in ms and ns. To effectively turn off this memory allocation set <b>MAX_EXEC_TIMES</b> equal to 1. It is only used by the unit test code, no library functions have execution time monitoring.
