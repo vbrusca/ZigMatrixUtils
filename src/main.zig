@@ -449,20 +449,17 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Theorem 5.9 test" {
     const c = n / d;
 
     xmu.prntNlStrArgs("Found c: {}", .{c});
-
     const alloc = std.testing.allocator;
     const projUontoV = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(&u, &v, xmu.dotPrdXvec);
     xmu.mulXvec(&cv, c);
 
     xmu.prntNlStr("Found cv:");
     xmu.prntXmtxNl(&cv, 3);
-
     const v1 = xmu.dstInrPrdctSpcXvec(&u, @constCast(projUontoV), xmu.dotPrdXvec, &alloc);
     const v2 = xmu.dstInrPrdctSpcXvec(&u, &cv, xmu.dotPrdXvec, &alloc);
 
     xmu.prntNlStrArgs("Found v1: {}", .{v1});
     xmu.prntNlStrArgs("Found v2: {}", .{v2});
-
     try std.testing.expectEqual(v1, v2);
     xmu.prntNl();
 }
@@ -597,6 +594,10 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     xmu.prntNl();
 }
 
+fn _diffInrPrdPrdctProblem13(u: []f32, v: []f32) f32 {
+    return ((2.0 * u[0] * v[0]) + (u[1] * v[1]) + (u[2] * v[2]) + (2.0 * u[3] * v[3]));
+}
+
 test "XMTX: ELA - Larson, Edwards: 5.2 Problem 13 test" {
     //Chapter 5: Section 5.2: Problem 13: pg 274
     //<a,b>=((2.0*A11*B11) + (A12*B12) + (2.0*A22*B22))
@@ -605,6 +606,194 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 13 test" {
     //      | 4 -2|       |1  1|
     //Find: (a)<A,B>, (b)||A||, (c)d(A,B)
     //Exp: (a) -6, (b) sqrt(35.0), (c) 3.0*sqrt(6.0)
+    //(a)
+    var la = [4]f32{ -1, 3, 4, -2 };
+    var lb = [4]f32{ 0, -2, 1, 1 };
+    var val: f32 = xmu.inrPrdct(&la, &lb, _diffInrPrdPrdctProblem13);
+    var exp: f32 = -6.0;
+    var alloc = std.testing.allocator;
+    xmu.prntNlStrArgs("13a Found val: {}", .{val});
+    xmu.prntNlStrArgs("13a Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    val = xmu.magInrPrdctSpcXvec(&la, _diffInrPrdPrdctProblem13);
+    exp = std.math.sqrt(35.0);
+    xmu.prntNlStrArgs("13b Found val: {}", .{val});
+    xmu.prntNlStrArgs("13b Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(c)
+    val = xmu.dstInrPrdctSpcXvec(&la, &lb, _diffInrPrdPrdctProblem13, &alloc);
+    exp = (3.0 * std.math.sqrt(6.0));
+    xmu.prntNlStrArgs("13c Found val: {}", .{val});
+    xmu.prntNlStrArgs("13c Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 15 test" {
+    //Chapter 5: Section 5.2: Problem 15: pg 274
+    //<p,q> = a0b0 + a1b1 + a2b2
+
+    //15: p(x)=(1 - x + (3.0 * x^2)), q(x)=(x - x^2)
+    //Find: (a)<p,q>, (b)||p||, (c)d(p,q)
+    //Exp: (a) -4, (b) sqrt(11), (c) sqrt(21)
+    //(a)
+    var p = [3]f32{ 1, -1, 3 };
+    var q = [3]f32{ 0, 1, -1 };
+    var val = xmu.inrPrdct(&p, &q, xmu.dotPrdXvec);
+    var exp: f32 = -4;
+    var alloc = std.testing.allocator;
+
+    xmu.prntNlStrArgs("15a Found val: {}", .{val});
+    xmu.prntNlStrArgs("15a Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    val = xmu.magInrPrdctSpcXvec(&p, xmu.dotPrdXvec);
+    exp = std.math.sqrt(11.0);
+    xmu.prntNlStrArgs("15b Found val: {}", .{val});
+    xmu.prntNlStrArgs("15b Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(c)
+    val = xmu.dstInrPrdctSpcXvec(&p, &q, xmu.dotPrdXvec, &alloc);
+    exp = std.math.sqrt(21.0);
+    xmu.prntNlStrArgs("15c Found val: {}", .{val});
+    xmu.prntNlStrArgs("15c Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+}
+
+fn _diffInrPrdPrdctProblem15(u: []f32, v: []f32) f32 {
+    return ((u[0] * v[0]) - (2.0 * u[1] * v[1]) + (u[2] * v[2]));
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 17 test" {
+    //Chapter 5: Section 5.2: Problem 17: pg 274
+    //Prove that the given function is an inner product.
+
+    //17: <u,v>=(u1 * v1) - (2.0 * u2 * v2) + (u3 * v3)
+    //Find: if <u,v> is an inner product space
+    //Exp: false
+    const u = [3]f32{ 1, 0, 0 };
+    const v = [3]f32{ 0, 1, 0 };
+    const w = [3]f32{ 0, 0, 1 };
+    const c: f32 = 5.0;
+    const exp: bool = false;
+    const alloc = std.testing.allocator;
+    const val: bool = try xmu.isInrPrdctSpc(@constCast(&u), @constCast(&v), @constCast(&w), c, _diffInrPrdPrdctProblem15, &alloc);
+    xmu.prntNlStrArgs("17 Found val: {}", .{val});
+    xmu.prntNlStrArgs("17 Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 19 test" {
+    //Chapter 5: Section 5.2: Problem 19: pg 274
+    //Prove that the given function is an inner product.
+
+    //19: <a,b>=((2.0*A11*B11) + (A12*B12) + (2.0*A22*B22))
+    //From problem 13.
+    //13: A=|-1  3|     B=|0 -2|
+    //      | 4 -2|       |1  1|
+    var u = [4]f32{ -1, 3, 4, -2 };
+    var v = [4]f32{ 0, -2, 1, 1 };
+    var w = [4]f32{ 0, 0, 0, 0 };
+    const c: f32 = 7.0;
+    const exp: bool = true;
+    const alloc = std.testing.allocator;
+    const val: bool = try xmu.isInrPrdctSpc(@constCast(&u), @constCast(&v), @constCast(&w), c, _diffInrPrdPrdctProblem13, &alloc);
+    xmu.prntNlStrArgs("19 Found val: {}", .{val});
+    xmu.prntNlStrArgs("19 Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 31 test" {
+    //Chapter 5: Section 5.2: Problem 31: pg 274
+    //31:
+    //(a) Verify the Cauchy-Schwarz Inequality.
+    //(b) Verify the Triangle Inquality.
+
+    //(a)
+    var u: [2]f32 = .{ 5, 12 };
+    var v: [2]f32 = .{ 3, 4 };
+    const prdct: *const fn (l: []f32, r: []f32) f32 = xmu.dotPrdXvec;
+    const alloc = std.testing.allocator;
+    var exp: bool = true;
+    var val: bool = xmu.tstCauchySchwarzIneq(&u, &v, prdct);
+    xmu.prntNlStrArgs("31a Found val: {}", .{val});
+    xmu.prntNlStrArgs("31a Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    exp = true;
+    val = try xmu.tstTriangleIneq(&u, &v, prdct, &alloc);
+    xmu.prntNlStrArgs("31b Found val: {}", .{val});
+    xmu.prntNlStrArgs("31b Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 33 test" {
+    //Chapter 5: Section 5.2: Problem 33: pg 274
+    //33:
+    //(a) Verify the Cauchy-Schwarz Inequality.
+    //(b) Verify the Triangle Inquality.
+    //<p,q> = a0*b0 + a1*b1 + a2*b2 = dotPrdctXvec
+    //p(x) = 2x, q(x) = 3.0 * x^2 + 1.0
+
+    //(a)
+    var u: [3]f32 = .{ 0, 2, 0 };
+    var v: [3]f32 = .{ 1, 0, 3 };
+    const prdct: *const fn (l: []f32, r: []f32) f32 = xmu.dotPrdXvec;
+    const alloc = std.testing.allocator;
+    var exp: bool = true;
+    var val: bool = xmu.tstCauchySchwarzIneq(&u, &v, prdct);
+    xmu.prntNlStrArgs("33a Found val: {}", .{val});
+    xmu.prntNlStrArgs("33a Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    exp = true;
+    val = try xmu.tstTriangleIneq(&u, &v, prdct, &alloc);
+    xmu.prntNlStrArgs("33b Found val: {}", .{val});
+    xmu.prntNlStrArgs("33b Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.2 Problem 41 test" {
+    //Chapter 5: Section 5.2: Problem 41: pg 275
+    //Find: (a) projUontoV, (b) projVontoU
+
+    //(a)
+    var u: [2]f32 = .{ 1, 2 };
+    var v: [2]f32 = .{ 2, 1 };
+    var val: [2]f32 = xmu.projXvec_VecP_Onto_VecQ(@constCast(&u), @constCast(&v))[0..2].*;
+    var exp: [2]f32 = .{ (8.0 / 5.0), (4.0 / 5.0) };
+    xmu.prntNlStrArgs("41a Found val: {any}", .{val});
+    xmu.prntNlStrArgs("41a Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
+
+    //(b)
+    u = [2]f32{ 1, 2 };
+    v = [2]f32{ 2, 1 };
+    val = xmu.projXvec_VecP_Onto_VecQ(@constCast(&v), @constCast(&u))[0..2].*;
+    exp = .{ (4.0 / 5.0), (8.0 / 5.0) };
+    xmu.prntNlStrArgs("41b Found val: {any}", .{val});
+    xmu.prntNlStrArgs("41b Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    xmu.prntNl();
 }
 
 //--------------------------------------------------------------------------------------

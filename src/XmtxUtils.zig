@@ -4297,13 +4297,13 @@ test "XMTX: nrmXvec test" {
     prntNl();
 }
 
-///Projects vector P onto vector Q.
+///Projects vector P onto vector Q. Alters the vecQ argument.
 ///
 ///  vecP = The vector to project onto.
 ///
 ///  vecQ = The vector to be projected on.
 ///
-///  returns = The parameters of the vector P that projects onto Q.
+///  returns = The parameters of the vector P that projects onto Q, stored in vecQ.
 ///
 pub fn projXvec_VecP_Onto_VecQ(vecP: []f32, vecQ: []f32) []f32 {
     const dotProd: f32 = dotPrdXvec(vecP, vecQ);
@@ -4340,13 +4340,13 @@ test "XMTX: projXvec_VecP_Onto_VecQ test" {
     prntNl();
 }
 
-///Projects vector P onto vector unit vector Q.
+///Projects vector P onto vector unit vector Q. Alters the vecQ argument.
 ///
 ///  vecP = The vector to project onto.
 ///
 ///  vecQ = The unit vector to be projected on.
 ///
-///  returns = The parameters of the vector P that projects onto Q.
+///  returns = The parameters of the vector P that projects onto Q, stored in vecQ.
 ///
 //progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1,
 //which simplifies the formula to <u,v>v
@@ -8718,7 +8718,49 @@ test "XMTX: inrPrdct test" {
     prntNl();
 }
 
-///Projects vector P onto vector Q in a general inner product space.
+//TODO: docs
+pub fn tstCauchySchwarzIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32) bool {
+    const v1: f32 = absF32(prdct(u, v));
+    const v2: f32 = magInrPrdctSpcXvec(u, prdct);
+    const v3: f32 = magInrPrdctSpcXvec(v, prdct);
+    const v4: f32 = (v2 * v3);
+    return (v1 < v4);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn tstTriangleIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
+    const t: []f32 = try alloc.*.alloc(f32, u.len);
+    defer alloc.*.free(t);
+    clrXvec(t);
+    sum2Xvec(t, u, v);
+    const v1: f32 = magInrPrdctSpcXvec(t, prdct);
+    const v2: f32 = magInrPrdctSpcXvec(u, prdct);
+    const v3: f32 = magInrPrdctSpcXvec(v, prdct);
+    const v4: f32 = (v2 + v3);
+    return (v1 <= v4);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn tstPythagoreanTheorem(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
+    const t: []f32 = try alloc.*.alloc(f32, u.len);
+    defer alloc.*.free(t);
+    clrXvec(t);
+    sum2Xvec(t, u, v);
+    const v1: f32 = magInrPrdctSpcXvec(t, prdct);
+    const v2: f32 = magInrPrdctSpcXvec(u, prdct);
+    const v3: f32 = magInrPrdctSpcXvec(v, prdct);
+    v1 = (v1 * v1);
+    const v4: f32 = (v2 * v2) + (v3 * v3);
+    return (v1 == v4);
+}
+
+//TODO: tests
+
+///Projects vector P onto vector Q in a general inner product space. Alters argument vecQ.
 ///
 ///  vecP = The vector to project onto.
 ///
@@ -8726,7 +8768,7 @@ test "XMTX: inrPrdct test" {
 ///
 ///  prdct = A function that takes two vector arguments and returns an f32 value.
 ///
-///  returns = The parameter of the vector P that projects onto Q.
+///  returns = The parameter of the vector P that projects onto Q, stored in vecQ.
 ///
 pub fn projXvec_VecP_Onto_VecQ_InrPrdctSpc(vecP: []f32, vecQ: []f32, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
     //Larson, Edwards: Chapter 5: Definition of Orthogonal projection: pg 272
@@ -8764,13 +8806,13 @@ test "XMTX: projXvec_VecP_Onto_VecQQ_InrPrdctSpc test" {
     prntNl();
 }
 
-///Projects vector P onto vector unit vector Q in a general inner product space.
+///Projects vector P onto vector unit vector Q in a general inner product space. Alters argument vecQ.
 ///
 ///  vecP = The vector to project onto.
 ///
 ///  vecQ = The unit vector to be projected on.
 ///
-///  returns = The parameters of the vector P that projects onto Q.
+///  returns = The parameters of the vector P that projects onto Q, stored in vecQ.
 ///
 //progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1,
 //which simplifies the formula to <u,v>v
@@ -13049,6 +13091,7 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Example Theorem 5.5 test" {
 }
 
 test "XMTX: ELA - Larson, Edwards: 5.1 Problem 1, 3, 5 test" {
+    //Chapter 5: Section 5.1: Problem 1,3,5: pg 275
     prntNl();
 
     var mag: f32 = 0;
@@ -13079,6 +13122,11 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 1, 3, 5 test" {
     exp = 7.0710;
     std.debug.print("5.1 Problem 5 mag: {}\n", .{mag});
     try std.testing.expectEqual(true, isEquF32(mag, exp, false));
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.1 Problem 7, 9 test" {
+    //Chapter 5: Section 5.1: Problem 7, 9: pg 275
+    //TODO
 }
 
 //--------------------------------------------------------------------------------------
