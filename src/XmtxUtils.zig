@@ -13125,7 +13125,131 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 1, 3, 5 test" {
 }
 
 test "XMTX: ELA - Larson, Edwards: 5.1 Problem 7, 9 test" {
-    //Chapter 5: Section 5.1: Problem 7, 9: pg 275
+    //Chapter 5: Section 5.1: Problem 7, 9: pg 262
+    //Find: (a) ||u||, (b) ||v||, (c) ||u + v||
+
+    //7: u=(0, 4, 3), v=(1,-2,1)
+    //Exp: (a) 5, (b) sqrt(6.0), (c) sqrt(21.0)
+    const u: [3]f32 = .{ 0, 4, 3 };
+    const v: [3]f32 = .{ 1, -2, 1 };
+    const t: [3]f32 = .{ 0, 0, 0 };
+    var val: f32 = 0;
+    var exp: f32 = 0;
+
+    //(a)
+    val = magXvec(@constCast(&u));
+    exp = 5;
+    prntNlStrArgs("7a Found val: {any}", .{val});
+    prntNlStrArgs("7a Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    //(b)
+    val = magXvec(@constCast(&v));
+    exp = std.math.sqrt(6.0);
+    prntNlStrArgs("7b Found val: {any}", .{val});
+    prntNlStrArgs("7b Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    //(c)
+    sum2Xvec(@constCast(&t), @constCast(&u), @constCast(&v));
+    val = magXvec(@constCast(&t));
+    exp = std.math.sqrt(21.0);
+    prntNlStrArgs("7c Found val: {any}", .{val});
+    prntNlStrArgs("7c Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    //9: u=(0, 4, 3), v=(1,-2,1)
+    //Exp: (a) sqrt(6.0), (b) sqrt(11.0), (c) sqrt(13.0)
+    const lu: [4]f32 = .{ 0, 1, -1, 2 };
+    const lv: [4]f32 = .{ 1, 1, 3, 0 };
+    const lt: [4]f32 = .{ 0, 0, 0, 0 };
+
+    //(a)
+    val = magXvec(@constCast(&lu));
+    exp = std.math.sqrt(6.0);
+    prntNlStrArgs("9a Found val: {any}", .{val});
+    prntNlStrArgs("9a Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    //(b)
+    val = magXvec(@constCast(&lv));
+    exp = std.math.sqrt(11.0);
+    prntNlStrArgs("9b Found val: {any}", .{val});
+    prntNlStrArgs("9b Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    //(c)
+    sum2Xvec(@constCast(&lt), @constCast(&lu), @constCast(&lv));
+    val = magXvec(@constCast(&lt));
+    exp = std.math.sqrt(13.0);
+    prntNlStrArgs("9c Found val: {any}", .{val});
+    prntNlStrArgs("9c Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.1 Problem 11, 13 test" {
+    //Chapter 5: Section 5.1: Problem 11, 13: pg 262
+    //Find: (a) a unit vector in the direction of u
+    //      (b) a unit vector in the direction opposite of u
+
+    //11: u=(-5,12)
+    //Exp: (a) ((-5.0 / 13.0), (12.0 / 13.0))
+    //     (b) ((5.0 / 13.0), (-12.0 / 13.0))
+    //(a)
+    var u: [2]f32 = .{ -5.0, 12.0 };
+    var exp: [2]f32 = .{ (-5.0 / 13.0), (12.0 / 13.0) };
+    nrmXvec(&u);
+    var val: [2]f32 = u;
+    prntNlStrArgs("11a Found val: {any}", .{val});
+    prntNlStrArgs("11a Found exp: {any}", .{exp});
+    try std.testing.expectEqual(true, equXvecWrkr(&val, &exp, false));
+    prntNl();
+
+    //(b)
+    u = .{ -5.0, 12.0 };
+    var t: [2]f32 = .{ 0, 0 };
+    diff1Xvec(&t, &u);
+    exp = .{ (5.0 / 13.0), (-12.0 / 13.0) };
+    nrmXvec(&t);
+    val = t;
+    prntNlStrArgs("11b Found val: {any}", .{val});
+    prntNlStrArgs("11b Found exp: {any}", .{exp});
+    try std.testing.expectEqual(true, equXvecWrkr(&val, &exp, false));
+    prntNl();
+
+    //13: u=(3,2,-5)
+    //Exp: (a) ((3.0 / sqrt(38.0)), (2.0 / sqrt(38.0)), (-5.0 / sqrt(38.0)))
+    //     (b) ((-3.0 / sqrt(38.0)), (-2.0 / sqrt(38.0)), (5.0 / sqrt(38.0)))
+    var lu: [3]f32 = .{ 3, 2, -5 };
+    var lexp: [3]f32 = .{ (3.0 / std.math.sqrt(38.0)), (2.0 / std.math.sqrt(38.0)), (-5.0 / std.math.sqrt(38.0)) };
+    nrmXvec(&lu);
+    var lval: [3]f32 = lu;
+    prntNlStrArgs("13a Found val: {any}", .{lval});
+    prntNlStrArgs("13a Found exp: {any}", .{lexp});
+    try std.testing.expectEqual(true, equXvecWrkr(&lval, &lexp, false));
+    prntNl();
+
+    //(b)
+    lu = .{ 3, 2, -5 };
+    var lt: [3]f32 = .{ 0, 0, 0 };
+    diff1Xvec(&lt, &lu);
+    lexp = .{ (-3.0 / std.math.sqrt(38.0)), (-2.0 / std.math.sqrt(38.0)), (5.0 / std.math.sqrt(38.0)) };
+    nrmXvec(&lt);
+    lval = lt;
+    prntNlStrArgs("13b Found val: {any}", .{lval});
+    prntNlStrArgs("13b Found exp: {any}", .{lexp});
+    try std.testing.expectEqual(true, equXvecWrkr(&lval, &lexp, false));
+    prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.1 Problem 15 test" {
+    //Chapter 5: Section 5.1: Problem 15: pg 262
     //TODO
 }
 
