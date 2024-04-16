@@ -34,7 +34,7 @@ zig test ./src/main.zig
 </pre>
 There are over 240 test run to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on DOS terminals. You'll have to search around and find an equivalent command if you are on MacOS, Linux, or Unix for your respective shell.
 <pre>
-zig test ./src/XmtxUtils.zig > all_test_output.txt 2>&1
+zig test ./src/main.zig > all_test_output.txt 2>&1
 </pre>
 Currently the library sets each module to use fast floating point math. This has already shown a positive impact in the performance of different functions in the function execution time list. If there is some instability in floating point math just comment out this line in the header of main.zig and XmtxUtils.zig.
 <pre>
