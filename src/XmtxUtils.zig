@@ -8549,20 +8549,44 @@ pub fn magInrPrdctSpcXvec(vec: []f32, prdct: *const fn (l: []f32, r: []f32) f32)
 ///
 ///  returns = An f32 value representing the distance between two vectors in a general inner product space or -1.0 if there's an error.
 ///
-pub fn dstInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) f32 {
+pub fn dstInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !f32 {
     if (vecL.len != vecR.len) {
-        prntNlStr("dstInrPrdctSpc: Error, vectors u and v must be the same size, returning -1.0.");
-        return -1.0;
+        prntNlStr("dstInrPrdctSpcXvec: Error, vectors u and v must be the same size, returning -1.0.");
+        return Error.InvalidLengths;
     }
 
-    const t: []f32 = alloc.*.alloc(f32, vecL.len) catch |err| {
-        prntNlStrArgs("dstInrPrdctSpcXvec: Error allocating memory {}, returning a -1.0.", .{err});
-        return -1.0;
-    };
+    const t: []f32 = try alloc.*.alloc(f32, vecL.len);
     defer alloc.*.free(t);
 
     diff2Xvec(@constCast(t), vecL, vecR);
     return magInrPrdctSpcXvec(@constCast(t), prdct);
+}
+
+//TODO: tests
+
+const Error = error{InvalidLengths};
+
+///Calculates the distance of two vectors in a general inner product spaces.
+///
+///  vecL = The left hand vector in the inner product distance calculation, vecL - vecR.
+///
+///  vecR = The right hand vector in the inner product distance calculation, vecL - vecR.
+///
+///  prdct = A function that takes two vectors as an argument and returns a f32 value determining the general inner product space.
+///
+///  returns = An f32 value representing the distance between two vectors in a general inner product space or -1.0 if there's an error.
+///
+pub fn dstXvec(vecL: []f32, vecR: []f32, alloc: *const std.mem.Allocator) !f32 {
+    if (vecL.len != vecR.len) {
+        prntNlStr("dstXvec: Error, vectors u and v must be the same size, returning -1.0.");
+        return Error.InvalidLengths;
+    }
+
+    const t: []f32 = try alloc.*.alloc(f32, vecL.len);
+    defer alloc.*.free(t);
+
+    diff2Xvec(@constCast(t), vecL, vecR);
+    return magXvec(@constCast(t));
 }
 
 //TODO: tests
@@ -13250,6 +13274,96 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 11, 13 test" {
 
 test "XMTX: ELA - Larson, Edwards: 5.1 Problem 15 test" {
     //Chapter 5: Section 5.1: Problem 15: pg 262
+    //For what values of c is ||c(1,2,3)|| = 1
+    //15:
+    const u = [3]f32{ 1, 2, 3 };
+    const su: []f32 = @constCast(&u);
+    const val = 1.0 / magXvec(@constCast(su));
+    const exp = (1.0 / std.math.sqrt(14.0));
+
+    prntNlStrArgs("15 Found val: {any}", .{val});
+    prntNlStrArgs("15 Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.1 Problem 17, 19 test" {
+    //Chapter 5: Section 5.1: Problem 17, 19: pg 262
+
+    //17:
+    const u: [2]f32 = .{ 2.0 * std.math.sqrt(2.0), 2.0 * std.math.sqrt(2.0) };
+    var val: f32 = magXvec(@constCast(&u));
+    var exp: f32 = 4.0;
+
+    prntNlStrArgs("17 Found val: {any}", .{val});
+    prntNlStrArgs("17 Found exp: {any}", .{exp});
+    try std.testing.expectEqual(true, isEquF32(val, exp, false));
+    prntNl();
+
+    //19:
+    const v: [3]f32 = .{ 1, std.math.sqrt(3.0), 0 };
+    val = magXvec(@constCast(&v));
+    exp = 2.0;
+
+    prntNlStrArgs("19 Found val: {any}", .{val});
+    prntNlStrArgs("19 Found exp: {any}", .{exp});
+    try std.testing.expectEqual(true, isEquF32(val, exp, false));
+    prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.1 Problem 21 test" {
+    //Chapter 5: Section 5.1: Problem 21: pg 262
+    //Given (8,8,6) find v = same direction, 1/2 len, v = opposite direction, 1/4 len
+    //21:
+    //(a)
+    const u: [3]f32 = .{ 8, 8, 6 };
+    const l: f32 = magXvec(@constCast(&u));
+    var val: f32 = l / 2.0;
+    var v: [3]f32 = .{ 4, 4, 3 };
+    var exp: f32 = magXvec(@constCast(&v));
+
+    prntNlStrArgs("21a Found val: {any}", .{val});
+    prntNlStrArgs("21a Found exp: {any}", .{exp});
+    try std.testing.expectEqual(true, isEquF32(val, exp, false));
+    prntNl();
+
+    //(b)
+    val = l / 4.0;
+    v = .{ -2.0, -2.0, (-3.0 / 2.0) };
+    exp = magXvec(@constCast(&v));
+
+    prntNlStrArgs("21b Found val: {any}", .{val});
+    prntNlStrArgs("21b Found exp: {any}", .{exp});
+    try std.testing.expectEqual(true, isEquF32(val, exp, false));
+    prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.1 Problem 23, 25 test" {
+    //Chapter 5: Section 5.1: Problem 23, 25: pg 262
+    //23:
+    const u = [2]f32{ 1, -1 };
+    const v = [2]f32{ -1, 1 };
+    const alloc = std.testing.allocator;
+    var val: f32 = try dstXvec(@constCast(&u), @constCast(&v), &alloc);
+    var exp: f32 = (2.0 * std.math.sqrt(2.0));
+    prntNlStrArgs("23 Found val: {any}", .{val});
+    prntNlStrArgs("23 Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    //25:
+    const lu = [3]f32{ 1, 1, 2 };
+    const lv = [3]f32{ -1, 3, 0 };
+    val = try dstXvec(@constCast(&lu), @constCast(&lv), &alloc);
+    exp = (2.0 * std.math.sqrt(3.0));
+    prntNlStrArgs("25 Found val: {any}", .{val});
+    prntNlStrArgs("25 Found exp: {any}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.1 Problem 27, 29 test" {
+    //Chapter 5: Section 5.1: Problem 23, 25: pg 262
     //TODO
 }
 

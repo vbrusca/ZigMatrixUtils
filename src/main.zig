@@ -455,8 +455,8 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Theorem 5.9 test" {
 
     xmu.prntNlStr("Found cv:");
     xmu.prntXmtxNl(&cv, 3);
-    const v1 = xmu.dstInrPrdctSpcXvec(&u, @constCast(projUontoV), xmu.dotPrdXvec, &alloc);
-    const v2 = xmu.dstInrPrdctSpcXvec(&u, &cv, xmu.dotPrdXvec, &alloc);
+    const v1 = try xmu.dstInrPrdctSpcXvec(&u, @constCast(projUontoV), xmu.dotPrdXvec, &alloc);
+    const v2 = try xmu.dstInrPrdctSpcXvec(&u, &cv, xmu.dotPrdXvec, &alloc);
 
     xmu.prntNlStrArgs("Found v1: {}", .{v1});
     xmu.prntNlStrArgs("Found v2: {}", .{v2});
@@ -499,7 +499,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     xmu.prntNl();
 
     //(c)
-    val = xmu.dstInrPrdctSpcXvec(&u, &v, xmu.dotPrdXvec, &alloc);
+    val = try xmu.dstInrPrdctSpcXvec(&u, &v, xmu.dotPrdXvec, &alloc);
     exp = (2.0 * std.math.sqrt(65.0));
     xmu.prntNlStrArgs("1c Found val: {}", .{val});
     xmu.prntNlStrArgs("1c Found exp: {}", .{exp});
@@ -528,7 +528,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     xmu.prntNl();
 
     //(c)
-    val = xmu.dstInrPrdctSpcXvec(&u, &v, _diffInrPrdPrdctProblem3, &alloc);
+    val = try xmu.dstInrPrdctSpcXvec(&u, &v, _diffInrPrdPrdctProblem3, &alloc);
     exp = (2.0 * std.math.sqrt(13.0));
     xmu.prntNlStrArgs("3c Found val: {}", .{val});
     xmu.prntNlStrArgs("3c Found exp: {}", .{exp});
@@ -557,7 +557,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     xmu.prntNl();
 
     //(c)
-    val = xmu.dstInrPrdctSpcXvec(&lu3, &lv3, xmu.dotPrdXvec, &alloc);
+    val = try xmu.dstInrPrdctSpcXvec(&lu3, &lv3, xmu.dotPrdXvec, &alloc);
     exp = std.math.sqrt(266.0);
     xmu.prntNlStrArgs("5c Found val: {}", .{val});
     xmu.prntNlStrArgs("5c Found exp: {}", .{exp});
@@ -586,7 +586,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 1, 3, 5, 7 test" {
     xmu.prntNl();
 
     //(c)
-    val = xmu.dstInrPrdctSpcXvec(&lu3, &lv3, _diffInrPrdPrdctProblem7, &alloc);
+    val = try xmu.dstInrPrdctSpcXvec(&lu3, &lv3, _diffInrPrdPrdctProblem7, &alloc);
     exp = std.math.sqrt(34.0);
     xmu.prntNlStrArgs("7c Found val: {}", .{val});
     xmu.prntNlStrArgs("7c Found exp: {}", .{exp});
@@ -626,7 +626,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 13 test" {
     xmu.prntNl();
 
     //(c)
-    val = xmu.dstInrPrdctSpcXvec(&la, &lb, _diffInrPrdPrdctProblem13, &alloc);
+    val = try xmu.dstInrPrdctSpcXvec(&la, &lb, _diffInrPrdPrdctProblem13, &alloc);
     exp = (3.0 * std.math.sqrt(6.0));
     xmu.prntNlStrArgs("13c Found val: {}", .{val});
     xmu.prntNlStrArgs("13c Found exp: {}", .{exp});
@@ -662,7 +662,7 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 15 test" {
     xmu.prntNl();
 
     //(c)
-    val = xmu.dstInrPrdctSpcXvec(&p, &q, xmu.dotPrdXvec, &alloc);
+    val = try xmu.dstInrPrdctSpcXvec(&p, &q, xmu.dotPrdXvec, &alloc);
     exp = std.math.sqrt(21.0);
     xmu.prntNlStrArgs("15c Found val: {}", .{val});
     xmu.prntNlStrArgs("15c Found exp: {}", .{exp});
