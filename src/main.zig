@@ -1,5 +1,9 @@
 //! The main execution point for running unit tests. This isn't used by the library
 //! except for unit testing.
+//!
+//! Developers: Carlo Bruscani, Victor Brusca
+//! 04/17/2024
+//!
 
 const std = @import("std");
 const xmu = @import("./XmtxUtils.zig");
