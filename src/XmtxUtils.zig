@@ -8579,7 +8579,7 @@ const Error = error{InvalidLengths};
 ///
 pub fn dstXvec(vecL: []f32, vecR: []f32, alloc: *const std.mem.Allocator) !f32 {
     if (vecL.len != vecR.len) {
-        prntNlStr("dstXvec: Error, vectors u and v must be the same size, returning -1.0.");
+        prntNlStr("dstXvec: Error, vectors u and v must be the same length.");
         return Error.InvalidLengths;
     }
 
@@ -8743,7 +8743,16 @@ test "XMTX: inrPrdct test" {
     prntNl();
 }
 
-//TODO: docs
+///Tests the vector arguments, u and v, with the given general inner product space, prdct, to verify the Cauchy-Schwarz Inequality theorem.
+///
+///  u = A vector used in this theorem test.
+///
+///  v = A vector used in this theorem test.
+///
+///  prdct = A function that takes two vector arguments and returns an f32 value. This function defines the inner product space.
+///
+///  returns = A boolean value indicating if the Cauchy-Schwarz Inequality theorem holds for the given arguments or an error value indicating the error encountered.
+///
 pub fn tstCauchySchwarzIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32) bool {
     const v1: f32 = absF32(prdct(u, v));
     const v2: f32 = magInrPrdctSpcXvec(u, prdct);
@@ -8754,7 +8763,18 @@ pub fn tstCauchySchwarzIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: [
 
 //TODO: tests
 
-//TODO: docs
+///Tests the vector arguments, u and v, with the given general inner product space, prdct, to verify the Triangle Inequality theorem.
+///
+///  u = A vector used in this theorem test.
+///
+///  v = A vector used in this theorem test.
+///
+///  prdct = A function that takes two vector arguments and returns an f32 value. This function defines the inner product space.
+///
+///  alloc = A memory allocator.
+///
+///  returns = A boolean value indicating if the Triangle Inequality theorem holds for the given arguments or an error value indicating the error encountered.
+///
 pub fn tstTriangleIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
     const t: []f32 = try alloc.*.alloc(f32, u.len);
     defer alloc.*.free(t);
@@ -8769,7 +8789,18 @@ pub fn tstTriangleIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32)
 
 //TODO: tests
 
-//TODO: docs
+///Tests the vector arguments, u and v, with the given general inner product space, prdct, to verify the Pythagorean theorem.
+///
+///  u = A vector used in this theorem test.
+///
+///  v = A vector used in this theorem test.
+///
+///  prdct = A function that takes two vector arguments and returns an f32 value. This function defines the inner product space.
+///
+///  alloc = A memory allocator.
+///
+///  returns = A boolean value indicating if the Pythagorean theorem holds for the given arguments or an error value indicating the error encountered.
+///
 pub fn tstPythagoreanTheorem(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
     const t: []f32 = try alloc.*.alloc(f32, u.len);
     defer alloc.*.free(t);
