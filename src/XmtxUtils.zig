@@ -39,6 +39,9 @@ const ZERO_F32: f32 = 0.001;
 ///A Boolean indicating if the library should use exact comparison, int values, or precision comparison, float.
 const COMPARE_MODE_EXACT: bool = false;
 
+///Error to use when invalid array lengths are encountered.
+const Error = error{InvalidLengths};
+
 ///i^ in 2x2 space
 const iH2: [2]f32 = .{ 1, 0 };
 
@@ -8538,7 +8541,25 @@ pub fn magInrPrdctSpcXvec(vec: []f32, prdct: *const fn (l: []f32, r: []f32) f32)
     return std.math.sqrt(prdct(vec, vec));
 }
 
-//TODO: tests
+test "XMTX: magInrPrdctSpcXvec test" {
+    const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
+    var u: [3]f32 = .{ 1, 2, 3 };
+    var v: [3]f32 = .{ 2, 4, 6 };
+    const v1: f32 = magInrPrdctSpcXvec(&u, prdct);
+    const v2: f32 = magInrPrdctSpcXvec(&v, prdct);
+    const e1: f32 = 3.74165749e+00;
+    const e2: f32 = 7.48331499e+00;
+
+    prntNlStrArgs("Found val 1: {}", .{v1});
+    prntNlStrArgs("Found exp 1: {}", .{e1});
+    try std.testing.expectEqual(v1, e1);
+    prntNl();
+
+    prntNlStrArgs("Found val 2: {}", .{v2});
+    prntNlStrArgs("Found exp 2: {}", .{e2});
+    try std.testing.expectEqual(v2, e2);
+    prntNl();
+}
 
 ///Calculates the distance of two vectors in a general inner product spaces.
 ///
@@ -8563,9 +8584,27 @@ pub fn dstInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, 
     return magInrPrdctSpcXvec(@constCast(t), prdct);
 }
 
-//TODO: tests
+test "XMTX: dstInrPrdctSpcXvec test" {
+    var alloc = std.testing.allocator;
+    const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
+    var u: [3]f32 = .{ 1, 0, 0 };
+    var v: [3]f32 = .{ 0, 0, 0 };
+    var val: f32 = try dstInrPrdctSpcXvec(&u, &v, prdct, &alloc);
+    var exp: f32 = 1.0;
+    prntNlStrArgs("Found val 1: {}", .{val});
+    prntNlStrArgs("Found exp 1: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
 
-const Error = error{InvalidLengths};
+    u = .{ 1, 1, 1 };
+    v = .{ 1, 0, 0 };
+    val = try dstInrPrdctSpcXvec(&u, &v, prdct, &alloc);
+    exp = 1.41421353e+00;
+    prntNlStrArgs("Found val 2: {}", .{val});
+    prntNlStrArgs("Found exp 2: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
 
 ///Calculates the distance of two vectors in a general inner product spaces.
 ///
@@ -8590,7 +8629,26 @@ pub fn dstXvec(vecL: []f32, vecR: []f32, alloc: *const std.mem.Allocator) !f32 {
     return magXvec(@constCast(t));
 }
 
-//TODO: tests
+test "XMTX: dstXvec test" {
+    var alloc = std.testing.allocator;
+    var u: [3]f32 = .{ 1, 0, 0 };
+    var v: [3]f32 = .{ 0, 0, 0 };
+    var val: f32 = try dstXvec(&u, &v, &alloc);
+    var exp: f32 = 1.0;
+    prntNlStrArgs("Found val 1: {}", .{val});
+    prntNlStrArgs("Found exp 1: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    u = .{ 1, 1, 1 };
+    v = .{ 1, 0, 0 };
+    val = try dstXvec(&u, &v, &alloc);
+    exp = 1.41421353e+00;
+    prntNlStrArgs("Found val 2: {}", .{val});
+    prntNlStrArgs("Found exp 2: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
 
 ///Calculates the angle in radians between two vectors in a general inner product space.
 ///
@@ -8761,7 +8819,26 @@ pub fn tstCauchySchwarzIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: [
     return (v1 < v4);
 }
 
-//TODO: tests
+test "XMTX: tstCauchySchwarzIneq test" {
+    var u: [2]f32 = .{ 5, 12 };
+    var v: [2]f32 = .{ 3, 4 };
+    const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
+    var exp: bool = true;
+    var val: bool = tstCauchySchwarzIneq(&u, &v, prdct);
+    prntNlStrArgs("Found val 1: {}", .{val});
+    prntNlStrArgs("Found exp 1: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    u = [2]f32{ 5, 15 };
+    v = [2]f32{ 3, 5 };
+    exp = true;
+    val = tstCauchySchwarzIneq(&u, &v, prdct);
+    prntNlStrArgs("Found val 2: {}", .{val});
+    prntNlStrArgs("Found exp 2: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
 
 ///Tests the vector arguments, u and v, with the given general inner product space, prdct, to verify the Triangle Inequality theorem.
 ///
@@ -8787,7 +8864,18 @@ pub fn tstTriangleIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32)
     return (v1 <= v4);
 }
 
-//TODO: tests
+test "XMTX: tstTriangleIneq test" {
+    var u: [2]f32 = .{ 5, 5 };
+    var v: [2]f32 = .{ 3, 3 };
+    const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
+    const alloc = std.testing.allocator;
+    const exp: bool = true;
+    const val: bool = try tstTriangleIneq(&u, &v, prdct, &alloc);
+    prntNlStrArgs("Found val: {}", .{val});
+    prntNlStrArgs("Found exp: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
 
 ///Tests the vector arguments, u and v, with the given general inner product space, prdct, to verify the Pythagorean theorem.
 ///
