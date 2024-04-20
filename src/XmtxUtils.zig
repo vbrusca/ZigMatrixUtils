@@ -4361,7 +4361,45 @@ pub fn projUnitXvec_VecP_Onto_VecQ(vecP: []f32, vecQ: []f32) []f32 {
     return vecQ;
 }
 
-//TODO tests
+test "XMTX: projUnitXvec_VecP_Onto_VecQ test" {
+    //Q = 2 2 1
+    //P = 1 -2 0
+    var Q: [3]f32 = .{ 2, 2, 1 };
+    nrmXvec(&Q);
+    var P: [3]f32 = .{ 1, -2, 0 };
+    nrmXvec(&P);
+    var exp: [3]f32 = .{ -1.76676996e-02, -1.76676996e-02, -8.83384980e-03 };
+
+    var start = try Instant.now();
+    const ret1: []f32 = projXvec_VecP_Onto_VecQ(&P, &Q);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprojXvec_VecP_Onto_VecQ: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("projXvec_VecP_Onto_VecQ", elapsed1);
+
+    start = try Instant.now();
+    const ret2: []f32 = projUnitXvec_VecP_Onto_VecQ(&P, &Q);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprojUnitXvec_VecP_Onto_VecQ: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("projUnitXvec_VecP_Onto_VecQ", elapsed1);
+
+    clnXvec(ret1);
+    clnXvec(ret2);
+    clnXvec(&exp);
+
+    prntXvecNl(ret1);
+    prntNl();
+    prntXvecNl(ret2);
+    prntNl();
+    prntXvecNl(&exp);
+    prntNl();
+
+    try std.testing.expectEqual(true, equXvecWrkr(ret1, ret2, false));
+    try std.testing.expectEqual(true, equXvecWrkr(ret1, &exp, false));
+    try std.testing.expectEqual(true, equXvecWrkr(ret2, &exp, false));
+    prntNl();
+}
 
 ///Finds the vector perpendicular to vectors P and Q.
 ///
@@ -8670,7 +8708,25 @@ pub fn aglBtwnInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f
     return arcCosA;
 }
 
-//TODO: tests
+test "XMTX: aglBtwnInrPrdctSpcXvec test" {
+    var v1: [3]f32 = .{ 1, 0, 0 };
+    var v2: [3]f32 = .{ 0, 0, 1 };
+    var angle: f32 = -1.0;
+
+    const start = try Instant.now();
+    angle = aglBtwnInrPrdctSpcXvec(&v1, &v2, dotPrdXvec);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\naglBtwnInrPrdctSpcXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("aglBtwnInrPrdctSpcXvec", elapsed1);
+
+    const exp: f32 = 1.57079625e+00;
+    prntXvecNl(&v1);
+    std.debug.print("\nAngle RAD: {}", .{angle});
+    std.debug.print("\nAngle DEG: {}", .{rad2Deg(angle)});
+    try std.testing.expectEqual(exp, angle);
+    prntNl();
+}
 
 ///Determines if the vectors u, v, and w are members of a general inner product space.
 ///
@@ -8838,6 +8894,15 @@ test "XMTX: tstCauchySchwarzIneq test" {
     prntNlStrArgs("Found exp 2: {}", .{exp});
     try std.testing.expectEqual(val, exp);
     prntNl();
+
+    u = [2]f32{ 5, 15 };
+    v = [2]f32{ 0, 0 };
+    exp = false;
+    val = tstCauchySchwarzIneq(&u, &v, prdct);
+    prntNlStrArgs("Found val 3: {}", .{val});
+    prntNlStrArgs("Found exp 3: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
 }
 
 ///Tests the vector arguments, u and v, with the given general inner product space, prdct, to verify the Triangle Inequality theorem.
@@ -8851,6 +8916,7 @@ test "XMTX: tstCauchySchwarzIneq test" {
 ///  alloc = A memory allocator.
 ///
 ///  returns = A boolean value indicating if the Triangle Inequality theorem holds for the given arguments or an error value indicating the error encountered.
+///            Returns false if any triangle side is length zero.
 ///
 pub fn tstTriangleIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
     const t: []f32 = try alloc.*.alloc(f32, u.len);
@@ -8861,7 +8927,11 @@ pub fn tstTriangleIneq(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32)
     const v2: f32 = magInrPrdctSpcXvec(u, prdct);
     const v3: f32 = magInrPrdctSpcXvec(v, prdct);
     const v4: f32 = (v2 + v3);
-    return (v1 <= v4);
+    if (v1 == 0 or v2 == 0 or v3 == 0) {
+        return false;
+    } else {
+        return (v1 <= v4);
+    }
 }
 
 test "XMTX: tstTriangleIneq test" {
@@ -8869,10 +8939,28 @@ test "XMTX: tstTriangleIneq test" {
     var v: [2]f32 = .{ 3, 3 };
     const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
     const alloc = std.testing.allocator;
-    const exp: bool = true;
-    const val: bool = try tstTriangleIneq(&u, &v, prdct, &alloc);
-    prntNlStrArgs("Found val: {}", .{val});
-    prntNlStrArgs("Found exp: {}", .{exp});
+    var exp: bool = true;
+    var val: bool = try tstTriangleIneq(&u, &v, prdct, &alloc);
+    prntNlStrArgs("Found val 1: {}", .{val});
+    prntNlStrArgs("Found exp 1: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    u = [2]f32{ 1, 1 };
+    v = [2]f32{ -1, -1 };
+    exp = false;
+    val = try tstTriangleIneq(&u, &v, prdct, &alloc);
+    prntNlStrArgs("Found val 2: {}", .{val});
+    prntNlStrArgs("Found exp 2: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    u = [2]f32{ 1, 1 };
+    v = [2]f32{ 0, 0 };
+    exp = false;
+    val = try tstTriangleIneq(&u, &v, prdct, &alloc);
+    prntNlStrArgs("Found val 3: {}", .{val});
+    prntNlStrArgs("Found exp 3: {}", .{exp});
     try std.testing.expectEqual(val, exp);
     prntNl();
 }
@@ -8888,21 +8976,55 @@ test "XMTX: tstTriangleIneq test" {
 ///  alloc = A memory allocator.
 ///
 ///  returns = A boolean value indicating if the Pythagorean theorem holds for the given arguments or an error value indicating the error encountered.
+///            Returns false if any triangle side is length zero.
 ///
 pub fn tstPythagoreanTheorem(u: []f32, v: []f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
     const t: []f32 = try alloc.*.alloc(f32, u.len);
     defer alloc.*.free(t);
     clrXvec(t);
     sum2Xvec(t, u, v);
-    const v1: f32 = magInrPrdctSpcXvec(t, prdct);
+    var v1: f32 = magInrPrdctSpcXvec(t, prdct);
     const v2: f32 = magInrPrdctSpcXvec(u, prdct);
     const v3: f32 = magInrPrdctSpcXvec(v, prdct);
     v1 = (v1 * v1);
     const v4: f32 = (v2 * v2) + (v3 * v3);
-    return (v1 == v4);
+    if (v1 == 0 or v2 == 0 or v3 == 0) {
+        return false;
+    } else {
+        return (isEquF32(v1, v4, false));
+    }
 }
 
-//TODO: tests
+test "XMTX: tstPythagoreanTheorem test" {
+    var u: [2]f32 = .{ 0, 5 };
+    var v: [2]f32 = .{ 3, 0 };
+    const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
+    const alloc = std.testing.allocator;
+    var exp: bool = true;
+    var val: bool = try tstPythagoreanTheorem(&u, &v, prdct, &alloc);
+    prntNlStrArgs("Found val 1: {}", .{val});
+    prntNlStrArgs("Found exp 1: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    u = [2]f32{ 1, 0 };
+    v = [2]f32{ 0, -1 };
+    exp = true;
+    val = try tstPythagoreanTheorem(&u, &v, prdct, &alloc);
+    prntNlStrArgs("Found val 2: {}", .{val});
+    prntNlStrArgs("Found exp 2: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+
+    u = [2]f32{ 3, 3 };
+    v = [2]f32{ 0, 0 };
+    exp = false;
+    val = try tstPythagoreanTheorem(&u, &v, prdct, &alloc);
+    prntNlStrArgs("Found val 3: {}", .{val});
+    prntNlStrArgs("Found exp 3: {}", .{exp});
+    try std.testing.expectEqual(val, exp);
+    prntNl();
+}
 
 ///Projects vector P onto vector Q in a general inner product space. Alters argument vecQ.
 ///
@@ -8967,7 +9089,45 @@ pub fn projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc(vecP: []f32, vecQ: []f32, prdct: 
     return vecQ;
 }
 
-//TODO tests
+test "XMTX: projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc test" {
+    //Q = 2 2 1
+    //P = 1 -2 0
+    var Q: [3]f32 = .{ 2, 2, 1 };
+    nrmXvec(&Q);
+    var P: [3]f32 = .{ 1, -2, 0 };
+    nrmXvec(&P);
+
+    const exp: [3]f32 = .{ -1.76676996e-02, -1.76676996e-02, -8.83384980e-03 };
+    var start = try Instant.now();
+    const ret1: []f32 = projXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nprojXvec_VecP_Onto_VecQ_InrPrdctSpc: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("projXvec_VecP_Onto_VecQ_InrPrdctSpc", elapsed1);
+
+    start = try Instant.now();
+    const ret2: []f32 = projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nprojUnitXvec_VecP_Onto_VecQ_InrPrdctSpc: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc", elapsed1);
+
+    clnXvec(ret1);
+    clnXvec(ret2);
+    clnXvec(@constCast(&exp));
+
+    prntXvecNl(ret1);
+    prntNl();
+    prntXvecNl(ret2);
+    prntNl();
+    prntXvecNl(@constCast(&exp));
+    prntNl();
+
+    try std.testing.expectEqual(true, equXvecWrkr(ret1, ret2, false));
+    try std.testing.expectEqual(true, equXvecWrkr(ret1, @constCast(&exp), false));
+    try std.testing.expectEqual(true, equXvecWrkr(ret2, @constCast(&exp), false));
+    prntNl();
+}
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
