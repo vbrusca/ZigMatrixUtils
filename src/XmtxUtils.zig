@@ -3102,7 +3102,6 @@ test "XMTX: isZeroXvec test" {
 ///  returns = A Boolean value indicating if the two vectors, vecL and vecR, are linearly independent.
 ///
 pub fn isLinIndXvec(vecL: []f32, vecR: []f32) bool {
-    //std.debug.print("\ndotPrdXvec: {}", .{dotPrdXvec(vecL, vecR)});
     if (dotPrdXvec(vecL, vecR) == 0) {
         return true;
     }
@@ -3135,6 +3134,39 @@ test "XMTX: isLinIndXvec test" {
     prntNl();
 }
 
+//TODO: docs
+pub fn isOrthogonalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !bool {
+    return try isLinIndXmtx(mtx, cols, alloc);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn isOrthonormalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !bool {
+    const b: bool = try isLinIndXmtx(mtx, cols, alloc);
+    if (b == true) {
+        var i = 0;
+        var ret = undefined;
+        var mag = 0;
+        const l = mtx.len / cols;
+        var r = 0;
+
+        while (i < l) {
+            ret = alloc.*.alloc([cols]f32, cols);
+            mag = magXvec(cpyLessColRowXmtx(mtx, ret, 0, cols, r, (r + 1), cols, cols));
+            if (!isEquF32(mag, 1.0, false)) {
+                return false;
+            }
+            i += cols;
+            r += 1;
+        }
+        return true;
+    }
+    return false;
+}
+
+//TODO: tests
+
 ///Returns true if the vectors of the given matrix, mtx, are linearly independent when tested in series.
 ///
 ///  mtx = The matrix to use to test for linear independence.
@@ -3145,23 +3177,22 @@ test "XMTX: isLinIndXvec test" {
 ///
 ///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors.
 ///
-pub fn isLinIndXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) bool {
+pub fn isLinIndXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !bool {
     var vecL: []f32 = undefined;
     var vecR: []f32 = undefined;
 
     vecL = crtXvec(cols, alloc) catch |err| {
         std.debug.print("\nisLinIndXmtx: Error creating new vector vecL: {}", .{err});
-        return false;
+        return err;
     };
 
     vecR = crtXvec(cols, alloc) catch |err| {
         std.debug.print("\nisLinIndXmtx: Error creating new vector vecR: {}", .{err});
         alloc.*.free(vecL);
-        return false;
+        return err;
     };
 
     const b: bool = isLinIndXmtxRef(mtx, vecL, vecR, cols);
-
     alloc.free(vecL);
     alloc.free(vecR);
     return b;
@@ -3173,7 +3204,7 @@ test "XMTX: isLinIndXmtx test" {
     var b: bool = false;
 
     const start = try Instant.now();
-    b = isLinIndXmtx(&mtx, 3, &alloc);
+    b = try isLinIndXmtx(&mtx, 3, &alloc);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nisLinIndXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
