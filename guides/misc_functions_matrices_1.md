@@ -57,7 +57,7 @@ There are a number of miscellaneous matrix functions that you can use for variou
 </ul>
 
 <!--
-NEEDED:
+TODO: needs
 adjXmtx
 adjXmtx1
 adjXmtx2

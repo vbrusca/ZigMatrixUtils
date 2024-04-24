@@ -3134,26 +3134,168 @@ test "XMTX: isLinIndXvec test" {
     prntNl();
 }
 
-//TODO: docs
+///Returns a Boolean indicating if the provided vectors are linearly independent, for the given general inner product space, or not.
+///
+///  vecL = The left-hand side vector to compare to vecR.
+///
+///  vecR = The right-hand side vector to compare to vecL.
+///
+///  prdct = A function that takes two vectors as arguments and returns an f32 value.
+///
+///  returns = A Boolean value indicating if the two vectors, vecL and vecR, are linearly independent, for the given general inner product space.
+///
+pub fn isLinIndInrPrdctSpcXvec(vecL: []f32, vecR: []f32, prdct: *const fn (l: []f32, r: []f32) f32) bool {
+    if (prdct(vecL, vecR) == 0) {
+        return true;
+    }
+    return false;
+}
+
+test "XMTX: isLinIndInrPrdctSpcXvec test" {
+    var v1: [3]f32 = .{ 1, 0, 0 };
+    var v2: [3]f32 = .{ 0, 1, 0 };
+    var v3: [3]f32 = .{ 0, 3, 0 };
+    var b: bool = false;
+    var b1: bool = false;
+    const prdct = dotPrdXvec;
+
+    var start = try Instant.now();
+    b = isLinIndXvec(&v1, &v2);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXvec", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+
+    start = try Instant.now();
+    b1 = isLinIndInrPrdctSpcXvec(&v1, &v2, &prdct);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndInrPrdctSpcXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndInrPrdctSpcXvec", elapsed1);
+
+    try std.testing.expectEqual(b, b1);
+
+    start = try Instant.now();
+    b = isLinIndXvec(&v2, &v3);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXvec", elapsed1);
+
+    try std.testing.expectEqual(false, b);
+
+    start = try Instant.now();
+    b1 = isLinIndInrPrdctSpcXvec(&v2, &v3, &prdct);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndInrPrdctSpcXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndInrPrdctSpcXvec", elapsed1);
+
+    try std.testing.expectEqual(b, b1);
+    prntNl();
+}
+
+///Returns true if the vectors of the given matrix, mtx, are orthogonal, linearly independent using the Euclidean dot product, when tested in series.
+///
+///  mtx = The matrix to use to test for orthogonality.
+///
+///  cols = The number of columns in the matrix, mtx.
+///
+///  alloc = The memory allocator used to create vectors as needed.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors, orthogonal or an error.
+///
 pub fn isOrthogonalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !bool {
     return try isLinIndXmtx(mtx, cols, alloc);
 }
 
 //TODO: tests
 
-//TODO: docs
+///Returns true if the vectors of the given matrix, mtx, are orthogonal, linearly independent using the given general inner product space, when tested in series.
+///
+///  mtx = The matrix to use to test for orthogonality.
+///
+///  cols = The number of columns in the matrix, mtx.
+///
+///  prdct = A function that takes two vectors as arguments and returns an f32 value.
+///
+///  alloc = The memory allocator used to create vectors as needed.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors, orthogonal or an error.
+///
+pub fn isOrthogonalInrPrdctSpcXmtx(mtx: []f32, cols: usize, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
+    return try isLinIndInrPrdctSpcXmtx(mtx, cols, prdct, alloc);
+}
+
+//TODO: tests
+
+///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent using Euclidean dot product with a magnitude of 1, when tested in series.
+///
+///  mtx = The matrix to use to test for orthonormality.
+///
+///  cols = The number of columns in the matrix, mtx.
+///
+///  alloc = The memory allocator used to create vectors as needed.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors, orthonormal, or an error.
+///
 pub fn isOrthonormalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !bool {
     const b: bool = try isLinIndXmtx(mtx, cols, alloc);
     if (b == true) {
-        var i = 0;
-        var ret = undefined;
-        var mag = 0;
-        const l = mtx.len / cols;
-        var r = 0;
+        const ret: []f32 = try alloc.*.alloc(f32, cols);
+        defer alloc.*.free(ret);
+
+        var i: usize = 0;
+        var mag: f32 = 0;
+        const l: usize = mtx.len / cols;
+        var r: usize = 0;
 
         while (i < l) {
-            ret = alloc.*.alloc([cols]f32, cols);
-            mag = magXvec(cpyLessColRowXmtx(mtx, ret, 0, cols, r, (r + 1), cols, cols));
+            clrXmtx(ret);
+            cpyLessColRowXmtx(mtx, ret, 0, cols, r, (r + 1), cols, cols);
+            mag = magXvec(ret);
+            if (!isEquF32(mag, 1.0, false)) {
+                return false;
+            }
+            i += cols;
+            r += 1;
+        }
+        return true;
+    }
+    return false;
+}
+
+//TODO: tests
+
+///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent using the given general inner product space with a magnitude of 1, when tested in series.
+///
+///  mtx = The matrix to use to test for orthonormality.
+///
+///  cols = The number of columns in the matrix, mtx.
+///
+///  prdct = A function that takes two vectors as arguments and returns an f32 value.
+///
+///  alloc = The memory allocator used to create vectors as needed.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors, orthonormal, or an error.
+///
+pub fn isOrthonormalInrPrdctSpcXmtx(mtx: []f32, cols: usize, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
+    const b: bool = try isLinIndInrPrdctSpcXmtx(mtx, cols, prdct, alloc);
+    if (b == true) {
+        const ret: []f32 = try alloc.*.alloc(f32, cols);
+        defer alloc.*.free(ret);
+
+        var i: usize = 0;
+        var mag: f32 = 0;
+        const l: usize = mtx.len / cols;
+        var r: usize = 0;
+
+        while (i < l) {
+            clrXmtx(ret);
+            cpyLessColRowXmtx(mtx, ret, 0, cols, r, (r + 1), cols, cols);
+            mag = magXvec(ret);
             if (!isEquF32(mag, 1.0, false)) {
                 return false;
             }
@@ -3213,6 +3355,85 @@ test "XMTX: isLinIndXmtx test" {
     try std.testing.expectEqual(true, b);
     prntNl();
 }
+
+///Returns true if the vectors of the given matrix, mtx, are linearly independent, for the given general inner product space, when tested in series.
+///
+///  mtx = The matrix to use to test for linear independence.
+///
+///  cols = The number of columns in the matrix, mtx, and the vectors vecL and vecR.
+///
+///  prdct = A function that takes two vectors as arguments and returns an f32 value.
+///
+///  alloc = The memory allocator used to create vectors to hold the left and right comparison of matrix rows.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors.
+///
+pub fn isLinIndInrPrdctSpcXmtx(mtx: []f32, cols: usize, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
+    var vecL: []f32 = undefined;
+    var vecR: []f32 = undefined;
+
+    vecL = crtXvec(cols, alloc) catch |err| {
+        std.debug.print("\nisLinIndInrPrdctSpcXmtx: Error creating new vector vecL: {}", .{err});
+        return err;
+    };
+
+    vecR = crtXvec(cols, alloc) catch |err| {
+        std.debug.print("\nisLinIndInrPrdctSpcXmtx: Error creating new vector vecR: {}", .{err});
+        alloc.*.free(vecL);
+        return err;
+    };
+
+    const b: bool = isLinIndInrPrdctSpcXmtxRef(mtx, vecL, vecR, cols, prdct);
+    alloc.free(vecL);
+    alloc.free(vecR);
+    return b;
+}
+
+test "XMTX: isLinIndInrPrdctSpcXmtx test" {
+    const alloc: std.mem.Allocator = std.testing.allocator;
+    var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var b: bool = false;
+    var b1: bool = false;
+
+    var start = try Instant.now();
+    b = try isLinIndXmtx(&mtx, 3, &alloc);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXmtx", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+    prntNl();
+
+    start = try Instant.now();
+    b1 = try isLinIndInrPrdctSpcXmtx(&mtx, 3, dotPrdXvec, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndInrPrdctSpcXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndInrPrdctSpcXmtx", elapsed1);
+
+    try std.testing.expectEqual(b1, b);
+    prntNl();
+}
+
+//TODO: needs
+//DONE isLinIndInrPrdctSpcXvec
+//DONE isLinIndInrPrdctSpcXmtx
+//DONE isLinIndInrPrdctSpcXmtxRef
+//DONE isOrthonormalInrPrdctSpcXmtx
+//DONE isOrthogonalInrPrdctSpcXmtx
+//IGNORE isOrthInrPrdctSpcXmtx
+//adjXmtx
+//adjXmtx1
+//adjXmtx2
+//cofXmtx1
+//cofXmtx2
+//cofXmtxSign1
+//cofXmtxSign1Ret
+//mnrXmtx1
+//mnrXmtx1Ret
+//rmvRowColXmtx2
+//trnXmtxRectInl
 
 ///Returns true if the vectors of the given matrix, mtx, are linearly independent when tested in series.
 ///
@@ -3294,6 +3515,102 @@ test "XMTX: isLinIndXmtxRef test" {
     addExecTime("isLinIndXmtxRef", elapsed1);
 
     try std.testing.expectEqual(true, b);
+    prntNl();
+}
+
+///Returns true if the vectors of the given matrix, mtx, are linearly independent, for the given general inner product space, when tested in series.
+///
+///  mtx = The matrix to use to test for linear independence.
+///
+///  vecL = The vector that holds the left comparison row.
+///
+///  vecR = The vector that holds the right comparison row.
+///
+///  cols = The number of columns in the matrix, mtx, and the vectors vecL and vecR.
+///
+///  prdct = A function that takes two vectors as arguments and returns an f32 value.
+///
+///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors.
+///
+pub fn isLinIndInrPrdctSpcXmtxRef(mtx: []f32, vecL: []f32, vecR: []f32, cols: usize, prdct: *const fn (l: []f32, r: []f32) f32) bool {
+    const llen: usize = mtx.len;
+    const rows: usize = llen / cols;
+    var i: usize = 0;
+    var j: i64 = -1;
+    var vecLset: bool = false;
+    var vecRset: bool = false;
+    var lind: bool = false;
+
+    while (j < (rows - 1)) {
+        i = @as(usize, @intCast((j + 1)));
+        vecLset = false;
+        vecRset = false;
+
+        while (i < (rows - 1)) {
+            if (vecLset == false) {
+                cpyLessColRowXmtx(mtx, vecL, 0, cols, i, i + 1, cols, cols);
+                vecLset = true;
+            } else if (vecRset == false) {
+                cpyLessColRowXmtx(mtx, vecR, 0, cols, i, i + 1, cols, cols);
+                vecRset = true;
+            }
+
+            if (vecLset and vecRset) {
+                if (VERBOSE) {
+                    prntNlStr("\nisLinIndXmtx: Compare L and R:");
+                    prntXvecNl(vecL);
+                    prntNl();
+                    prntXvecNl(vecR);
+                    prntNl();
+                }
+
+                lind = isLinIndInrPrdctSpcXvec(vecL, vecR, prdct);
+                if (!lind) {
+                    return false;
+                } else if (lind) {
+                    cpyXvec(vecR, vecL);
+                    clrXvec(vecR);
+                    vecLset = true;
+                    vecRset = false;
+                }
+            } else {
+                lind = false;
+            }
+
+            i += 1;
+        }
+        j += 1;
+    }
+
+    return true;
+}
+
+test "XMTX: isLinIndInrPrdctSpcXmtxRef test" {
+    var mtx: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    var vecL: [3]f32 = .{ 0, 0, 0 };
+    var vecR: [3]f32 = .{ 0, 0, 0 };
+    const cols: usize = 3;
+    var b: bool = false;
+    var b1: bool = false;
+
+    var start = try Instant.now();
+    b = isLinIndXmtxRef(&mtx, &vecL, &vecR, cols);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndXmtxRef: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndXmtxRef", elapsed1);
+
+    try std.testing.expectEqual(true, b);
+    prntNl();
+
+    start = try Instant.now();
+    b1 = isLinIndInrPrdctSpcXmtxRef(&mtx, &vecL, &vecR, cols, dotPrdXvec);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisLinIndPrdctSpcXmtxRef: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isLinIndPrdctSpcXmtxRef", elapsed1);
+
+    try std.testing.expectEqual(b1, b);
     prntNl();
 }
 
@@ -8166,7 +8483,8 @@ test "XMTX: getBasisCnvXmtx test" {
     prntNl();
 }
 
-///Returns a Boolean value indicating if the mtx argument is an orthogonal matrix.
+///Returns a Boolean value indicating if the mtx argument is an orthogonal matrix. Uses matrix reduction to determine
+/// if the matrix, mtx, is orthogonal.
 ///
 ///  mtx = The matrix to determine othogonality for.
 ///

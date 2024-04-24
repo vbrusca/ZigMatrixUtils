@@ -3,7 +3,7 @@
 The transpose of a matrix can be calculated using the <b>trnXmtx</b>, <b>trnXmtxInl</b>, or <b>trnXmtxRect</b> functions, lines 31 - 32, 33 - 34, respectively.
 
 <!--
-NEEDED:
+TODO: needs
 trnXmtxRectInl
 -->
 

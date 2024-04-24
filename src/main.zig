@@ -800,6 +800,24 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Problem 41 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.3 Example 1 test" {
+    //Chapter 5: Section 5.3: Example 1: pg 276
+    const cols: usize = 3.0;
+    const alloc = std.testing.allocator;
+    var S: [9]f32 = .{ (1.0 / std.math.sqrt(2.0)), (1.0 / std.math.sqrt(2.0)), (0.0), (std.math.sqrt(2.0) / -6.0), (std.math.sqrt(2.0) / 6.0), ((2.0 * std.math.sqrt(2.0)) / 3.0), (2.0 / 3.0), (-2.0 / 3.0), (1.0 / 3.0) };
+    var retS: [9]f32 = .{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    var idtS: [9]f32 = .{ 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 };
+    var trnS: [9]f32 = .{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    const b1: bool = xmu.isOrthXmtx(&S, cols, &retS, &idtS, &trnS);
+    const b2: bool = try xmu.isOrthogonalXmtx(&S, cols, &alloc);
+    const b3: bool = try xmu.isOrthonormalXmtx(&S, cols, &alloc);
+    xmu.prntNlStrArgs("Found isOrthXmtx: {}, isOrthogonalXmtx: {}, isOrthonormalXmtx: {}", .{ b1, b2, b3 });
+    try std.testing.expectEqual(b1, b2);
+    try std.testing.expectEqual(b1, b3);
+    try std.testing.expectEqual(b2, b3);
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
