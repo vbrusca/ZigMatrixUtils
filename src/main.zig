@@ -808,7 +808,7 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Example 1 test" {
     var retS: [9]f32 = .{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     var idtS: [9]f32 = .{ 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 };
     var trnS: [9]f32 = .{ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-    const b1: bool = xmu.isOrthXmtx(&S, cols, &retS, &idtS, &trnS);
+    const b1: bool = try xmu.isOrthXmtx(&S, cols, &retS, &idtS, &trnS);
     const b2: bool = try xmu.isOrthogonalXmtx(&S, cols, &alloc);
     const b3: bool = try xmu.isOrthonormalXmtx(&S, cols, &alloc);
     xmu.prntNlStrArgs("Found isOrthXmtx: {}, isOrthogonalXmtx: {}, isOrthonormalXmtx: {}", .{ b1, b2, b3 });

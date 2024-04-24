@@ -39,7 +39,7 @@ const ZERO_F32: f32 = 0.001;
 const COMPARE_MODE_EXACT: bool = false;
 
 ///Error to use when invalid array lengths are encountered.
-const Error = error{InvalidLengths};
+const Error = error{ InvalidLengths, OperationFailed };
 
 ///Identity for a 1x1 matrix.
 const iM1: [1]f32 = .{1};
@@ -2914,7 +2914,7 @@ test "XMTX: hasInvXmtx test" {
     prntXmtxNl(&m1, 4);
 
     var sclr: f32 = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&m1, &m2);
     cpyXmtx(&origM1, &m1);
@@ -3237,7 +3237,21 @@ pub fn isOrthogonalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator
     return try isLinIndXmtx(mtx, cols, alloc);
 }
 
-//TODO: tests
+test "XMTX: isOrthogonalXmtx test" {
+    const v1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    const v2: [9]f32 = .{ 0, 1, 0, 0, 1, 0, 0, 1, 0 };
+    const exp1: bool = true;
+    const exp2: bool = false;
+    const cols: usize = 3;
+    const alloc = std.testing.allocator;
+    const b1: bool = try isOrthogonalXmtx(@constCast(&v1), cols, &alloc);
+    const b2: bool = try isOrthogonalXmtx(@constCast(&v2), cols, &alloc);
+
+    prntNlStrArgs("B1: {} Exp1: {} B2: {} Exp2: {}", .{ b1, exp1, b2, exp2 });
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    prntNl();
+}
 
 ///Returns true if the vectors of the given matrix, mtx, are orthogonal, linearly independent using the given general inner product space, when tested in series.
 ///
@@ -3255,7 +3269,26 @@ pub fn isOrthogonalInrPrdctSpcXmtx(mtx: []f32, cols: usize, prdct: *const fn (l:
     return try isLinIndInrPrdctSpcXmtx(mtx, cols, prdct, alloc);
 }
 
-//TODO: tests
+test "XMTX: isOrthogonalInrPrdctSpcXmtx test" {
+    const v1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    const v2: [9]f32 = .{ 0, 1, 0, 0, 1, 0, 0, 1, 0 };
+    const exp1: bool = true;
+    const exp2: bool = false;
+    const cols: usize = 3;
+    const alloc = std.testing.allocator;
+    const prdct = dotPrdXvec;
+    const b1: bool = try isOrthogonalXmtx(@constCast(&v1), cols, &alloc);
+    const b2: bool = try isOrthogonalXmtx(@constCast(&v2), cols, &alloc);
+    const b3: bool = try isOrthogonalInrPrdctSpcXmtx(@constCast(&v1), cols, prdct, &alloc);
+    const b4: bool = try isOrthogonalInrPrdctSpcXmtx(@constCast(&v2), cols, prdct, &alloc);
+
+    prntNlStrArgs("B1: {} Exp1: {} B2: {} Exp2: {} B3: {} B4: {}", .{ b1, exp1, b2, exp2, b3, b4 });
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    try std.testing.expectEqual(b3, b1);
+    try std.testing.expectEqual(b4, b2);
+    prntNl();
+}
 
 ///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent using Euclidean dot product with a magnitude of 1, when tested in series.
 ///
@@ -4079,7 +4112,7 @@ test "XMTX: tmsXmtx test" {
     prntXmtxNl(&m1, 4);
 
     var sclr: f32 = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&m1, &m2);
     cpyXmtx(&origM1, &m1);
@@ -5065,7 +5098,7 @@ test "XMTX: procXmtx tests" {
 ///
 ///  returns = A Boolean value indicating  if the matrix was reduced successfuly.
 ///
-pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx: []f32, dim: usize, triagRdcOnly: bool, sclr: *f32) bool {
+pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx: []f32, dim: usize, triagRdcOnly: bool, sclr: *f32) !bool {
     const rows: usize = mtx.len / cols;
     var r: usize = 0;
     var c: usize = 0;
@@ -5085,24 +5118,23 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
     idtCols -= diff;
     const idtRows: usize = idtMtx.len / idtCols;
     var startingCol: usize = 0;
-    //prntNl();
 
     if (hasAug) {
         if (rows != (cols - diff)) {
             std.debug.print("\n!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!", .{});
-            return false;
+            return Error.InvalidLengths;
         }
     } else {
         if (rows != cols) {
             std.debug.print("\n!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!", .{});
-            return false;
+            return Error.InvalidLengths;
         }
     }
 
     if (hasIdtMtx) {
         if (idtRows != idtCols) {
             std.debug.print("\n!!Warning rdcXmtxInl identity matrix should be square !!", .{});
-            return false;
+            return Error.InvalidLengths;
         }
     }
 
@@ -5113,7 +5145,6 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
     }
 
     while (r < rows) : (r += 1) {
-        //std.debug.print("\nRow: {} StartingCol: {}", .{r, startingCol});
         c = startingCol;
 
         var fndRow: usize = 0;
@@ -5121,7 +5152,6 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
             fndRow = fndLgstRowAbsXmtx(mtx, cols, c, r);
             if (fndRow != r and fndRow != errRow) {
                 if (verbose) {
-                    //std.debug.print("\n{} Found abs row: {} on source row: {} with val: {}", .{c, fndRow, r, (mtx[(fndRow * cols) + c])});
                     std.debug.print("\nAlternate row {} with {}", .{ fndRow, r });
                 }
 
@@ -5136,10 +5166,6 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
                 }
             }
         }
-
-        //if(mtx[(r * cols) + c] == std.math.nan(f32)) { //std.math.nan_f32) {
-        //    std.debug.print("\nFound Nan after altXmtxRowsInl alternating {} with {}", .{fndRow, r});
-        //}
 
         var v: f32 = 0;
         var tmp: f32 = 0;
@@ -5165,10 +5191,6 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
             }
         }
 
-        //if(mtx[(r * cols) + c] == std.math.nan(f32)) { //std.math.nan_f32) {
-        //    std.debug.print("\nFound Nan after sclMulXmtxRowsInl multiplying by {}", .{tmp});
-        //}
-
         //for other rows
         var z: usize = 0;
 
@@ -5191,13 +5213,15 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
 
                 if (isZeroXvec(mtx[(z * cols)..((z * cols) + dim)])) {
                     if (hasAug == false or (hasAug == true and isEquF32(mtx[(z * cols) + (cols - 1)], 0, true) == false)) {
-                        std.debug.print("\nFound zero vector index start {} and stop {}", .{ (z * cols), ((z * cols) + cols - 1) });
-                        prntXvecNl(mtx[(z * cols)..((z * cols) + cols - 1)]);
-                        prntNl();
+                        if (verbose) {
+                            std.debug.print("\nFound zero vector index start {} and stop {}", .{ (z * cols), ((z * cols) + cols - 1) });
+                            prntXvecNl(mtx[(z * cols)..((z * cols) + cols - 1)]);
+                            prntNl();
 
-                        std.debug.print("\nMatrix state:", .{});
-                        prntXmtxNl(mtx, cols);
-                        prntNl();
+                            std.debug.print("\nMatrix state:", .{});
+                            prntXmtxNl(mtx, cols);
+                            prntNl();
+                        }
                         return false;
                     }
                 }
@@ -5254,7 +5278,7 @@ test "XMTX: rdcXmtxInl test" {
     var sclr: f32 = 0.0;
 
     var start = try Instant.now();
-    _ = rdcXmtxInl(&m1, 4, true, true, &idtM1, 3, false, &sclr);
+    _ = try rdcXmtxInl(&m1, 4, true, true, &idtM1, 3, false, &sclr);
     var end = try Instant.now();
     var elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nrdcXmtxInl #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -5274,7 +5298,7 @@ test "XMTX: rdcXmtxInl test" {
     sclr = 0.0;
 
     start = try Instant.now();
-    _ = rdcXmtxInl(&m3, 3, false, true, &idtM3, 3, false, &sclr);
+    _ = try rdcXmtxInl(&m3, 3, false, true, &idtM3, 3, false, &sclr);
     end = try Instant.now();
     elapsed1 = @floatFromInt(end.since(start));
     std.debug.print("\nrdcXmtxInl #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -5295,7 +5319,7 @@ test "XMTX: rdcXmtxInl test" {
     sclr = 0.0;
 
     start = try Instant.now();
-    _ = rdcXmtxInl(&m4, 3, false, true, &idtM4, 3, false, &sclr);
+    _ = try rdcXmtxInl(&m4, 3, false, true, &idtM4, 3, false, &sclr);
     end = try Instant.now();
     elapsed1 = @floatFromInt(end.since(start));
     std.debug.print("\nrdcXmtxInl #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -5335,9 +5359,9 @@ test "XMTX: rdcXmtxInl test" {
 ///
 ///  returns = A Boolean value indicating  if the matrix was reduced successfuly.
 ///
-pub fn rdcXmtx(mtx: []f32, cols: usize, hasAug: bool, ret: []f32, hasIdtMtx: bool, idtMtx: []f32, dim: usize, triagRdcOnly: bool, sclr: *f32) bool {
+pub fn rdcXmtx(mtx: []f32, cols: usize, hasAug: bool, ret: []f32, hasIdtMtx: bool, idtMtx: []f32, dim: usize, triagRdcOnly: bool, sclr: *f32) !bool {
     cpyXmtx(mtx, ret);
-    return rdcXmtxInl(ret, cols, hasAug, hasIdtMtx, idtMtx, dim, triagRdcOnly, sclr);
+    return try rdcXmtxInl(ret, cols, hasAug, hasIdtMtx, idtMtx, dim, triagRdcOnly, sclr);
 }
 
 test "XMTX: rdcXmtx test" {
@@ -5354,7 +5378,7 @@ test "XMTX: rdcXmtx test" {
     var sclr: f32 = 0.0;
 
     const start = try Instant.now();
-    b = rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, true, &idtM1, 3, false, &sclr);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nrdcXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -7663,9 +7687,9 @@ test "XMTX: detXmtx test" {
     prntNl();
 }
 
-///Calculates the inverse of the provided 2x2 matrix using the determinant and stores the result in the return matrix.
+///Calculates the inverse of the provided 1x1 matrix using the determinant and stores the result in the return matrix.
 ///
-///  mtx = The 2x2 matrix to calculate the inverse for.
+///  mtx = The 1x1 matrix to calculate the inverse for.
 ///
 ///  det = The determinant of the provided matrix.
 ///
@@ -7673,13 +7697,13 @@ test "XMTX: detXmtx test" {
 ///
 ///  returns = A Boolean value indicating the operation was a success.
 ///
-pub fn getInvFromDet1(mtx: []f32, det: f32, ret: []f32) bool {
+pub fn getInvFromDet1(mtx: *[1]f32, det: f32, ret: *[1]f32) !bool {
     if (mtx.len != 1) {
         std.debug.print("\n!! Warning getInvFromDet2 requires 1x1 matrices !!", .{});
-        return false;
+        return Error.InvalidLengths;
     } else if (ret.len != 1) {
         std.debug.print("\n!! Warning getInvFromDet2 requires 1x1 matrices !!", .{});
-        return false;
+        return Error.InvalidLengths;
     }
 
     ret[0] = (1.0 / det);
@@ -7694,7 +7718,7 @@ test "XMTX: getInvFromDet1 test" {
     var b: bool = false;
 
     const start = try Instant.now();
-    b = getInvFromDet1(&m1, detM1, &res);
+    b = try getInvFromDet1(&m1, detM1, &res);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -7726,13 +7750,13 @@ test "XMTX: getInvFromDet1 test" {
 ///
 ///  returns = A Boolean value indicating the operation was a success.
 ///
-pub fn getInvFromDet2(mtx: []f32, det: f32, ret: []f32) bool {
+pub fn getInvFromDet2(mtx: *[4]f32, det: f32, ret: *[4]f32) !bool {
     if (mtx.len != 4) {
         std.debug.print("\n!! Warning getInvFromDet2 requires 2x2 matrices !!", .{});
         return false;
     } else if (ret.len != 4) {
         std.debug.print("\n!! Warning getInvFromDet2 requires 2x2 matrices !!", .{});
-        return false;
+        return Error.InvalidLengths;
     }
 
     const cols: usize = 2;
@@ -7740,7 +7764,6 @@ pub fn getInvFromDet2(mtx: []f32, det: f32, ret: []f32) bool {
     ret[(1 * cols) + 1] = mtx[(0 * cols) + 0] / det; //set 1x1 from 0x0
     ret[(0 * cols) + 1] = -1.0 * mtx[(0 * cols) + 1] / det; //set 0x1
     ret[(1 * cols) + 0] = -1.0 * mtx[(1 * cols) + 0] / det; //set 1x0
-    //mulXvec(ret, (1.0 / det));
     return true;
 }
 
@@ -7752,7 +7775,7 @@ test "XMTX: getInvFromDet2 test" {
     var b: bool = false;
 
     const start = try Instant.now();
-    b = getInvFromDet2(&m1, detM1, &res);
+    b = try getInvFromDet2(&m1, detM1, &res);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -7773,13 +7796,13 @@ test "XMTX: getInvFromDet2 test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success.
 ///
-pub fn getInvFromDet3(mtx: []f32, det: f32, ret: []f32) bool {
+pub fn getInvFromDet3(mtx: *[9]f32, det: f32, ret: *[9]f32) !bool {
     if (mtx.len != 9) {
         std.debug.print("\n!! Warning getInvFromDet3 requires 3x3 matrices !!", .{});
         return false;
     } else if (ret.len != 9) {
         std.debug.print("\n!! Warning getInvFromDet3 requires 3x3 matrices !!", .{});
-        return false;
+        return Error.InvalidLengths;
     }
 
     const cols: usize = 3;
@@ -7837,7 +7860,7 @@ test "XMTX: getInvFromDet3 test" {
     var b: bool = false;
 
     const start = try Instant.now();
-    b = getInvFromDet3(&A, detA, &res);
+    b = try getInvFromDet3(&A, detA, &res);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -7858,13 +7881,13 @@ test "XMTX: getInvFromDet3 test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success.
 ///
-pub fn getInvFromDet4(mtx: []f32, det: f32, ret: []f32) bool {
+pub fn getInvFromDet4(mtx: *[16]f32, det: f32, ret: *[16]f32) !bool {
     if (mtx.len != 16) {
         std.debug.print("\n!! Warning getInvFromDet4 requires 4x4 matrices !!", .{});
         return false;
     } else if (ret.len != 16) {
         std.debug.print("\n!! Warning getInvFromDet4 requires 4x4 matrices !!", .{});
-        return false;
+        return Error.InvalidLengths;
     }
 
     const cols: usize = 4;
@@ -8128,9 +8151,11 @@ pub fn getInvFromDet4(mtx: []f32, det: f32, ret: []f32) bool {
     //0x0                    1x2                   2x1
     - (mtx[(0 * cols) + 0] * mtx[(1 * cols) + 2] * mtx[(2 * cols) + 1]));
 
-    prntNl();
-    prntXmtxNl(ret, 4);
-    prntNl();
+    if (VERBOSE) {
+        prntNl();
+        prntXmtxNl(ret, 4);
+        prntNl();
+    }
 
     mulXvec(ret, (1.0 / det));
     return true;
@@ -8145,7 +8170,7 @@ test "XMTX: getInvFromDet4 test" {
     var b: bool = false;
 
     const start = try Instant.now();
-    b = getInvFromDet4(&mtx, det, &ret);
+    b = try getInvFromDet4(&mtx, det, &ret);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8418,25 +8443,23 @@ test "XMTX: rslvCramersRule test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success or not.
 ///
-pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis: []f32, chgCols: usize, chgIsStd: bool, idtMtx: []f32, ret: []f32, nvec: []f32, verbose: bool) bool {
+pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis: []f32, chgCols: usize, chgIsStd: bool, idtMtx: []f32, ret: []f32, nvec: []f32, verbose: bool) !bool {
     _ = idtMtx;
     _ = isStd;
 
     if (cols != chgCols) {
         std.debug.print("\n!! Warning expected column counts to match !!", .{});
-        return false;
+        return Error.InvalidLengths;
     }
 
     var b: bool = false;
     if (chgIsStd) {
         b = true;
-
         if (verbose) {
             std.debug.print("\nchgVecBasis:change basis is identity so conversion matrix = basis {}", .{b});
         }
     } else {
-        b = getBasisCnvXmtx(basis, cols, chgBasis, chgCols, ret, verbose);
-
+        b = try getBasisCnvXmtx(basis, cols, chgBasis, chgCols, ret, verbose);
         if (verbose) {
             std.debug.print("\nchgVecBasis:getBasisCnvMtx {}", .{b});
         }
@@ -8455,13 +8478,13 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
 
     if (!b) { // or equXmtx(ret, idtMtx) == false) {}
         std.debug.print("\n!! Warning matrix reduction failed !!", .{});
-        return false;
+        return Error.OperationFailed;
     }
 
     b = tmsXmtx(basis, cols, vec, 1, nvec, 1);
     if (!b) {
         std.debug.print("\n!! Warning matrix multiplication failed !!", .{});
-        return false;
+        return Error.OperationFailed;
     }
     return true;
 }
@@ -8493,7 +8516,7 @@ test "XMTX: chgXvecBasis test" {
     var ret: [4]f32 = .{ 0, 0, 0, 0 };
 
     const start = try Instant.now();
-    b = chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
+    b = try chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nchgXvecBasis: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8530,7 +8553,7 @@ test "XMTX: chgXvecBasis test" {
 ///
 ///  returns = A Boolean value indicating if this function was successful or not.
 ///
-pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) bool {
+pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) !bool {
     if (cols != chgCols) {
         std.debug.print("\n!! Warning expected column counts to match !!", .{});
         return false;
@@ -8553,7 +8576,7 @@ pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usiz
     const dim: usize = cols;
     var sclr: f32 = 0.0;
     const triagRdcOnly: bool = false;
-    b = rdcXmtx(chgBasis, chgCols, hasAug, ret, hasIdtMtx, basis, dim, triagRdcOnly, &sclr);
+    b = try rdcXmtx(chgBasis, chgCols, hasAug, ret, hasIdtMtx, basis, dim, triagRdcOnly, &sclr);
 
     if (verbose) {
         std.debug.print("\ngetBasisCnvMtx:rdcXmtx {}", .{b});
@@ -8589,7 +8612,7 @@ test "XMTX: getBasisCnvXmtx test" {
     var b: bool = false;
 
     const start = try Instant.now();
-    b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
+    b = try getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetBasisCnvXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8624,7 +8647,7 @@ test "XMTX: getBasisCnvXmtx test" {
 ///
 ///  return = A Boolean value indicating if mtx is orthogonal or not.
 ///
-pub fn isOrthXmtx(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []f32) bool {
+pub fn isOrthXmtx(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []f32) !bool {
     //get the inverse
 
     //Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
@@ -8644,7 +8667,7 @@ pub fn isOrthXmtx(mtx: []f32, cols: usize, ret: []f32, idtMtx: []f32, trnMtx: []
     const dim: usize = cols;
     var sclr: f32 = 0.0;
     const triagRdcOnly: bool = false;
-    b = rdcXmtx(mtx, cols, hasAug, ret, hasIdtMtx, idtMtx, dim, triagRdcOnly, &sclr);
+    b = try rdcXmtx(mtx, cols, hasAug, ret, hasIdtMtx, idtMtx, dim, triagRdcOnly, &sclr);
 
     //get the transpose
     trnXmtx(mtx, cols, trnMtx);
@@ -8664,7 +8687,7 @@ test "XMTX: isOrthXmtx test" {
     var b: bool = false;
 
     const start = try Instant.now();
-    b = isOrthXmtx(&mtx, cols, &ret, &idtMtx, &trnMtx);
+    b = try isOrthXmtx(&mtx, cols, &ret, &idtMtx, &trnMtx);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nisOrthXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -10161,7 +10184,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.9 test" {
     try std.testing.expectEqual(true, b);
 
     var sclr: f32 = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
     try std.testing.expectEqual(false, b);
 
     b = isIdtXmtx(&m1, 3);
@@ -10177,7 +10200,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.9 test" {
     try std.testing.expectEqual(false, b);
 
     sclr = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
     prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
@@ -10207,7 +10230,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     try std.testing.expectEqual(true, b);
 
     var sclr: f32 = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
     prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
@@ -10226,7 +10249,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     try std.testing.expectEqual(true, b);
 
     sclr = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
     prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(false, b);
@@ -10254,7 +10277,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     try std.testing.expectEqual(false, b);
 
     sclr = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
     prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
@@ -10273,7 +10296,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.10 test" {
     try std.testing.expectEqual(false, b);
 
     sclr = 0.0;
-    b = rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
+    b = try rdcXmtxInl(&m1, 3, false, false, &idtM1, 3, false, &sclr);
     prntXmtxNl(&m1, 3);
     prntNl();
     try std.testing.expectEqual(true, b);
@@ -10309,7 +10332,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
     try std.testing.expectEqual(true, b);
 
     var sclr: f32 = 0.0;
-    b = rdcXmtxInl(&FG, 3, false, true, &invFG, 3, false, &sclr);
+    b = try rdcXmtxInl(&FG, 3, false, true, &invFG, 3, false, &sclr);
     std.debug.print("BBB Reduced FG\n", .{});
     prntXmtxNl(&FG, 3);
     prntNl();
@@ -10319,7 +10342,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
     try std.testing.expectEqual(true, b);
 
     sclr = 0.0;
-    b = rdcXmtxInl(&F, 3, false, true, &invF, 3, false, &sclr);
+    b = try rdcXmtxInl(&F, 3, false, true, &invF, 3, false, &sclr);
     std.debug.print("CCC Reduced F\n", .{});
     prntXmtxNl(&F, 3);
     prntNl();
@@ -10330,7 +10353,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
     try std.testing.expectEqual(true, b);
 
     sclr = 0.0;
-    b = rdcXmtxInl(&G, 3, false, true, &invG, 3, false, &sclr);
+    b = try rdcXmtxInl(&G, 3, false, true, &invG, 3, false, &sclr);
     std.debug.print("DDD Reduced G\n", .{});
     prntXmtxNl(&G, 3);
     prntNl();
@@ -10373,7 +10396,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.15 test" {
     var b: bool = false;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtxInl(&M, 3, false, true, &invM, 3, false, &sclr);
+    b = try rdcXmtxInl(&M, 3, false, true, &invM, 3, false, &sclr);
     std.debug.print("AAA Reduced M\n", .{});
     prntXmtxNl(&M, 3);
     prntNl();
@@ -10398,7 +10421,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.15 test" {
     b = false;
 
     sclr = 0.0;
-    b = rdcXmtxInl(&M, 3, false, true, &invM, 3, false, &sclr);
+    b = try rdcXmtxInl(&M, 3, false, true, &invM, 3, false, &sclr);
     std.debug.print("BBB Reduced M\n", .{});
     prntXmtxNl(&M, 3);
     prntNl();
@@ -10477,7 +10500,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.19 test" {
     m2 = .{ 5, 6, 5, 6 };
     var m3: [4]f32 = .{ 1, 0, 0, 1 };
     var sclr: f32 = 0.0;
-    var b: bool = rdcXmtxInl(&m2, cols, false, true, &m3, 2, false, &sclr);
+    var b: bool = try rdcXmtxInl(&m2, cols, false, true, &m3, 2, false, &sclr);
     try std.testing.expectEqual(false, b);
 
     b = isIdtXmtx(&m2, 2);
@@ -10493,7 +10516,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.19 test" {
     m2 = .{ 5, 6, 8, 9 };
     m3 = .{ 1, 0, 0, 1 };
     sclr = 0.0;
-    b = rdcXmtxInl(&m2, cols, false, true, &m3, 2, false, &sclr);
+    b = try rdcXmtxInl(&m2, cols, false, true, &m3, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -10551,7 +10574,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     F = .{ 5, 6, 8, 9 };
     var idtF: [4]f32 = .{ 1, 0, 0, 1 };
     var sclr: f32 = 0.0;
-    var b: bool = rdcXmtxInl(&F, cols, false, true, &idtF, 2, false, &sclr);
+    var b: bool = try rdcXmtxInl(&F, cols, false, true, &idtF, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Calculated inverse F (should be identity matrix):\n", .{});
@@ -10564,7 +10587,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     prntXmtxNl(&idtF, cols);
 
     F = .{ 5, 6, 8, 9 };
-    b = getInvFromDet2(&F, detF, &invF);
+    b = try getInvFromDet2(&F, detF, &invF);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Generated inverse from detF (should be inverse matrix):\n", .{});
@@ -10587,7 +10610,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     F2 = .{ 2, 3, 8, 6, 0, -3, -1, 3, 2 };
     var idtF2: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     sclr = 0.0;
-    b = rdcXmtxInl(&F2, cols, false, true, &idtF2, 3, false, &sclr);
+    b = try rdcXmtxInl(&F2, cols, false, true, &idtF2, 3, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Calculated inverse F2 (should be identity matrix):\n", .{});
@@ -10600,7 +10623,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     prntXmtxNl(&idtF2, cols);
 
     F2 = .{ 2, 3, 8, 6, 0, -3, -1, 3, 2 };
-    b = getInvFromDet3(&F2, detF2, &invF2);
+    b = try getInvFromDet3(&F2, detF2, &invF2);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Generated inverse from detF2 (should be inverse matrix):\n", .{});
@@ -10654,7 +10677,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 3 test" {
     const triag: bool = false; //A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, hasAug, &retM1, hasIdt, &idtM1, dim, triag, &sclr);
+    b = try rdcXmtx(&m1, cols, hasAug, &retM1, hasIdt, &idtM1, dim, triag, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -10689,7 +10712,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 4 test" {
     const cols: usize = 5;
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
+    b = try rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -10724,7 +10747,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 6 test" {
     const cols: usize = 4;
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, false, &retM1, true, &idtM1, dim, false, &sclr);
+    b = try rdcXmtx(&m1, cols, false, &retM1, true, &idtM1, dim, false, &sclr);
     try std.testing.expectEqual(false, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -10754,7 +10777,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 7 test" {
     const cols: usize = 4;
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
+    b = try rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -10789,7 +10812,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 8 test" {
     const cols: usize = 4;
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
+    b = try rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -10824,7 +10847,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Example 9 test" {
     const cols: usize = 4;
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
+    b = try rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -10859,7 +10882,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Problem 19 test" {
     const cols: usize = 3;
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
+    b = try rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -10894,7 +10917,7 @@ test "XMTX: ELA - Larson, Edwards: 1.2 Problem 20 test" {
     const cols: usize = 3;
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
+    b = try rdcXmtx(&m1, cols, true, &retM1, true, &idtM1, dim, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     std.debug.print("Matrix M1:\n", .{});
@@ -11046,7 +11069,7 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 6 test" {
     var m2: [4]f32 = .{ 0, 0, 0, 0 };
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&m1, 4, true, &ret, false, &idtM1, 2, false, &sclr);
+    b = try rdcXmtx(&m1, 4, true, &ret, false, &idtM1, 2, false, &sclr);
 
     prntXmtxNl(&m1, 4);
     prntNl();
@@ -11626,7 +11649,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 2 test" {
     var res: bool = false;
 
     var sclr: f32 = 0.0;
-    res = rdcXmtx(&A, 2, false, &B, true, &I, 2, false, &sclr);
+    res = try rdcXmtx(&A, 2, false, &B, true, &I, 2, false, &sclr);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&B, 2);
@@ -11651,7 +11674,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 3 test" {
     var b: bool = false;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 3, false, &R, true, &I, 3, false, &sclr);
+    b = try rdcXmtx(&A, 3, false, &R, true, &I, 3, false, &sclr);
 
     prntXmtxNl(&A, 3);
     prntNl();
@@ -11675,7 +11698,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 4 test" {
     var b: bool = false;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 3, false, &R, true, &I, 3, false, &sclr);
+    b = try rdcXmtx(&A, 3, false, &R, true, &I, 3, false, &sclr);
 
     prntXmtxNl(&A, 3);
     prntNl();
@@ -11700,11 +11723,11 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 5 test" {
     var b: bool = false;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 2, false, &aI, true, &I1, 2, false, &sclr);
+    b = try rdcXmtx(&A, 2, false, &aI, true, &I1, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     sclr = 0.0;
-    b = rdcXmtx(&B, 2, false, &bI, true, &I2, 2, false, &sclr);
+    b = try rdcXmtx(&B, 2, false, &bI, true, &I2, 2, false, &sclr);
     try std.testing.expectEqual(false, b);
 
     prntXmtxNl(&A, 2);
@@ -11738,7 +11761,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 6 test" {
     try std.testing.expectEqual(true, equXmtx(&expAa, &aA));
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 2, false, &invA, true, &I, 2, false, &sclr);
+    b = try rdcXmtx(&A, 2, false, &invA, true, &I, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     clnXmtx(&I);
@@ -11760,7 +11783,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 6 test" {
     try std.testing.expectEqual(true, equXmtx(&expAa, &aA));
 
     sclr = 0.0;
-    b = rdcXmtx(&aA, 2, false, &invAa, true, &I, 2, false, &sclr);
+    b = try rdcXmtx(&aA, 2, false, &invAa, true, &I, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&I, &invAa);
     try std.testing.expectEqual(true, equXmtx(&expInvAa, &invAa));
@@ -11792,17 +11815,17 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 7 test" {
     try std.testing.expectEqual(true, b);
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, cols, false, &tmp, true, &invA, cols, false, &sclr); //Set invA
+    b = try rdcXmtx(&A, cols, false, &tmp, true, &invA, cols, false, &sclr); //Set invA
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&expInvA, &invA));
 
     sclr = 0.0;
-    b = rdcXmtx(&B, cols, false, &tmp, true, &invB, cols, false, &sclr); //Set invB
+    b = try rdcXmtx(&B, cols, false, &tmp, true, &invB, cols, false, &sclr); //Set invB
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&expInvB, &invB));
 
     sclr = 0.0;
-    b = rdcXmtx(&AB, cols, false, &tmp, true, &invAB, cols, false, &sclr); //Set invAB
+    b = try rdcXmtx(&AB, cols, false, &tmp, true, &invAB, cols, false, &sclr); //Set invAB
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&expInvAB, &invAB));
 }
@@ -11828,7 +11851,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
     const cols: usize = 3;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, cols, false, &tmp, true, &invA, cols, false, &sclr); //Set invA
+    b = try rdcXmtx(&A, cols, false, &tmp, true, &invA, cols, false, &sclr); //Set invA
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -11889,7 +11912,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 1, 3 test" {
     const cols2: usize = 2;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A2, cols2, false, &tmp2, true, &idt2, cols2, false, &sclr);
+    b = try rdcXmtx(&A2, cols2, false, &tmp2, true, &idt2, cols2, false, &sclr);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&B2, &idt2));
 
@@ -11902,7 +11925,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 1, 3 test" {
 
     mulXvec(&B3, m);
     sclr = 0.0;
-    b = rdcXmtx(&A3, cols3, false, &tmp3, true, &idt3, cols3, false, &sclr);
+    b = try rdcXmtx(&A3, cols3, false, &tmp3, true, &idt3, cols3, false, &sclr);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&B3, &idt3));
 }
@@ -11933,7 +11956,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test" {
     var b: bool = false;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 2, false, &tmp2, true, &idt2, 2, false, &sclr);
+    b = try rdcXmtx(&A, 2, false, &tmp2, true, &idt2, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&invA, &idt2));
 
@@ -11943,7 +11966,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test" {
 
     idt2 = .{ 1, 0, 0, 1 };
     sclr = 0.0;
-    b = rdcXmtx(&B, 2, false, &tmp2, true, &idt2, 2, false, &sclr);
+    b = try rdcXmtx(&B, 2, false, &tmp2, true, &idt2, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&invB, &idt2));
 
@@ -11952,7 +11975,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Problem 5, 7, 9 test" {
     prntXmtxNl(&idt2, 2);
 
     sclr = 0.0;
-    b = rdcXmtx(&C, 3, false, &tmp3, true, &idt3, 3, false, &sclr);
+    b = try rdcXmtx(&C, 3, false, &tmp3, true, &idt3, 3, false, &sclr);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&invC, &idt3));
 
@@ -11972,7 +11995,7 @@ test "XMTX: ELA - Larson, Edwards: 2.4 Example 3 test" {
     var b: bool = false;
 
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 4, true, &tmp3, true, &idt3, 3, false, &sclr);
+    b = try rdcXmtx(&A, 4, true, &tmp3, true, &idt3, 3, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12029,7 +12052,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
 
     //Get inverse matrix
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 3, false, &tmp3, true, &idt3, 3, false, &sclr);
+    b = try rdcXmtx(&A, 3, false, &tmp3, true, &idt3, 3, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12195,7 +12218,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 15, 17 test" {
 
     var b: bool = false;
     var sclr: f32 = 0.0;
-    b = rdcXmtx(&A, 3, false, &tmpA, true, &idtA, 3, false, &sclr);
+    b = try rdcXmtx(&A, 3, false, &tmpA, true, &idtA, 3, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     //Encode
@@ -12278,7 +12301,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 15, 17 test" {
 
     //Encode
     sclr = 0.0;
-    b = rdcXmtx(&B, 2, false, &tmpB, true, &idtB, 2, false, &sclr);
+    b = try rdcXmtx(&B, 2, false, &tmpB, true, &idtB, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
 
     b = tmsXmtx(&bW1, 2, &B, 2, &bEw1, 2);
@@ -12575,7 +12598,7 @@ test "XMTX: ELA - Larson, Edwards: 3.2 Example 1, 2, 3 test" {
     var b: bool = false;
     std.debug.print("AAA START DetG:\n", .{});
     sclr = 0.0;
-    b = rdcXmtx(&G, 3, false, &retG, true, &idtG, 3, true, &sclr);
+    b = try rdcXmtx(&G, 3, false, &retG, true, &idtG, 3, true, &sclr);
     try std.testing.expectEqual(true, b);
     var detG: f32 = detTriangXmtx(&retG, 3);
     prntXmtxNl(&retG, 3);
@@ -12596,7 +12619,7 @@ test "XMTX: ELA - Larson, Edwards: 3.2 Example 1, 2, 3 test" {
     var idtH: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 
     sclr = 0.0;
-    b = rdcXmtx(&H, 3, false, &retH, true, &idtH, 3, true, &sclr);
+    b = try rdcXmtx(&H, 3, false, &retH, true, &idtH, 3, true, &sclr);
     var detH: f32 = 0;
 
     if (b) {
@@ -13505,7 +13528,7 @@ test "XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test" {
     //  triagRdcOnly = A Boolean value indicating if the reduction operation should stop when the matrix is triangular.
     //  sclr = A pointer to a floating point variable that keeps track of the scalar multiplication performed against the matrix, mtx.
     //  returns = A Boolean value indicating  if the matrix was reduced successfuly.
-    b = rdcXmtx(&mtx, cols, hasAug, &ret, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
+    b = try rdcXmtx(&mtx, cols, hasAug, &ret, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
     try std.testing.expectEqual(true, b);
     std.debug.print("RdcMtx Result Example 8: {}\n", .{b});
     prntXmtxNl(&ret, 4);
@@ -13529,7 +13552,7 @@ test "XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test" {
     //|-2  -1   1   0|
     mtx = .{ 1, 2, 0, 0, 1, 5, 1, 0, -2, -1, 1, 0 };
     ret = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    b = rdcXmtx(&mtx, cols, hasAug, &ret, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
+    b = try rdcXmtx(&mtx, cols, hasAug, &ret, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
     try std.testing.expectEqual(true, b);
     std.debug.print("RdcMtx Result Example 9: {}\n", .{b});
     prntXmtxNl(&ret, 4);
@@ -13557,7 +13580,7 @@ test "XMTX: ELA - Larson, Edwards: 4.4 Example 8, 9, 10 test" {
     var mtxB: [16]f32 = .{ 2, 3, 1, 0, 1, 0, 0, 0, 0, 2, 2, 0, 1, 1, 0, 0 };
     hasAug = false;
     var retB: [16]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    b = rdcXmtx(&mtxB, cols, hasAug, &retB, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
+    b = try rdcXmtx(&mtxB, cols, hasAug, &retB, hasIdtMtx, &idtMtx, dim, triagRdcOnly, &sclr);
     try std.testing.expectEqual(false, b);
     std.debug.print("RdcMtx Result Example 10: {}\n", .{b});
     prntXmtxNl(&ret, 4);
@@ -13585,7 +13608,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     var vbose: bool = true;
     var ret: [4]f32 = .{ 0, 0, 0, 0 };
 
-    b = chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
+    b = try chgXvecBasis(&vec, &B, cols, false, &Bp, colsp, true, &idtMtx, &ret, &nvec, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 2 ret {}\n", .{b});
     prntXmtxNl(&ret, cols);
@@ -13624,7 +13647,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     vbose = false;
     var ret3: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    b = chgXvecBasis(&vec3, &B3, cols3, true, &Bp3, colsp3, false, &idtMtx3, &ret3, &nvec3, vbose);
+    b = try chgXvecBasis(&vec3, &B3, cols3, true, &Bp3, colsp3, false, &idtMtx3, &ret3, &nvec3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 3 ret3 {}\n", .{b});
     prntXmtxNl(&ret3, cols3);
@@ -13657,7 +13680,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     vbose = false;
     ret3 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    b = getBasisCnvXmtx(&B3, cols3, &Bp3, colsp3, &ret3, vbose);
+    b = try getBasisCnvXmtx(&B3, cols3, &Bp3, colsp3, &ret3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 4 ret3 {}\n", .{b});
     prntXmtxNl(&ret3, cols3);
@@ -13689,7 +13712,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Example 2, 3, 4, 5 test" {
     vbose = true;
     ret = .{ 0, 0, 0, 0 };
 
-    b = getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
+    b = try getBasisCnvXmtx(&B, cols, &Bp, colsp, &ret, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Example 5 ret5 {}\n", .{b});
     prntXmtxNl(&ret, cols);
@@ -13721,7 +13744,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     var exp2: [2]f32 = .{ 8, -3 };
     var idtMtx2: [4]f32 = .{ 1, 0, 0, 1 };
 
-    b = chgXvecBasis(&vec2, &B2, cols2, false, &Bp2, cols2, true, &idtMtx2, &ret2, &nvec2, vbose);
+    b = try chgXvecBasis(&vec2, &B2, cols2, false, &Bp2, cols2, true, &idtMtx2, &ret2, &nvec2, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 1 ret2 {}\n", .{b});
     prntXmtxNl(&ret2, cols2);
@@ -13746,7 +13769,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     var exp3: [3]f32 = .{ 5, 4, 3 };
     var idtMtx3: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 
-    b = chgXvecBasis(&vec3, &B3, cols3, false, &Bp3, cols3, true, &idtMtx3, &ret3, &nvec3, vbose);
+    b = try chgXvecBasis(&vec3, &B3, cols3, false, &Bp3, cols3, true, &idtMtx3, &ret3, &nvec3, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 3 ret3 {}\n", .{b});
     prntXmtxNl(&ret3, cols3);
@@ -13771,7 +13794,7 @@ test "XMTX: ELA - Larson, Edwards: 4.7 Problem 1, 3, 5 test" {
     var exp4: [4]f32 = .{ -1, 2, 0, 1 };
     var idtMtx4: [16]f32 = .{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
-    b = chgXvecBasis(&vec4, &B4, cols4, false, &Bp4, cols4, true, &idtMtx4, &ret4, &nvec4, vbose);
+    b = try chgXvecBasis(&vec4, &B4, cols4, false, &Bp4, cols4, true, &idtMtx4, &ret4, &nvec4, vbose);
     try std.testing.expectEqual(true, b);
     std.debug.print("4.7 Problem 5 ret4 {}\n", .{b});
     prntXmtxNl(&ret4, cols4);
