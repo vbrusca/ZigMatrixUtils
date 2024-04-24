@@ -42,6 +42,9 @@ const COMPARE_MODE_EXACT: bool = false;
 ///Error to use when invalid array lengths are encountered.
 const Error = error{InvalidLengths};
 
+///i^ in 1x1 space
+const iH1: [1]f32 = .{1};
+
 ///i^ in 2x2 space
 const iH2: [2]f32 = .{ 1, 0 };
 
@@ -54,8 +57,20 @@ const iH3: [3]f32 = .{ 1, 0, 0 };
 ///j^ in 3x3 space
 const jH3: [3]f32 = .{ 0, 1, 0 };
 
-///z^ in 3x3 space
+///k^ in 3x3 space
 const kH3: [3]f32 = .{ 0, 0, 1 };
+
+///i^ in 4x4 space
+const iH4: [4]f32 = .{ 1, 0, 0, 0 };
+
+///j^ in 4x4 space
+const jH4: [4]f32 = .{ 0, 1, 0, 0 };
+
+///k^ in 4x4 space
+const kH4: [4]f32 = .{ 0, 0, 1, 0 };
+
+///l^ in 4x4 space
+const lH4: [4]f32 = .{ 0, 0, 0, 1 };
 
 ///An enumeration that describes the solution types, discriminant, of a second order polynomial.
 const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
