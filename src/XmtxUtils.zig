@@ -7730,6 +7730,18 @@ test "XMTX: getInvFromDet1 test" {
     prntNl();
 }
 
+///Returns the inverse of a 1x1 matrix which is the reciprocal of the single matrix entry.
+///
+///  mtx = The 1x1 matrix to calculate the inverse for.
+///
+///  returns = The inverse of the provided 1x1 matrix, mtx.
+///
+pub fn getInvXmtx1(mtx: *[1]f32) [1]f32 {
+    return .{(1.0 / mtx[0])};
+}
+
+//TODO: tests
+
 ///Calculates the inverse of the provided 2x2 matrix using the determinant and stores the result in the return matrix.
 ///
 ///  mtx = The 2x2 matrix to calculate the inverse for.
@@ -7765,7 +7777,12 @@ test "XMTX: getInvFromDet2 test" {
     prntNl();
 }
 
-//TODO: docs
+///Returns the inverse of a 2x2 matrix with direct determinant calculation.
+///
+///  mtx = The 2x2 matrix to calculate the inverse for.
+///
+///  returns = The inverse of the provided 2x2 matrix, mtx.
+///
 pub fn getInvXmtx2(mtx: *[4]f32) [4]f32 {
     return mulXvec(.{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] }, (1.0 / (mtx[0] * mtx[3]) - (mtx[1] * mtx[2])));
 }
