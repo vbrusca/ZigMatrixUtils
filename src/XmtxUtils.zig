@@ -7697,17 +7697,9 @@ test "XMTX: detXmtx test" {
 ///
 ///  returns = A Boolean value indicating the operation was a success.
 ///
-pub fn getInvFromDet1(mtx: *[1]f32, det: f32, ret: *[1]f32) !bool {
-    if (mtx.len != 1) {
-        std.debug.print("\n!! Warning getInvFromDet2 requires 1x1 matrices !!", .{});
-        return Error.InvalidLengths;
-    } else if (ret.len != 1) {
-        std.debug.print("\n!! Warning getInvFromDet2 requires 1x1 matrices !!", .{});
-        return Error.InvalidLengths;
-    }
-
+pub fn getInvFromDet1(mtx: *[1]f32, det: f32, ret: *[1]f32) void {
+    _ = mtx;
     ret[0] = (1.0 / det);
-    return true;
 }
 
 test "XMTX: getInvFromDet1 test" {
@@ -7715,10 +7707,9 @@ test "XMTX: getInvFromDet1 test" {
     var invM1: [1]f32 = .{(1.0 / 7.0)};
     var res: [1]f32 = std.mem.zeroes([1]f32);
     const detM1: f32 = detXmtx1(&m1);
-    var b: bool = false;
 
     const start = try Instant.now();
-    b = try getInvFromDet1(&m1, detM1, &res);
+    getInvFromDet1(&m1, detM1, &res);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -7735,7 +7726,6 @@ test "XMTX: getInvFromDet1 test" {
     prntXmtxNl(&invM1, 1);
     prntNl();
 
-    try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&res, &invM1));
     prntNl();
 }
@@ -7750,21 +7740,12 @@ test "XMTX: getInvFromDet1 test" {
 ///
 ///  returns = A Boolean value indicating the operation was a success.
 ///
-pub fn getInvFromDet2(mtx: *[4]f32, det: f32, ret: *[4]f32) !bool {
-    if (mtx.len != 4) {
-        std.debug.print("\n!! Warning getInvFromDet2 requires 2x2 matrices !!", .{});
-        return false;
-    } else if (ret.len != 4) {
-        std.debug.print("\n!! Warning getInvFromDet2 requires 2x2 matrices !!", .{});
-        return Error.InvalidLengths;
-    }
-
+pub fn getInvFromDet2(mtx: *[4]f32, det: f32, ret: *[4]f32) void {
     const cols: usize = 2;
     ret[(0 * cols) + 0] = mtx[(1 * cols) + 1] / det; //set 0x0 from 1x1
     ret[(1 * cols) + 1] = mtx[(0 * cols) + 0] / det; //set 1x1 from 0x0
     ret[(0 * cols) + 1] = -1.0 * mtx[(0 * cols) + 1] / det; //set 0x1
     ret[(1 * cols) + 0] = -1.0 * mtx[(1 * cols) + 0] / det; //set 1x0
-    return true;
 }
 
 test "XMTX: getInvFromDet2 test" {
@@ -7772,19 +7753,24 @@ test "XMTX: getInvFromDet2 test" {
     var invM1: [4]f32 = .{ 4, -1, -7, 2 };
     var res: [4]f32 = std.mem.zeroes([4]f32); //.{};
     const detM1: f32 = detXmtx2(&m1);
-    var b: bool = false;
 
     const start = try Instant.now();
-    b = try getInvFromDet2(&m1, detM1, &res);
+    getInvFromDet2(&m1, detM1, &res);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("getInvFromDet2", elapsed1);
 
-    try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&res, &invM1));
     prntNl();
 }
+
+//TODO: docs
+pub fn getInvXmtx2(mtx: *[4]f32) [4]f32 {
+    return mulXvec(.{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] }, (1.0 / (mtx[0] * mtx[3]) - (mtx[1] * mtx[2])));
+}
+
+//TODO: tests
 
 ///Calculates the inverse of the provided 3x3 matrix using the determinant and stores the result in the return matrix.
 ///
@@ -7796,15 +7782,7 @@ test "XMTX: getInvFromDet2 test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success.
 ///
-pub fn getInvFromDet3(mtx: *[9]f32, det: f32, ret: *[9]f32) !bool {
-    if (mtx.len != 9) {
-        std.debug.print("\n!! Warning getInvFromDet3 requires 3x3 matrices !!", .{});
-        return false;
-    } else if (ret.len != 9) {
-        std.debug.print("\n!! Warning getInvFromDet3 requires 3x3 matrices !!", .{});
-        return Error.InvalidLengths;
-    }
-
+pub fn getInvFromDet3(mtx: *[9]f32, det: f32, ret: *[9]f32) void {
     const cols: usize = 3;
     //COL 0
     //0x0                  1x1                   2x2                     1x2                   2x1
@@ -7837,7 +7815,6 @@ pub fn getInvFromDet3(mtx: *[9]f32, det: f32, ret: *[9]f32) !bool {
     ret[(2 * cols) + 2] = (mtx[(0 * cols) + 0] * mtx[(1 * cols) + 1]) - (mtx[(0 * cols) + 1] * mtx[(1 * cols) + 0]); //set 2x2
 
     mulXvec(ret, (1.0 / det));
-    return true;
 }
 
 test "XMTX: getInvFromDet3 test" {
@@ -7857,16 +7834,14 @@ test "XMTX: getInvFromDet3 test" {
     var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     const detA: f32 = -36;
     var invA: [9]f32 = .{ (-11.0 / 12.0), (1.0 / 3.0), (1.0 / 12.0), (-1.0 / 6.0), (1.0 / 3.0), (-1.0 / 6.0), (3.0 / 4.0), (-1.0 / 3.0), (1.0 / 12.0) };
-    var b: bool = false;
 
     const start = try Instant.now();
-    b = try getInvFromDet3(&A, detA, &res);
+    getInvFromDet3(&A, detA, &res);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("getInvFromDet3", elapsed1);
 
-    try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&res, &invA));
     prntNl();
 }
@@ -7881,15 +7856,7 @@ test "XMTX: getInvFromDet3 test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success.
 ///
-pub fn getInvFromDet4(mtx: *[16]f32, det: f32, ret: *[16]f32) !bool {
-    if (mtx.len != 16) {
-        std.debug.print("\n!! Warning getInvFromDet4 requires 4x4 matrices !!", .{});
-        return false;
-    } else if (ret.len != 16) {
-        std.debug.print("\n!! Warning getInvFromDet4 requires 4x4 matrices !!", .{});
-        return Error.InvalidLengths;
-    }
-
+pub fn getInvFromDet4(mtx: *[16]f32, det: f32, ret: *[16]f32) void {
     const cols: usize = 4;
     //ROW 0
     //COL 0
@@ -8158,7 +8125,6 @@ pub fn getInvFromDet4(mtx: *[16]f32, det: f32, ret: *[16]f32) !bool {
     }
 
     mulXvec(ret, (1.0 / det));
-    return true;
 }
 
 test "XMTX: getInvFromDet4 test" {
@@ -8167,10 +8133,9 @@ test "XMTX: getInvFromDet4 test" {
     var expMtx: [16]f32 = .{ (1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (-1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0), (1.0 / 4.0) };
     const det: f32 = detXmtx4(&mtx);
     const expDet: f32 = -16;
-    var b: bool = false;
 
     const start = try Instant.now();
-    b = try getInvFromDet4(&mtx, det, &ret);
+    getInvFromDet4(&mtx, det, &ret);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetInvFromDet4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8185,7 +8150,6 @@ test "XMTX: getInvFromDet4 test" {
     prntXmtxNl(&expMtx, cols);
     prntNl();
 
-    try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, isEquF32(expDet, det, true));
     try std.testing.expectEqual(true, equXmtx(&expMtx, &ret));
     prntNl();
@@ -10587,8 +10551,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     prntXmtxNl(&idtF, cols);
 
     F = .{ 5, 6, 8, 9 };
-    b = try getInvFromDet2(&F, detF, &invF);
-    try std.testing.expectEqual(true, b);
+    getInvFromDet2(&F, detF, &invF);
 
     std.debug.print("Generated inverse from detF (should be inverse matrix):\n", .{});
     clnXmtx(&invF);
@@ -10623,8 +10586,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.21 test" {
     prntXmtxNl(&idtF2, cols);
 
     F2 = .{ 2, 3, 8, 6, 0, -3, -1, 3, 2 };
-    b = try getInvFromDet3(&F2, detF2, &invF2);
-    try std.testing.expectEqual(true, b);
+    getInvFromDet3(&F2, detF2, &invF2);
 
     std.debug.print("Generated inverse from detF2 (should be inverse matrix):\n", .{});
     clnXmtx(&invF2);
