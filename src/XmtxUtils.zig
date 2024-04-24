@@ -3417,21 +3417,22 @@ test "XMTX: isLinIndInrPrdctSpcXmtx test" {
 }
 
 //TODO: needs
+//IGNORE isOrthInrPrdctSpcXmtx - NOT POSSIBLE doesn't use Euclidean or inner product
+//IGNORE adjXmtx - NOT POSSIBLE - NOT POSSIBLE needs to know the size of the matrix
 //DONE isLinIndInrPrdctSpcXvec
 //DONE isLinIndInrPrdctSpcXmtx
 //DONE isLinIndInrPrdctSpcXmtxRef
 //DONE isOrthonormalInrPrdctSpcXmtx
 //DONE isOrthogonalInrPrdctSpcXmtx
-//IGNORE isOrthInrPrdctSpcXmtx
-//adjXmtx
-//adjXmtx1
-//adjXmtx2
-//cofXmtx1
-//cofXmtx2
-//cofXmtxSign1
-//cofXmtxSign1Ret
-//mnrXmtx1
-//mnrXmtx1Ret
+//DONE cofXmtx2
+//DONE cofXmtxSign1
+//DONE cofXmtxSign1Ret
+//DONE adjXmtx1
+//DONE adjXmtx2
+//DONE cofXmtx1
+//DONE mnrXmtx1
+//DONE mnrXmtx1Ret
+
 //rmvRowColXmtx2
 //trnXmtxRectInl
 
@@ -6516,7 +6517,7 @@ test "XMTX: adjXmtx4 test" {
 ///  returns = A new 3x3 matrix with the transpose of the cofactors of the original matrix, mtx.
 ///
 pub fn adjXmtx3(mtx: *[9]f32) [9]f32 {
-    var ret: [9]f32 = std.mem.zeroes([9]f32); //.{};
+    var ret: [9]f32 = std.mem.zeroes([9]f32);
     var cofA: [9]f32 = cofXmtx3(mtx);
     trnXmtx(&cofA, 3, &ret);
     return ret;
@@ -6537,6 +6538,32 @@ test "XMTX: adjXmtx3 test" {
     try std.testing.expectEqual(true, equXmtx(&expA, &retA));
     prntNl();
 }
+
+///Returns the adjoint of the given 2x2 matrix, mtx.
+///
+///  mtx = The 2x2 matrix to find the adjoint matrix for.
+///
+///  returns = A new 2x2 matrix with the transpose of the cofactors of the original matrix, mtx.
+///
+pub fn adjXmtx2(mtx: *[4]f32) [9]f32 {
+    //|  d -b | or |  mtx[3] -mtx[1] |
+    //| -c  a |    | -mtx[2]  mtx[0] |
+    return [4]f32{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] };
+}
+
+//TODO: tests
+
+///Returns the adjoint of the given 1x1 matrix, mtx.
+///
+///  mtx = The 1x1 matrix to find the adjoint matrix for.
+///
+///  returns = A new 1x1 matrix with the transpose of the cofactors of the original matrix, mtx.
+///
+pub fn adjXmtx1(mtx: *[1]f32) [1]f32 {
+    return [1]f32{mtx[0]};
+}
+
+//TODO: tests
 
 ///Returns a matrix of full co-factors, sign * minor for the given 4x4 matrix.
 ///
@@ -6641,6 +6668,40 @@ test "XMTX: cofXmtx3 test" {
     try std.testing.expectEqual(true, b);
     prntNl();
 }
+
+///Returns a matrix of full cofactors, sign * minor, for the given 2x2 matrix.
+///
+///  mtx = The 2x2 matrix to find cofactors for.
+///
+///  returns = A new 2x2 matrix of cofactors for the given matrix, mtx.
+///
+pub fn cofXmtx2(mtx: *[4]f32) [4]f32 {
+    var mnr = mnrXmtx2(mtx);
+    const cofSgn = cofXmtxSign2();
+    var i: usize = 0;
+    const l: usize = mtx.len;
+
+    while (i < l) : (i += 1) {
+        mnr[i] = (mnr[i] * cofSgn[i]);
+    }
+
+    return mnr;
+}
+
+//TODO: tests
+
+///Returns a matrix of full cofactors, sign * minor, for the given 1x1 matrix.
+///
+///  mtx = The 1x1 matrix to find cofactor for.
+///
+///  returns = A new 1x1 matrix with cofactor for the given matrix, mtx.
+///
+pub fn cofXmtx1(mtx: *[1]f32) [1]f32 {
+    _ = mtx;
+    return [1]f32{1.0};
+}
+
+//TODO: tests
 
 ///Calculates a matrix of minors for the given 4x4 matrix.
 ///
@@ -6998,6 +7059,32 @@ test "XMTX: mnrXmtx2 test" {
     prntNl();
 }
 
+///Calculates a matrix of minors for the given 1x1 matrix.
+///
+///  mtx = The 1x1 matrix to find minors for.
+///
+///  ret = Stores a new 1x1 matrix of the calculated minors for the provided matrix, mtx.
+///
+pub fn mnrXmtx1Ret(mtx: *[1]f32, ret: *[1]f32) void {
+    _ = mtx[0];
+    ret[0] = 1.0; //det[A] = a * det[] = a * 1
+}
+
+//TODO: tests
+
+///Returns a matrix of minors for the given 1x1 matrix.
+///
+///  mtx = The 1x1 matrix to find minors for.
+///
+///  returns = A new 1x1 matrix of the calculated minors for the provided matrix, mtx.
+///
+pub fn mnrXmtx1(mtx: *[1]f32) [1]f32 {
+    _ = mtx;
+    return .{1.0};
+}
+
+//TODO: tests
+
 ///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 4x4 matrix.
 pub fn cofXmtxSign4() [16]f32 {
     return .{ 1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, -1, -1, 1, -1, 1 };
@@ -7186,7 +7273,6 @@ test "XMTX: cofXmtxSign2 test" {
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[2]);
-
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[3]);
     prntNl();
 }
@@ -7195,8 +7281,8 @@ test "XMTX: cofXmtxSign2 test" {
 pub fn cofXmtxSign2Ret(ret: *[4]f32) void {
     ret[0] = 1;
     ret[1] = -1;
-    ret[2] = 1;
-    ret[3] = -1;
+    ret[2] = -1;
+    ret[3] = 1;
     //return .{ 1,-1,
     //         -1, 1 };
 }
@@ -7213,10 +7299,24 @@ test "XMTX: cofXmtxSign2Ret test" {
 
     try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
     try std.testing.expectEqual(@as(f32, -1.0), cofSgn[1]);
-    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[2]);
-    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[3]);
+    try std.testing.expectEqual(@as(f32, -1.0), cofSgn[2]);
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[3]);
     prntNl();
 }
+
+///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 1x1 matrix.
+pub fn cofXmtxSign1() [1]f32 {
+    return .{1};
+}
+
+//TODO: tests
+
+///Calculates and stores, in ret, a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 1x1 matrix.
+pub fn cofXmtxSign1Ret(ret: *[1]f32) void {
+    ret[0] = 1;
+}
+
+//TODO: tests
 
 ///Returns the determinant of a 1x1 matrix.
 ///
