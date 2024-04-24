@@ -29,7 +29,6 @@ comptime {
     @setFloatMode(std.builtin.FloatMode.Optimized);
 }
 
-const len = std.mem.len;
 const time = std.time;
 const Instant = time.Instant;
 
@@ -41,6 +40,18 @@ const COMPARE_MODE_EXACT: bool = false;
 
 ///Error to use when invalid array lengths are encountered.
 const Error = error{InvalidLengths};
+
+///Identity for a 1x1 matrix.
+const iM1: [1]f32 = .{1};
+
+///Identity for a 2x2 matrix.
+const iM2: [4]f32 = .{ 1, 0, 0, 1 };
+
+///Identity for a 3x3 matrix.
+const iM3: [3]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+
+///Identity for a 4x4 matrix.
+const iM4: [4]f32 = .{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
 ///i^ in 1x1 space
 const iH1: [1]f32 = .{1};
