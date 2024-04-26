@@ -39,7 +39,7 @@ const ZERO_F32: f32 = 0.001;
 const COMPARE_MODE_EXACT: bool = false;
 
 ///Error to use when invalid array lengths are encountered.
-const Error = error{ InvalidLengths, OperationFailed, DivideByZero };
+const Error = error{ InvalidLengths, OperationFailed, DivideByZero, NonInvertibleMatrix };
 
 ///Identity for a 1x1 matrix.
 const iM1: [1]f32 = .{1};
@@ -1962,7 +1962,7 @@ test "XMTX: fndEigVal3 test" {
 ///
 ///  returns = A boolean value indicating the success of the operation.
 ///
-pub fn fndEigVal2(mtx: []f32, evs: *EigVal2) bool {
+pub fn fndEigVal2(mtx: *const [4]f32, evs: *EigVal2) bool {
     //Given 2x2 matrix A
     //A = a b
     //    c d
@@ -1975,12 +1975,12 @@ pub fn fndEigVal2(mtx: []f32, evs: *EigVal2) bool {
     //polyExp = 2    1       1       0     2
     //position  Y    X       X       Z     Y
 
-    if (mtx.len != 4) {
-        std.debug.print("\n!! Warning fndEigVal2 requires 2x2 matrices !!", .{});
-        return false;
-    }
+    //if (mtx.len != 4) {
+    //    std.debug.print("\n!! Warning fndEigVal2 requires 2x2 matrices !!", .{});
+    //    return false;
+    //}
 
-    const lamda: f32 = std.math.nan(f32); //std.math.nan_f32;
+    const lamda: f32 = std.math.nan(f32);
     evs.*.lamdExp[0] = mtx[0];
     evs.*.lamdExp[1] = -lamda;
     evs.*.lamdExp[2] = mtx[3];
@@ -2035,28 +2035,30 @@ test "XMTX: fndEigVal2 test" {
     prntNl();
 }
 
-///Cleans the given matrix by rounding float values to the nearest significance, ZERO_F32, resulting in clean 0.0, 1.0, etc, values.
+///Cleans the given matrix by rounding f32 values to the nearest significance, ZERO_F32, resulting in clean 0.0, 1.0, etc, values.
 ///
 ///  mtx = The matrix to process.
 ///
 ///  returns = A clean matrix with values truncated.
 ///
 pub fn clnXmtx(mtx: []f32) void {
-    const l: usize = mtx.len;
-    var i: usize = 0;
-    while (i < l) {
-        if (absF32(@floor(mtx[i]) - mtx[i]) < ZERO_F32) {
-            mtx[i] = @floor(mtx[i]);
-        } else if (absF32(@ceil(mtx[i]) - mtx[i]) < ZERO_F32) {
-            mtx[i] = @ceil(mtx[i]);
-        }
+    clnXvec(mtx);
 
-        if (mtx[i] == -0.0) {
-            mtx[i] = 0.0;
-        }
-
-        i += 1;
-    }
+    //const l: usize = mtx.len;
+    //var i: usize = 0;
+    //while (i < l) {
+    //    if (absF32(@floor(mtx[i]) - mtx[i]) < ZERO_F32) {
+    //        mtx[i] = @floor(mtx[i]);
+    //    } else if (absF32(@ceil(mtx[i]) - mtx[i]) < ZERO_F32) {
+    //        mtx[i] = @ceil(mtx[i]);
+    //    }
+    //
+    //    if (mtx[i] == -0.0) {
+    //        mtx[i] = 0.0;
+    //    }
+    //
+    //    i += 1;
+    //}
 }
 
 test "XMTX: clnXmtx test" {
@@ -2113,7 +2115,7 @@ test "XMTX: clnXvec test" {
     prntNl();
 }
 
-///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
+///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison or precision delta comparison.
 ///
 ///  l = The left-hand number in the comparison.
 ///
@@ -2124,19 +2126,20 @@ test "XMTX: clnXvec test" {
 ///  returns = A Boolean value indicating if the two numbers provided are equal under the specified comparison mode.
 ///
 pub fn isEquF32(l: f32, r: f32, compareModeExact: bool) bool {
-    if (compareModeExact) {
-        if (l == r) {
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        if (absF32(l - r) < ZERO_F32) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    return isEquF32Ref(&l, &r, &compareModeExact);
+    //if (compareModeExact) {
+    //    if (l == r) {
+    //        return true;
+    //    } else {
+    //        return false;
+    //    }
+    //} else {
+    //    if (absF32(l - r) < ZERO_F32) {
+    //        return true;
+    //    } else {
+    //        return false;
+    //    }
+    //}
 }
 
 test "XMTX: isEquF32 test" {
@@ -2163,7 +2166,7 @@ test "XMTX: isEquF32 test" {
     prntNl();
 }
 
-///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
+///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison or precision delta comparison.
 ///
 ///  l = A reference to the left-hand number in the comparison.
 ///
@@ -2173,9 +2176,9 @@ test "XMTX: isEquF32 test" {
 ///
 ///  returns = A Boolean value indicating if the two numbers provided are equal under the specified comparison mode.
 ///
-pub fn isEquF32Ref(l: *f32, r: *f32, compareModeExact: *bool) bool {
+pub fn isEquF32Ref(l: *const f32, r: *const f32, compareModeExact: *const bool) bool {
     if (compareModeExact.*) {
-        if (l == r) {
+        if (l.* == r.*) {
             return true;
         } else {
             return false;
@@ -2237,7 +2240,7 @@ test "XMTX: isEquF32Ref test" {
     prntNl();
 }
 
-///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison.
+///Returns a Boolean value indicating if the two f32 numbers are equal using optional exact comparison or precision delta comparison.
 ///
 ///  l = A reference to the left-hand number in the comparison.
 ///
@@ -2247,7 +2250,7 @@ test "XMTX: isEquF32Ref test" {
 ///
 ///  ret = Stores a Boolean value indicating if the two numbers provided are equal under the specified comparison mode.
 ///
-pub fn isEquF32Ret(l: *f32, r: *f32, compareModeExact: *bool, ret: *bool) void {
+pub fn isEquF32Ret(l: *const f32, r: *const f32, compareModeExact: *const bool, ret: *bool) void {
     ret.* = isEquF32Ref(l, r, compareModeExact);
 }
 
@@ -2299,7 +2302,7 @@ test "XMTX: isEquF32Ret test" {
     prntNl();
 }
 
-///Copies the mtx matrix into the ret matrix argument.
+///Copies the mtx matrix argument into the ret matrix argument.
 ///
 ///  mtx = The matrix to copy into the ret matrix argument.
 ///
@@ -2334,9 +2337,9 @@ test "XMTX: cpyXmtx test" {
     prntNl();
 }
 
-///Copies the mtx matrix into the ret matrix argument if the column is < cpyCols.
+///Copies the mtx matrix into the ret matrix argument if the column is less than cpyCols.
 ///
-///  mtx = The matrix to copy into the ret matrix argument, less columns >= cpyCols
+///  mtx = The matrix to copy into the ret matrix argument, less columns greater than or equal to cpyCols
 ///
 ///  ret = The return matrix to store the copy in.
 ///
@@ -2704,11 +2707,12 @@ test "XMTX: crtXvec test" {
 ///  mtx = The matrix to reset to zero for all values.
 ///
 pub fn clrXmtx(mtx: []f32) void {
-    const l = mtx.len;
-    var i: usize = 0;
-    while (i < l) : (i += 1) {
-        mtx[i] = 0;
-    }
+    clrXvec(mtx);
+    //const l = mtx.len;
+    //var i: usize = 0;
+    //while (i < l) : (i += 1) {
+    //    mtx[i] = 0;
+    //}
 }
 
 test "XMTX: clrXmtx test" {
@@ -2853,8 +2857,7 @@ test "XMTX: magXvec test" {
     prntNl();
 }
 
-///Returns a Boolean value indicating if the matrix has an inverse.
-///Not a deep check. Does not check for reduction or the determinant of the matrix mtx.
+///Returns a Boolean value indicating if the matrix has an inverse. Does not perform a deep check. Does not check for reduction or the determinant of the matrix mtx.
 ///
 ///  mtx = The matrix to check for an inverse.
 ///
@@ -2866,32 +2869,32 @@ test "XMTX: magXvec test" {
 ///
 pub fn hasInvXmtx(mtx: []f32, cols: usize, trnMtx: []f32) bool {
     if (isZeroXmtx(mtx, cols)) {
-        std.debug.print("\nhasInvXmtx: Exit 1", .{});
+        prntNlStr("hasInvXmtx: Exit 1");
         return false;
     }
 
     if (!idnfXmtx(mtx, cols, MTX_OPS.MTX_IS_LIN_INDP)) {
-        std.debug.print("\nhasInvXmtx: Exit 2", .{});
+        prntNlStr("hasInvXmtx: Exit 2");
         return false;
     }
 
     if (!isSqrXmtx(mtx, cols)) {
-        std.debug.print("\nhasInvXmtx: Exit 3", .{});
+        prntNlStr("hasInvXmtx: Exit 3");
         return false;
     }
 
     if (isZeroXmtx(trnMtx, cols)) {
-        std.debug.print("\nhasInvXmtx: Exit 4", .{});
+        prntNlStr("hasInvXmtx: Exit 4");
         return false;
     }
 
     if (!idnfXmtx(trnMtx, cols, MTX_OPS.MTX_IS_LIN_INDP)) {
-        std.debug.print("\nhasInvXmtx: Exit 5", .{});
+        prntNlStr("hasInvXmtx: Exit 5");
         return false;
     }
 
     if (!isSqrXmtx(trnMtx, cols)) {
-        std.debug.print("\nhasInvXmtx: Exit 6", .{});
+        prntNlStr("hasInvXmtx: Exit 6");
         return false;
     }
 
@@ -2926,7 +2929,7 @@ test "XMTX: hasInvXmtx test" {
     prntNl();
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
 
-    b = tmsXmtx(&m2, cols, &m1, cols, &ret, cols);
+    b = try tmsXmtx(&m2, cols, &m1, cols, &ret, cols);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&m1, &ret));
 
@@ -3015,6 +3018,7 @@ pub fn isZeroXmtx(mtx: []f32, cols: usize) bool {
     var r: usize = 0;
     var c: usize = 0;
 
+    //check rows
     while (r < rows) : (r += 1) {
         c = 0;
         isZero = true;
@@ -3030,6 +3034,7 @@ pub fn isZeroXmtx(mtx: []f32, cols: usize) bool {
         }
     }
 
+    //check cols
     c = 0;
     while (c < cols) : (c += 1) {
         r = 0;
@@ -3221,7 +3226,7 @@ test "XMTX: isLinIndInrPrdctSpcXvec test" {
     prntNl();
 }
 
-///Returns true if the vectors of the given matrix, mtx, are orthogonal, linearly independent using the Euclidean dot product, when tested in series.
+///Returns true if the vectors of the given matrix, mtx, are orthogonal, linearly independent, using the Euclidean dot product, when tested in series.
 ///
 ///  mtx = The matrix to use to test for orthogonality.
 ///
@@ -3251,7 +3256,7 @@ test "XMTX: isOrthogonalXmtx test" {
     prntNl();
 }
 
-///Returns true if the vectors of the given matrix, mtx, are orthogonal, linearly independent using the given general inner product space, when tested in series.
+///Returns true if the vectors of the given matrix, mtx, are orthogonal, linearly independent, using the given general inner product space, when tested in series.
 ///
 ///  mtx = The matrix to use to test for orthogonality.
 ///
@@ -3288,7 +3293,7 @@ test "XMTX: isOrthogonalInrPrdctSpcXmtx test" {
     prntNl();
 }
 
-///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent using Euclidean dot product with a magnitude of 1, when tested in series.
+///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent, using Euclidean dot product with a magnitude of 1, when tested in series.
 ///
 ///  mtx = The matrix to use to test for orthonormality.
 ///
@@ -3326,7 +3331,7 @@ pub fn isOrthonormalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocato
 
 //TODO: tests
 
-///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent using the given general inner product space with a magnitude of 1, when tested in series.
+///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent, using the given general inner product space with a magnitude of 1, when tested in series.
 ///
 ///  mtx = The matrix to use to test for orthonormality.
 ///
@@ -3366,7 +3371,7 @@ pub fn isOrthonormalInrPrdctSpcXmtx(mtx: []f32, cols: usize, prdct: *const fn (l
 
 //TODO: tests
 
-///Returns true if the vectors of the given matrix, mtx, are linearly independent when tested in series.
+///Returns true if the vectors of the given matrix, mtx, are linearly independent, when tested in series.
 ///
 ///  mtx = The matrix to use to test for linear independence.
 ///
@@ -3805,7 +3810,15 @@ test "XMTX: crsPrdXvec3 test" {
     prntNl();
 }
 
-pub fn crsPrdXvec(vecL: []f32, vecR: []f32) [3]f32 {
+pub fn crsPrdXvec(vecL: []f32, vecR: []f32) ![3]f32 {
+    if (vecL.len != 3) {
+        prntNlStr("!! Warning, the crsPrdXvec function expect vecL to be a vector 3 !!");
+        return Error.InvalidLengths;
+    } else if (vecR.len != 3) {
+        prntNlStr("!! Warning, the crsPrdXvec function expect vecR to be a vector 3 !!");
+        return Error.InvalidLengths;
+    }
+    //return crsPrdXvec3(vecL[0..3], vecR[0..3]);
     return [3]f32{ (vecL[1] * vecR[2]) - (vecL[2] * vecR[1]), (vecL[2] * vecR[0]) - (vecL[0] * vecR[2]), (vecL[0] * vecR[1]) - (vecL[1] * vecR[0]) };
 }
 
@@ -3817,14 +3830,14 @@ test "XMTX: crsPrdXvec test" {
     var v5: [3]f32 = .{ 0, 0, 0 };
 
     var start = try Instant.now();
-    v4 = crsPrdXvec(&v1, &v3);
+    v4 = try crsPrdXvec(&v1, &v3);
     var end = try Instant.now();
     var elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ncrsPrdXvec #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("crsPrdXvec", elapsed1);
 
     start = try Instant.now();
-    v5 = crsPrdXvec(&v1, &v2);
+    v5 = try crsPrdXvec(&v1, &v2);
     end = try Instant.now();
     elapsed1 = @floatFromInt(end.since(start));
     std.debug.print("\ncrsPrdXvec #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -3978,15 +3991,15 @@ test "XMTX: subXvec test" {
 ///
 ///  returns = A Boolean value indicating if the vector multiplication operation was successful.
 ///
-pub fn tmsXvec(vecL: []f32, vecR: []f32, ret: []f32) bool {
+pub fn tmsXvec(vecL: []f32, vecR: []f32, ret: []f32) !bool {
     if (vecL.len != vecR.len) {
-        std.debug.print("!! Warning tmsXvec vector arguments are not the same legnth !!", .{});
-        return false;
+        prntNlStr("!! Warning tmsXvec vector arguments are not the same legnth !!");
+        return Error.InvalidLengths;
     }
 
     if (ret.len != 1) {
-        std.debug.print("!! Warning tmsXvec returns a vector of length 1 !!", .{});
-        return false;
+        prntNlStr("!! Warning tmsXvec returns a vector of length 1 !!");
+        return Error.InvalidLengths;
     }
 
     const l: usize = vecL.len;
@@ -4005,7 +4018,7 @@ test "XMTX: tmsXvec test" {
     var exp: [1]f32 = .{18};
 
     const start = try Instant.now();
-    _ = tmsXvec(&v1, &v2, &v3);
+    _ = try tmsXvec(&v1, &v2, &v3);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ntmsXvec: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -4017,6 +4030,44 @@ test "XMTX: tmsXvec test" {
     try std.testing.expectEqual(true, equXvec(&exp, &v3));
     prntNl();
 }
+
+//TODO: docs
+pub fn tmsXvecRet(vecL: []f32, vecR: []f32, ret: *f32) !bool {
+    const r: []f32 = undefined;
+    const b: bool = try tmsXvec(vecL, vecR, r);
+    ret.* = r[0];
+    return b;
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn tmsXvec1(vecL: *const [1]f32, vecR: *const [1]f32) f32 {
+    return (vecL[0] * vecR[0]);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn tmsXvec2(vecL: *const [2]f32, vecR: *const [2]f32) f32 {
+    return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]));
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn tmsXvec3(vecL: *const [3]f32, vecR: *const [3]f32) f32 {
+    return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]) + (vecL[2] * vecR[2]));
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn tmsXvec4(vecL: *const [4]f32, vecR: *const [4]f32) f32 {
+    return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]) + (vecL[2] * vecR[2]) + (vecL[3] * vecR[3]));
+}
+
+//TODO: tests
 
 ///Performs matrix multiplication on the provided matrices with results being stored in the ret matrix.
 ///
@@ -4034,7 +4085,7 @@ test "XMTX: tmsXvec test" {
 ///
 ///  returns = A Boolean value that indicates if the matrix multiplication succeeded.
 ///
-pub fn tmsXmtx(mtxL: []f32, colsL: usize, mtxR: []f32, colsR: usize, ret: []f32, colsRet: usize) bool {
+pub fn tmsXmtx(mtxL: []f32, colsL: usize, mtxR: []f32, colsR: usize, ret: []f32, colsRet: usize) !bool {
     //m X p * p X n = m X n
     //2x2 * 2x3 = 2*3
     //L: row X col * R: row X col = ret: row * col
@@ -4046,30 +4097,30 @@ pub fn tmsXmtx(mtxL: []f32, colsL: usize, mtxR: []f32, colsR: usize, ret: []f32,
     const rowsMtxRet: usize = ret.len / colsRet;
 
     if (colsL != rowsMtxR) {
-        std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-        std.debug.print("\n!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!", .{});
-        return false;
+        prntNlStrArgs("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+        prntNlStr("!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!");
+        return Error.InvalidLengths;
     }
 
     if (rowsMtxRet != rowsMtxL) {
-        std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-        std.debug.print("\n!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!", .{});
-        return false;
+        prntNlStrArgs("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+        prntNlStr("!! Warning tmsXmtx expects the following argument matrix size, m X p * p X n = m X n !!");
+        return Error.InvalidLengths;
     }
 
     if (isMtxLSqr and isMtxRSqr) {
         if (!isRetSqr) {
-            std.debug.print("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}\n", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-            std.debug.print("!! Warning tmsXmtx expects the return matrix to be square !!", .{});
-            return false;
+            prntNlStrArgs("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}\n", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+            prntNlStr("!! Warning tmsXmtx expects the return matrix to be square !!");
+            return Error.InvalidLengths;
         } else if (colsL != colsR or colsL != colsRet) {
-            std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-            std.debug.print("\n!! Warning tmsXmtx expects the matrix columns to match when working with square matrices !!", .{});
-            return false;
+            prntNlStrArgs("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+            prntNlStr("\n!! Warning tmsXmtx expects the matrix columns to match when working with square matrices !!");
+            return Error.InvalidLengths;
         } else if (rowsMtxL != rowsMtxR or rowsMtxL != rowsMtxRet) {
-            std.debug.print("\nrowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
-            std.debug.print("\n!! Warning tmsXmtx expects the matrix rows to match when working with square matrices !!", .{});
-            return false;
+            prntNlStrArgs("rowsL: {} colsL: {} rowsR: {} colsR: {} rowRet: {} colsRet: {}", .{ rowsMtxL, colsL, rowsMtxR, colsR, rowsMtxRet, colsRet });
+            prntNlStr("\n!! Warning tmsXmtx expects the matrix rows to match when working with square matrices !!");
+            return Error.InvalidLengths;
         }
     }
 
@@ -4125,7 +4176,7 @@ test "XMTX: tmsXmtx test" {
     try std.testing.expectEqual(true, isRdcFrmXmtx(&m2, 3));
 
     const start = try Instant.now();
-    b = tmsXmtx(&m2, cols, &m1, cols, &ret, cols);
+    b = try tmsXmtx(&m2, cols, &m1, cols, &ret, cols);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ntmsXmtx: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -4267,14 +4318,14 @@ test "XMTX: diff2Xvec test" {
     prntNl();
 }
 
-///Prints the matrix with the specified number of columns.
+///Prints the matrix, followed by a new line, with the specified number of columns.
 ///
 ///  mtx = The matrix to print.
 ///
 ///  cols = The number of columns in the matrix.
 ///
 pub fn prntXmtx(mtx: []f32, cols: usize) void {
-    std.debug.print("", .{});
+    //std.debug.print("", .{});
     const l: usize = mtx.len / cols;
     var i: usize = 0;
     while (i < l) {
@@ -4299,7 +4350,7 @@ test "XMTX: prntXmtx test" {
     prntNl();
 }
 
-///Prints the matrix, following a new line, with the specified number of columns.
+///Prints the matrix, after printing a new line and followed by a new line, with the specified number of columns.
 ///
 ///  mtx = The matrix to print.
 ///
@@ -4336,7 +4387,7 @@ test "XMTX: prntXmtxNl test" {
 ///  vec = The vector to print.
 ///
 pub fn prntXvec(vec: []f32) void {
-    std.debug.print("", .{});
+    //std.debug.print("", .{});
     const l: usize = vec.len;
     var i: usize = 0;
     var c: u8 = '-';
@@ -4706,6 +4757,28 @@ test "XMTX: nrmXvec test" {
     try std.testing.expectEqual(@as(f32, 8.01783740e-01), v1[2]);
     prntNl();
 }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//TODO: current page here!!
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 ///Projects vector P onto vector Q. Alters the vecQ argument.
 ///
@@ -5310,7 +5383,7 @@ test "XMTX: rdcXmtxInl test" {
     prntNl();
 
     std.debug.print("\nTest:", .{});
-    retVal = tmsXmtx(&origM3, 3, &idtM3, 3, &ret, 3);
+    retVal = try tmsXmtx(&origM3, 3, &idtM3, 3, &ret, 3);
     clnXmtx(&ret);
     prntXmtxNl(&ret, 3);
     prntNl();
@@ -5329,7 +5402,7 @@ test "XMTX: rdcXmtxInl test" {
 
     ret = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     std.debug.print("\nTest 2:", .{});
-    retVal = tmsXmtx(&origM4, 3, &idtM4, 3, &ret, 3);
+    retVal = try tmsXmtx(&origM4, 3, &idtM4, 3, &ret, 3);
     clnXmtx(&ret);
     prntXmtxNl(&ret, 3);
     prntNl();
@@ -7781,8 +7854,12 @@ test "XMTX: getInvFromDet2 test" {
 ///
 ///  returns = The inverse of the provided 2x2 matrix, mtx.
 ///
-pub fn getInvXmtx2(mtx: *[4]f32) [4]f32 {
-    return mulXvec(.{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] }, (1.0 / (mtx[0] * mtx[3]) - (mtx[1] * mtx[2])));
+pub fn getInvXmtx2(mtx: *[4]f32) ![4]f32 {
+    if (((mtx[0] * mtx[3]) - (mtx[1] * mtx[2])) == 0) {
+        prntNlStr("!! Warning the getInvXmtx2 function expects the mtx argument to be invertible, non singular !!");
+        return Error.NonInvertibleMatrix;
+    }
+    return mulXvec(.{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] }, (1.0 / ((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]))));
 }
 
 //TODO: tests
@@ -8460,7 +8537,7 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
         return Error.OperationFailed;
     }
 
-    b = tmsXmtx(basis, cols, vec, 1, nvec, 1);
+    b = try tmsXmtx(basis, cols, vec, 1, nvec, 1);
     if (!b) {
         std.debug.print("\n!! Warning matrix multiplication failed !!", .{});
         return Error.OperationFailed;
@@ -9903,7 +9980,7 @@ test "XMTX: MF3D - Lengyel: Theorem 2.7 test" {
     prntNl();
     var P: [3]f32 = .{ 1, 3, 6 }; //P
     var Q: [3]f32 = .{ 6, 9, 12 }; //Q
-    var R: [3]f32 = crsPrdXvec(&P, &Q);
+    var R: [3]f32 = try crsPrdXvec(&P, &Q);
     const dp1: f32 = dotPrdXvec(&R, &Q);
     const dp2: f32 = dotPrdXvec(&R, &P);
     std.debug.print("(P X Q) . Q = (P X Q)  . P = 0:\n", .{});
@@ -9917,8 +9994,8 @@ test "XMTX: MF3D - Lengyel: Theorem 2.9 test" {
     var v1: [3]f32 = .{ 1, 3, 6 }; //P
     var v2: [3]f32 = .{ 6, 9, 12 }; //Q
     var v3: [3]f32 = .{ 2, 4, 8 }; //R
-    v3 = crsPrdXvec(&v2, &v1);
-    var v4: [3]f32 = crsPrdXvec(&v1, &v2);
+    v3 = try crsPrdXvec(&v2, &v1);
+    var v4: [3]f32 = try crsPrdXvec(&v1, &v2);
     mulXvec(&v4, -1);
     std.debug.print("Q X P = -(P X Q):\n", .{});
     try std.testing.expectEqual(true, equXvec(&v3, &v4));
@@ -9929,8 +10006,8 @@ test "XMTX: MF3D - Lengyel: Theorem 2.9 test" {
     const a: f32 = 3;
     _ = cpyXvec(&v1, &v3);
     mulXvec(&v3, a);
-    v3 = crsPrdXvec(&v3, &v2);
-    v4 = crsPrdXvec(&v1, &v2);
+    v3 = try crsPrdXvec(&v3, &v2);
+    v4 = try crsPrdXvec(&v1, &v2);
     mulXvec(&v4, a);
     std.debug.print("(aP) X Q = a(P X Q):\n", .{});
     try std.testing.expectEqual(true, equXvec(&v3, &v4));
@@ -9940,9 +10017,9 @@ test "XMTX: MF3D - Lengyel: Theorem 2.9 test" {
     v3 = .{ 2, 4, 8 }; //R
     cpyXvec(&v2, &v4);
     sum1Xvec(&v4, &v3);
-    v4 = crsPrdXvec(&v1, &v4);
-    var v5: [3]f32 = crsPrdXvec(&v1, &v2);
-    var v6: [3]f32 = crsPrdXvec(&v1, &v3);
+    v4 = try crsPrdXvec(&v1, &v4);
+    var v5: [3]f32 = try crsPrdXvec(&v1, &v2);
+    var v6: [3]f32 = try crsPrdXvec(&v1, &v3);
     sum1Xvec(&v5, &v6);
     prntXvecNl(&v4);
     prntXvecNl(&v5);
@@ -9952,7 +10029,7 @@ test "XMTX: MF3D - Lengyel: Theorem 2.9 test" {
     v1 = .{ 1, 3, 6 }; //P
     v2 = .{ 6, 9, 12 }; //Q
     v3 = .{ 2, 4, 8 }; //R
-    v4 = crsPrdXvec(&v1, &v1);
+    v4 = try crsPrdXvec(&v1, &v1);
     v5 = .{ 0, 0, 0 };
     std.debug.print("P X P = [0,0,0]:\n", .{});
     try std.testing.expectEqual(true, equXvec(&v4, &v5));
@@ -9960,19 +10037,19 @@ test "XMTX: MF3D - Lengyel: Theorem 2.9 test" {
     v1 = .{ 1, 3, 6 }; //P
     v2 = .{ 6, 9, 12 }; //Q
     v3 = .{ 2, 4, 8 }; //R
-    v4 = crsPrdXvec(&v1, &v2);
+    v4 = try crsPrdXvec(&v1, &v2);
     const c1 = dotPrdXvec(&v4, &v3);
-    v5 = crsPrdXvec(&v3, &v1);
+    v5 = try crsPrdXvec(&v3, &v1);
     const c2 = dotPrdXvec(&v5, &v2);
-    v6 = crsPrdXvec(&v2, &v3);
+    v6 = try crsPrdXvec(&v2, &v3);
     const c3 = dotPrdXvec(&v6, &v1);
     std.debug.print("(P X Q) . R = (R X P) . Q = (Q X R) . P:\n", .{});
     try std.testing.expectEqual(true, (c1 == c2 and c1 == c3));
 
-    v4 = crsPrdXvec(&v2, &v1);
-    v4 = crsPrdXvec(&v1, &v4);
-    v5 = crsPrdXvec(&v1, &v2);
-    v5 = crsPrdXvec(&v5, &v1);
+    v4 = try crsPrdXvec(&v2, &v1);
+    v4 = try crsPrdXvec(&v1, &v4);
+    v5 = try crsPrdXvec(&v1, &v2);
+    v5 = try crsPrdXvec(&v5, &v1);
 
     const d: f32 = (magXvec(&v1) * magXvec(&v1));
     cpyXvec(&v2, &v6);
@@ -10091,14 +10168,14 @@ test "XMTX: MF3D - Lengyel: Theorem 3.2 test" {
     var b: bool = false;
     cpyXmtx(&F, &FG);
     mulXvec(&FG, a);
-    b = tmsXmtx(&FG, 3, &G, 3, &RES, 3);
+    b = try tmsXmtx(&FG, 3, &G, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &FG);
 
     RES = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     cpyXmtx(&F, &GF);
     cpyXmtx(&G, &GH);
-    b = tmsXmtx(&GF, 3, &GH, 3, &RES, 3);
+    b = try tmsXmtx(&GF, 3, &GH, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &GF);
     mulXvec(&GF, a);
@@ -10112,22 +10189,22 @@ test "XMTX: MF3D - Lengyel: Theorem 3.2 test" {
     GF = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     GH = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     RES = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    b = tmsXmtx(&F, 3, &G, 3, &RES, 3);
+    b = try tmsXmtx(&F, 3, &G, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &FG);
 
     RES = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    b = tmsXmtx(&FG, 3, &H, 3, &RES, 3);
+    b = try tmsXmtx(&FG, 3, &H, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &FG); //LEFT
 
     RES = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    b = tmsXmtx(&G, 3, &H, 3, &RES, 3);
+    b = try tmsXmtx(&G, 3, &H, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &GH);
 
     RES = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    b = tmsXmtx(&F, 3, &GH, 3, &RES, 3);
+    b = try tmsXmtx(&F, 3, &GH, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &GH); //RIGHT
     std.debug.print("XMTX: ((F * G) * H) = (F * (G * H)):\n", .{});
@@ -10140,7 +10217,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.2 test" {
     GH = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     H = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     RES = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    b = tmsXmtx(&F, 3, &G, 3, &RES, 3);
+    b = try tmsXmtx(&F, 3, &G, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &GH);
     trnXmtx(&GH, 3, &H); //Left
@@ -10148,7 +10225,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.2 test" {
     RES = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     trnXmtx(&G, 3, &GF);
     trnXmtx(&F, 3, &FG);
-    b = tmsXmtx(&GF, 3, &FG, 3, &RES, 3);
+    b = try tmsXmtx(&GF, 3, &FG, 3, &RES, 3);
     try std.testing.expectEqual(true, b);
     cpyXmtx(&RES, &GF); //Right
     std.debug.print("XMTX: ((F * G) ^ T) = (G^T * F^T):\n", .{});
@@ -10304,7 +10381,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
     var invGinvF: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var b: bool = false;
 
-    b = tmsXmtx(&F, 3, &G, 3, &FG, 3);
+    b = try tmsXmtx(&F, 3, &G, 3, &FG, 3);
     std.debug.print("BBB FG\n", .{});
     prntXmtxNl(&FG, 3);
     prntNl();
@@ -10343,7 +10420,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.11 test" {
     try std.testing.expectEqual(true, b);
 
     clrXmtx(&invGinvF);
-    b = tmsXmtx(&invG, 3, &invF, 3, &invGinvF, 3);
+    b = try tmsXmtx(&invG, 3, &invF, 3, &invGinvF, 3);
     std.debug.print("EEE invG * invF\n", .{});
     prntXmtxNl(&invGinvF, 3);
     prntNl();
@@ -10520,7 +10597,7 @@ test "XMTX: MF3D - Lengyel: Theorem 3.20 test" {
     var FG: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     const alloc: std.mem.Allocator = std.testing.allocator;
-    const b: bool = tmsXmtx(&F, cols, &G, cols, &FG, cols);
+    const b: bool = try tmsXmtx(&F, cols, &G, cols, &FG, cols);
     try std.testing.expectEqual(true, b);
 
     const detFG: f32 = try detXmtx(&FG, cols, &alloc, detRow);
@@ -10975,7 +11052,7 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" {
     var ret1: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
     var exp1: [6]f32 = .{ -9, 1, -4, 6, -15, 10 };
     var b: bool = false;
-    b = tmsXmtx(&m1, 2, &m2, 2, &ret1, 2);
+    b = try tmsXmtx(&m1, 2, &m2, 2, &ret1, 2);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&exp1, &ret1));
 
@@ -10984,7 +11061,7 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" {
     var m4: [4]f32 = .{ 1, 0, 0, 1 };
     var ret2: [4]f32 = .{ 0, 0, 0, 0 };
     var exp2: [4]f32 = .{ 3, 4, -2, 5 };
-    b = tmsXmtx(&m3, 2, &m4, 2, &ret2, 2);
+    b = try tmsXmtx(&m3, 2, &m4, 2, &ret2, 2);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&exp2, &ret2));
 
@@ -10993,7 +11070,7 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" {
     m4 = .{ -1, 2, 1, -1 };
     ret2 = .{ 0, 0, 0, 0 };
     exp2 = .{ 1, 0, 0, 1 };
-    b = tmsXmtx(&m3, 2, &m4, 2, &ret2, 2);
+    b = try tmsXmtx(&m3, 2, &m4, 2, &ret2, 2);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&exp2, &ret2));
 
@@ -11003,7 +11080,7 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" {
     var ret3: [1]f32 = .{0};
     var exp3: [1]f32 = .{1};
     std.debug.print("\nQuestion D:\n", .{});
-    b = tmsXmtx(&m5, 3, &m6, 1, &ret3, 1);
+    b = try tmsXmtx(&m5, 3, &m6, 1, &ret3, 1);
 
     prntXmtxNl(&m5, 3);
     prntNl();
@@ -11023,7 +11100,7 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Example 4, E5 test" {
     var ret4: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     var exp4: [9]f32 = .{ 2, -4, -6, -1, 2, 3, 1, -2, -3 };
     std.debug.print("\nQuestion E:\n", .{});
-    b = tmsXmtx(&m6, 1, &m5, 3, &ret4, 3);
+    b = try tmsXmtx(&m6, 1, &m5, 3, &ret4, 3);
 
     prntXmtxNl(&m5, 3);
     prntNl();
@@ -11159,14 +11236,14 @@ test "XMTX: ELA - Larson, Edwards: 2.1 Problem 9 test" {
     var aTb: [4]f32 = .{ 0, 0, 0, 0 };
     var exp: [4]f32 = .{ 0, 15, 6, 12 };
     var res: bool = false;
-    res = tmsXmtx(&a, 2, &b, 2, &aTb, 2);
+    res = try tmsXmtx(&a, 2, &b, 2, &aTb, 2);
     try std.testing.expectEqual(true, res);
     try std.testing.expectEqual(true, equXmtx(&aTb, &exp));
 
     aTb = .{ 0, 0, 0, 0 };
     exp = .{ -2, 2, 31, 14 };
     res = false;
-    res = tmsXmtx(&b, 2, &a, 2, &aTb, 2);
+    res = try tmsXmtx(&b, 2, &a, 2, &aTb, 2);
     try std.testing.expectEqual(true, res);
     try std.testing.expectEqual(true, equXmtx(&aTb, &exp));
 }
@@ -11220,13 +11297,13 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 3 test" {
     var exp: [4]f32 = .{ 17, 4, 13, 14 };
     var res: bool = false;
 
-    res = tmsXmtx(&a, 2, &b, 3, &ret1, 3);
+    res = try tmsXmtx(&a, 2, &b, 3, &ret1, 3);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret1, 2);
     prntNl();
 
-    res = tmsXmtx(&ret1, 3, &c, 2, &ret2, 2);
+    res = try tmsXmtx(&ret1, 3, &c, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret2, 2);
@@ -11249,13 +11326,13 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 4 test" {
     var exp2: [4]f32 = .{ 0, 7, 4, -2 };
     var res: bool = false;
 
-    res = tmsXmtx(&a, 2, &b, 2, &ret1, 2);
+    res = try tmsXmtx(&a, 2, &b, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret1, 2);
     prntNl();
 
-    res = tmsXmtx(&b, 2, &a, 2, &ret2, 2);
+    res = try tmsXmtx(&b, 2, &a, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret2, 2);
@@ -11282,13 +11359,13 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 5 test" {
     var exp: [4]f32 = .{ -2, 4, -1, 2 };
     var res: bool = false;
 
-    res = tmsXmtx(&a, 2, &c, 2, &ret1, 2);
+    res = try tmsXmtx(&a, 2, &c, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret1, 2);
     prntNl();
 
-    res = tmsXmtx(&b, 2, &c, 2, &ret2, 2);
+    res = try tmsXmtx(&b, 2, &c, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret2, 2);
@@ -11309,7 +11386,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 6 test" {
     var exp1: [6]f32 = .{ 3, -2, 4, 0, -1, 1 };
     var res: bool = false;
 
-    res = tmsXmtx(&a, 2, &b, 2, &ret1, 2);
+    res = try tmsXmtx(&a, 2, &b, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret1, 2);
@@ -11326,7 +11403,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 6 test" {
     var ret2: [3]f32 = .{ 0, 0, 0 };
     var exp2: [3]f32 = .{ -2, 1, 4 };
 
-    res = tmsXmtx(&c, 3, &d, 1, &ret2, 1);
+    res = try tmsXmtx(&c, 3, &d, 1, &ret2, 1);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&ret2, 3);
@@ -11345,7 +11422,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 7 test" {
     var exp: [4]f32 = .{ -4, -1, 3, -6 };
     var res: bool = false;
 
-    res = tmsXmtx(&a, 2, &a, 2, &ret1, 2);
+    res = try tmsXmtx(&a, 2, &a, 2, &ret1, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&a, 2);
@@ -11354,7 +11431,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 7 test" {
     prntXmtxNl(&ret1, 2);
     prntNl();
 
-    res = tmsXmtx(&ret1, 2, &a, 2, &ret2, 2);
+    res = try tmsXmtx(&ret1, 2, &a, 2, &ret2, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&a, 2);
@@ -11446,7 +11523,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 9 test" {
     var btAt: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
     var expBtAt: [6]f32 = .{ 2, 6, -1, 1, -1, 2 };
     var res: bool = false;
-    res = tmsXmtx(&a, 3, &b, 2, &ab, 2);
+    res = try tmsXmtx(&a, 3, &b, 2, &ab, 2);
     try std.testing.expectEqual(true, res);
 
     prntXmtxNl(&a, 3);
@@ -11476,7 +11553,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 9 test" {
     trnXmtxRect(&ab, 2, &abT, 3);
     try std.testing.expectEqual(true, equXmtx(&abT, &expAbt));
 
-    res = tmsXmtx(&bT, 3, &aT, 3, &btAt, 3);
+    res = try tmsXmtx(&bT, 3, &aT, 3, &btAt, 3);
     prntXmtxNl(&btAt, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&btAt, &expBtAt));
@@ -11498,7 +11575,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Example 10 test" {
     trnXmtxRect(&a, 2, &aT, 3);
     try std.testing.expectEqual(true, equXmtx(&aT, &expAt));
 
-    res = tmsXmtx(&a, 2, &aT, 3, &aAt, 3);
+    res = try tmsXmtx(&a, 2, &aT, 3, &aAt, 3);
     try std.testing.expectEqual(true, res);
     try std.testing.expectEqual(true, equXmtx(&aAt, &expAat));
 }
@@ -11571,7 +11648,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Problem 19, 21 test" {
     var AA: [4]f32 = .{ 0, 0, 0, 0 };
     var b: bool = false;
     cpyXmtx(&A, &AA);
-    b = tmsXmtx(&A, 2, &A, 2, &AA, 2);
+    b = try tmsXmtx(&A, 2, &A, 2, &AA, 2);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&AA, &I));
 
@@ -11580,7 +11657,7 @@ test "XMTX: ELA - Larson, Edwards: 2.2 Problem 19, 21 test" {
 
     var aIpa: [4]f32 = .{ 0, 0, 0, 0 };
     var exp: [4]f32 = .{ 2, 2, 0, 0 };
-    b = tmsXmtx(&I, 2, &iPa, 2, &aIpa, 2);
+    b = try tmsXmtx(&I, 2, &iPa, 2, &aIpa, 2);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&exp, &aIpa));
 }
@@ -11600,10 +11677,10 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 1 test" {
     var I: [4]f32 = .{ 1, 0, 0, 1 };
     var b: bool = false;
 
-    b = tmsXmtx(&A, 2, &B, 2, &AB, 2);
+    b = try tmsXmtx(&A, 2, &B, 2, &AB, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&B, 2, &A, 2, &BA, 2);
+    b = try tmsXmtx(&B, 2, &A, 2, &BA, 2);
     try std.testing.expectEqual(true, b);
 
     try std.testing.expectEqual(true, equXmtx(&AB, &I));
@@ -11733,7 +11810,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 6 test" {
 
     var expInvAa: [4]f32 = .{ (9.0 / 2.0), (-5.0 / 4.0), (-5.0 / 2.0), (3.0 / 4.0) };
 
-    b = tmsXmtx(&A, 2, &A, 2, &aA, 2);
+    b = try tmsXmtx(&A, 2, &A, 2, &aA, 2);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&expAa, &aA));
 
@@ -11749,12 +11826,12 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 6 test" {
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&expInvA, &I));
 
-    b = tmsXmtx(&I, 2, &I, 2, &invAa, 2);
+    b = try tmsXmtx(&I, 2, &I, 2, &invAa, 2);
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&expInvAa, &invAa));
 
     A = .{ 1, 1, 2, 4 };
-    b = tmsXmtx(&A, 2, &A, 2, &aA, 2);
+    b = try tmsXmtx(&A, 2, &A, 2, &aA, 2);
     I = .{ 1, 0, 0, 1 };
     try std.testing.expectEqual(true, b);
     try std.testing.expectEqual(true, equXmtx(&expAa, &aA));
@@ -11788,7 +11865,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 7 test" {
     var b: bool = false;
     const cols: usize = 3;
 
-    b = tmsXmtx(&A, cols, &B, cols, &AB, cols); //Set AB
+    b = try tmsXmtx(&A, cols, &B, cols, &AB, cols); //Set AB
     try std.testing.expectEqual(true, b);
 
     var sclr: f32 = 0.0;
@@ -11847,7 +11924,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
 
     //ANSWERS
     var exp: [3]f32 = .{ 2, -1, -2 };
-    b = tmsXmtx(&invA, cols, &sA, 1, &sD, 1);
+    b = try tmsXmtx(&invA, cols, &sA, 1, &sD, 1);
     try std.testing.expectEqual(true, b);
     prntNl();
     std.debug.print("XMTX: a:\n", .{});
@@ -11855,7 +11932,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
     try std.testing.expectEqual(true, equXmtx(&exp, &sD));
 
     exp = .{ 4, 1, -7 };
-    b = tmsXmtx(&invA, cols, &sB, 1, &sD, 1);
+    b = try tmsXmtx(&invA, cols, &sB, 1, &sD, 1);
     try std.testing.expectEqual(true, b);
     prntNl();
     std.debug.print("XMTX: b:\n", .{});
@@ -11863,7 +11940,7 @@ test "XMTX: ELA - Larson, Edwards: 2.3 Example 8 test" {
     try std.testing.expectEqual(true, equXmtx(&exp, &sD));
 
     exp = .{ 0, 0, 0 };
-    b = tmsXmtx(&invA, cols, &sC, 1, &sD, 1);
+    b = try tmsXmtx(&invA, cols, &sC, 1, &sD, 1);
     try std.testing.expectEqual(true, b);
     prntNl();
     std.debug.print("XMTX: c:\n", .{});
@@ -12047,7 +12124,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     A = .{ 1, -2, 2, -1, 1, 3, 1, -1, -4 };
 
     //Encode word 1
-    b = tmsXmtx(&w1, 3, &A, 3, &eW1, 3);
+    b = try tmsXmtx(&w1, 3, &A, 3, &eW1, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12059,7 +12136,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&eW1, 3);
 
     //Encode word 2
-    b = tmsXmtx(&w2, 3, &A, 3, &eW2, 3);
+    b = try tmsXmtx(&w2, 3, &A, 3, &eW2, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12071,7 +12148,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&eW2, 3);
 
     //Encode word 3
-    b = tmsXmtx(&w3, 3, &A, 3, &eW3, 3);
+    b = try tmsXmtx(&w3, 3, &A, 3, &eW3, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12083,7 +12160,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&eW3, 3);
 
     //Encode word 4
-    b = tmsXmtx(&w4, 3, &A, 3, &eW4, 3);
+    b = try tmsXmtx(&w4, 3, &A, 3, &eW4, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12095,7 +12172,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&eW4, 3);
 
     //Encode word 5
-    b = tmsXmtx(&w5, 3, &A, 3, &eW5, 3);
+    b = try tmsXmtx(&w5, 3, &A, 3, &eW5, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12107,7 +12184,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&eW5, 3);
 
     //Decode word 1
-    b = tmsXmtx(&eW1, 3, &idt3, 3, &cW1, 3);
+    b = try tmsXmtx(&eW1, 3, &idt3, 3, &cW1, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12115,7 +12192,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&cW1, 3);
 
     //Decode word 2
-    b = tmsXmtx(&eW2, 3, &idt3, 3, &cW2, 3);
+    b = try tmsXmtx(&eW2, 3, &idt3, 3, &cW2, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12123,7 +12200,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&cW2, 3);
 
     //Decode word 3
-    b = tmsXmtx(&eW3, 3, &idt3, 3, &cW3, 3);
+    b = try tmsXmtx(&eW3, 3, &idt3, 3, &cW3, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12131,7 +12208,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&cW3, 3);
 
     //Decode word 4
-    b = tmsXmtx(&eW4, 3, &idt3, 3, &cW4, 3);
+    b = try tmsXmtx(&eW4, 3, &idt3, 3, &cW4, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12139,7 +12216,7 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 5, 6 test" {
     prntXmtxNl(&cW4, 3);
 
     //Decode word 5
-    b = tmsXmtx(&eW5, 3, &idt3, 3, &cW5, 3);
+    b = try tmsXmtx(&eW5, 3, &idt3, 3, &cW5, 3);
     try std.testing.expectEqual(true, b);
 
     prntNl();
@@ -12199,41 +12276,41 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 15, 17 test" {
     try std.testing.expectEqual(true, b);
 
     //Encode
-    b = tmsXmtx(&aW1, 3, &A, 3, &aEw1, 3);
+    b = try tmsXmtx(&aW1, 3, &A, 3, &aEw1, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aW2, 3, &A, 3, &aEw2, 3);
+    b = try tmsXmtx(&aW2, 3, &A, 3, &aEw2, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aW3, 3, &A, 3, &aEw3, 3);
+    b = try tmsXmtx(&aW3, 3, &A, 3, &aEw3, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aW4, 3, &A, 3, &aEw4, 3);
+    b = try tmsXmtx(&aW4, 3, &A, 3, &aEw4, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aW5, 3, &A, 3, &aEw5, 3);
+    b = try tmsXmtx(&aW5, 3, &A, 3, &aEw5, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aW6, 3, &A, 3, &aEw6, 3);
+    b = try tmsXmtx(&aW6, 3, &A, 3, &aEw6, 3);
     try std.testing.expectEqual(true, b);
 
     //Decode
-    b = tmsXmtx(&aEw1, 3, &idtA, 3, &aCw1, 3);
+    b = try tmsXmtx(&aEw1, 3, &idtA, 3, &aCw1, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aEw2, 3, &idtA, 3, &aCw2, 3);
+    b = try tmsXmtx(&aEw2, 3, &idtA, 3, &aCw2, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aEw3, 3, &idtA, 3, &aCw3, 3);
+    b = try tmsXmtx(&aEw3, 3, &idtA, 3, &aCw3, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aEw4, 3, &idtA, 3, &aCw4, 3);
+    b = try tmsXmtx(&aEw4, 3, &idtA, 3, &aCw4, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aEw5, 3, &idtA, 3, &aCw5, 3);
+    b = try tmsXmtx(&aEw5, 3, &idtA, 3, &aCw5, 3);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&aEw6, 3, &idtA, 3, &aCw6, 3);
+    b = try tmsXmtx(&aEw6, 3, &idtA, 3, &aCw6, 3);
     try std.testing.expectEqual(true, b);
 
     try std.testing.expectEqual(true, equXmtx(&aW1, &aCw1));
@@ -12281,47 +12358,47 @@ test "XMTX: ELA - Larson, Edwards: 2.5 Example 15, 17 test" {
     b = try rdcXmtx(&B, 2, false, &tmpB, true, &idtB, 2, false, &sclr);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bW1, 2, &B, 2, &bEw1, 2);
+    b = try tmsXmtx(&bW1, 2, &B, 2, &bEw1, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bW2, 2, &B, 2, &bEw2, 2);
+    b = try tmsXmtx(&bW2, 2, &B, 2, &bEw2, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bW3, 2, &B, 2, &bEw3, 2);
+    b = try tmsXmtx(&bW3, 2, &B, 2, &bEw3, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bW4, 2, &B, 2, &bEw4, 2);
+    b = try tmsXmtx(&bW4, 2, &B, 2, &bEw4, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bW5, 2, &B, 2, &bEw5, 2);
+    b = try tmsXmtx(&bW5, 2, &B, 2, &bEw5, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bW6, 2, &B, 2, &bEw6, 2);
+    b = try tmsXmtx(&bW6, 2, &B, 2, &bEw6, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bW7, 2, &B, 2, &bEw7, 2);
+    b = try tmsXmtx(&bW7, 2, &B, 2, &bEw7, 2);
     try std.testing.expectEqual(true, b);
 
     //Decode
-    b = tmsXmtx(&bEw1, 2, &idtB, 2, &bCw1, 2);
+    b = try tmsXmtx(&bEw1, 2, &idtB, 2, &bCw1, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bEw2, 2, &idtB, 2, &bCw2, 2);
+    b = try tmsXmtx(&bEw2, 2, &idtB, 2, &bCw2, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bEw3, 2, &idtB, 2, &bCw3, 2);
+    b = try tmsXmtx(&bEw3, 2, &idtB, 2, &bCw3, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bEw4, 2, &idtB, 2, &bCw4, 2);
+    b = try tmsXmtx(&bEw4, 2, &idtB, 2, &bCw4, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bEw5, 2, &idtB, 2, &bCw5, 2);
+    b = try tmsXmtx(&bEw5, 2, &idtB, 2, &bCw5, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bEw6, 2, &idtB, 2, &bCw6, 2);
+    b = try tmsXmtx(&bEw6, 2, &idtB, 2, &bCw6, 2);
     try std.testing.expectEqual(true, b);
 
-    b = tmsXmtx(&bEw7, 2, &idtB, 2, &bCw7, 2);
+    b = try tmsXmtx(&bEw7, 2, &idtB, 2, &bCw7, 2);
     try std.testing.expectEqual(true, b);
 
     try std.testing.expectEqual(true, equXmtx(&bW1, &bCw1));
@@ -12666,7 +12743,7 @@ test "XMTX: ELA - Larson, Edwards: 3.3 Example 1, 2, 3, 4 test" {
     try std.testing.expectEqual(true, isEquF32(expA, detA, true));
     detB = try detXmtx(&B, cols, &alloc, 0);
     try std.testing.expectEqual(true, isEquF32(expB, detB, true));
-    const b: bool = tmsXmtx(&A, cols, &B, cols, &retA, cols);
+    const b: bool = try tmsXmtx(&A, cols, &B, cols, &retA, cols);
     try std.testing.expectEqual(true, b);
     detRet = try detXmtx(&retA, cols, &alloc, 0);
     try std.testing.expectEqual(true, isEquF32(expB * expA, detRet, true));
@@ -12720,7 +12797,7 @@ test "XMTX: ELA - Larson, Edwards: 3.3 Problem 1, 3, 5, 7 test" {
     try std.testing.expectEqual(true, isEquF32(expA, detA, true));
     detB = try detXmtx(&B, 2, &alloc, 0);
     try std.testing.expectEqual(true, isEquF32(expB, detB, true));
-    b = tmsXmtx(&A, 2, &B, 2, &AB, 2);
+    b = try tmsXmtx(&A, 2, &B, 2, &AB, 2);
     try std.testing.expectEqual(true, b);
     detAB = try detXmtx(&AB, 2, &alloc, 0);
     try std.testing.expectEqual(true, isEquF32(expAB, detAB, true));
@@ -12742,7 +12819,7 @@ test "XMTX: ELA - Larson, Edwards: 3.3 Problem 1, 3, 5, 7 test" {
     try std.testing.expectEqual(true, isEquF32(expC, detC, true));
     detD = try detXmtx(&D, 3, &alloc, 0);
     try std.testing.expectEqual(true, isEquF32(expD, detD, true));
-    b = tmsXmtx(&C, 3, &D, 3, &CD, 3);
+    b = try tmsXmtx(&C, 3, &D, 3, &CD, 3);
     try std.testing.expectEqual(true, b);
     detCD = try detXmtx(&CD, 3, &alloc, 0);
     try std.testing.expectEqual(true, isEquF32(expCD, detCD, true));
@@ -12897,7 +12974,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     //|1  2| * |1  0| = |1  0| => 1 * |1  0| = |1  0|
     //|0  3|
     var ret11: [2]f32 = .{ 0, 0 };
-    b = tmsXmtx(&A1, 2, &xi1, 1, &ret11, 1);
+    b = try tmsXmtx(&A1, 2, &xi1, 1, &ret11, 1);
     var ret12: [2]f32 = .{ 1, 0 };
     mulXvec(&ret12, evs1.eignVals[0]);
     try std.testing.expectEqual(true, equXmtx(&ret11, &ret12));
@@ -12923,7 +13000,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     //|0  1  0|
     //|1  1  1|
     var ret21: [3]f32 = .{ 0, 0, 0 };
-    b = tmsXmtx(&A2, 3, &xi2, 1, &ret21, 1);
+    b = try tmsXmtx(&A2, 3, &xi2, 1, &ret21, 1);
     var ret22: [3]f32 = .{ 1, 0, 1 };
     mulXvec(&ret22, evs2.eignVals[1]);
     try std.testing.expectEqual(true, equXmtx(&ret21, &ret22));
@@ -12953,7 +13030,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     //2x1 - 5x2 = 0 => |5 -2|
     //2x1 - 5x2 = 0 => |5 -2|
     var ret31: [2]f32 = .{ 0, 0 };
-    b = tmsXmtx(&A3, 2, &xi3a, 1, &ret31, 1);
+    b = try tmsXmtx(&A3, 2, &xi3a, 1, &ret31, 1);
     var ret32: [2]f32 = .{ 5, 2 };
     mulXvec(&ret32, evs3.eignVals[0]);
     try std.testing.expectEqual(true, equXmtx(&ret31, &ret32));
@@ -12963,7 +13040,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     //5x1 - 5x2 = 0 => |1  1|
     //2x1 - 2x2 = 0 => |1  1|
     ret31 = .{ 0, 0 };
-    b = tmsXmtx(&A3, 2, &xi3b, 1, &ret31, 1);
+    b = try tmsXmtx(&A3, 2, &xi3b, 1, &ret31, 1);
     ret32 = .{ 1, 1 };
     mulXvec(&ret32, evs3.eignVals[1]);
     try std.testing.expectEqual(true, equXmtx(&ret31, &ret32));
@@ -12993,7 +13070,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     //2x1 + 1x2 = 3x1 => 2x1 - 3x1 + 1x2 = 0 => -1x1 + 1x2 = 0 => -1 * (1x1 - 1x2) = 0 => |1  1|
     //3x1 + 0x2 = 3x2 => 3x1 + 0x2 - 3x2 = 0 => 3x1 - 3x2 = 0 => 3 * (1x1 - 1x2) = 0 => |1  1|
     var ret41: [2]f32 = .{ 0, 0 };
-    b = tmsXmtx(&A4, 2, &xi4a, 1, &ret41, 1);
+    b = try tmsXmtx(&A4, 2, &xi4a, 1, &ret41, 1);
     var ret42: [2]f32 = .{ 1, 1 };
     mulXvec(&ret42, evs4.eignVals[0]);
     try std.testing.expectEqual(true, equXmtx(&ret41, &ret42));
@@ -13003,7 +13080,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 1, 3, 5, 7 test" {
     //2x1 + 1x2 = -1x1 => 3x1 + 1x2 = 0 => |-1  3|
     //3x1 + 0x2 = -1x2 => 3x1 + 1x2 = 0 => |-1  3|
     ret41 = .{ 0, 0 };
-    b = tmsXmtx(&A4, 2, &xi4b, 1, &ret41, 1);
+    b = try tmsXmtx(&A4, 2, &xi4b, 1, &ret41, 1);
     ret42 = .{ -1, 3 };
     mulXvec(&ret42, evs4.eignVals[1]);
     try std.testing.expectEqual(true, equXmtx(&ret41, &ret42));
