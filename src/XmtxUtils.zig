@@ -3478,26 +3478,6 @@ test "XMTX: isLinIndInrPrdctSpcXmtx test" {
     prntNl();
 }
 
-//TODO: needs
-//IGNORE isOrthInrPrdctSpcXmtx - NOT POSSIBLE doesn't use Euclidean or inner product
-//IGNORE adjXmtx - NOT POSSIBLE - NOT POSSIBLE needs to know the size of the matrix
-//DONE isLinIndInrPrdctSpcXvec
-//DONE isLinIndInrPrdctSpcXmtx
-//DONE isLinIndInrPrdctSpcXmtxRef
-//DONE isOrthonormalInrPrdctSpcXmtx
-//DONE isOrthogonalInrPrdctSpcXmtx
-//DONE cofXmtx2
-//DONE cofXmtxSign1
-//DONE cofXmtxSign1Ret
-//DONE adjXmtx1
-//DONE adjXmtx2
-//DONE cofXmtx1
-//DONE mnrXmtx1
-//DONE mnrXmtx1Ret
-
-//rmvRowColXmtx2
-//trnXmtxRectInl
-
 ///Returns true if the vectors of the given matrix, mtx, are linearly independent when tested in series.
 ///
 ///  mtx = The matrix to use to test for linear independence.
@@ -4758,6 +4738,26 @@ test "XMTX: nrmXvec test" {
     prntNl();
 }
 
+//TODO: needs
+//IGNORE isOrthInrPrdctSpcXmtx - NOT POSSIBLE doesn't use Euclidean or inner product
+//IGNORE adjXmtx - NOT POSSIBLE - NOT POSSIBLE needs to know the size of the matrix at compile time
+//DONE isLinIndInrPrdctSpcXvec
+//DONE isLinIndInrPrdctSpcXmtx
+//DONE isLinIndInrPrdctSpcXmtxRef
+//DONE isOrthonormalInrPrdctSpcXmtx
+//DONE isOrthogonalInrPrdctSpcXmtx
+//DONE cofXmtx2
+//DONE cofXmtxSign1
+//DONE cofXmtxSign1Ret
+//DONE adjXmtx1
+//DONE adjXmtx2
+//DONE cofXmtx1
+//DONE mnrXmtx1
+//DONE mnrXmtx1Ret
+//DONE rmvRowColXmtx2
+//
+//
+//NEEDED trnXmtxRectInl
 //
 //
 //
@@ -4769,16 +4769,6 @@ test "XMTX: nrmXvec test" {
 //
 //
 //TODO: current page here!!
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 ///Projects vector P onto vector Q. Alters the vecQ argument.
 ///
@@ -6475,13 +6465,13 @@ test "XMTX: cofXmtxSign test" {
 
 ///Returns a new matrix based on the 4x4 matrix, mtx, with the specified row and column data removed.
 ///
-///  mtx = The matrix to use as the basis of the new matrix.
+///  mtx = The 4x4 matrix to use as the basis of the new matrix.
 ///
 ///  row = The row to skip in the source matrix.
 ///
 ///  col = The col to skip in the source matrix.
 ///
-///  returns = A new matrix based on, mtx, with the specified row and column removed.
+///  returns = A new 3x3 matrix based on, mtx, with the specified row and column removed.
 ///
 pub fn rmvRowColXmtx4(mtx: *[16]f32, row: f32, col: f32) [9]f32 {
     const cols: usize = 4;
@@ -6540,13 +6530,13 @@ test "XMTX: rmvRowColXmtx4 test" {
 
 ///Returns a new matrix based on the 3x3 matrix, mtx, with the specified row and column data removed.
 ///
-///  mtx = The matrix to use as the basis of the new matrix.
+///  mtx = The 3x3 matrix to use as the basis of the new matrix.
 ///
 ///  row = The row to skip in the source matrix.
 ///
 ///  col = The col to skip in the source matrix.
 ///
-///  returns = A new matrix based on, mtx, with the specified row and column removed.
+///  returns = A new 2x2 matrix based on, mtx, with the specified row and column removed.
 ///
 pub fn rmvRowColXmtx3(mtx: *[9]f32, row: f32, col: f32) [4]f32 {
     const cols: usize = 3;
@@ -6557,9 +6547,9 @@ pub fn rmvRowColXmtx3(mtx: *[9]f32, row: f32, col: f32) [4]f32 {
     var j: usize = 0;
     var actI: usize = 0;
     var actJ: usize = 0;
-    var dest: [4]f32 = std.mem.zeroes([4]f32); //.{};
-    const actRow: usize = @intFromFloat(row); //@as(usize, @intFromFloat(row));
-    const actCol: usize = @intFromFloat(col); //@as(usize, @intFromFloat(col));
+    var dest: [4]f32 = std.mem.zeroes([4]f32);
+    const actRow: usize = @intFromFloat(row);
+    const actCol: usize = @intFromFloat(col);
 
     while (i < r) {
         j = 0;
@@ -6601,6 +6591,49 @@ test "XMTX: rmvRowColXmtx3 test" {
     try std.testing.expectEqual(true, equXmtx(&expA, &res));
     prntNl();
 }
+
+///Returns a new matrix based on the 2x2 matrix, mtx, with the specified row and column data removed.
+///
+///  mtx = The 2x2 matrix to use as the basis of the new matrix.
+///
+///  row = The row to skip in the source matrix.
+///
+///  col = The col to skip in the source matrix.
+///
+///  returns = A new 1x1 matrix based on, mtx, with the specified row and column removed.
+///
+pub fn rmvRowColXmtx2(mtx: *[4]f32, row: f32, col: f32) [1]f32 {
+    const cols: usize = 2;
+    const destCols: usize = 1;
+    const r: usize = 2;
+    const c: usize = 2;
+    var i: usize = 0;
+    var j: usize = 0;
+    var actI: usize = 0;
+    var actJ: usize = 0;
+    var dest: [1]f32 = std.mem.zeroes([1]f32);
+    const actRow: usize = @intFromFloat(row);
+    const actCol: usize = @intFromFloat(col);
+
+    while (i < r) {
+        j = 0;
+        actJ = 0;
+        if (i != actRow) {
+            while (j < c) {
+                if (j != actCol) {
+                    dest[(actI * destCols) + actJ] = mtx[(i * cols) + j];
+                    actJ += 1;
+                }
+                j += 1;
+            }
+            actI += 1;
+        }
+        i += 1;
+    }
+    return dest;
+}
+
+//TODO: tests
 
 ///Returns the adjoint matrix for a given 4x4 matrix, mtx.
 ///
