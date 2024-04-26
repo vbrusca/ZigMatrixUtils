@@ -23,9 +23,9 @@ This project was built using the following books as a basis.<br>
 1. LT: Continuous development to complete the material covered in both books regarding linear algebra and matrix manipulations.<br>
 2. LT: To keep the project up to date with new versions of Zig as the language matures.
 3. LT: To complete and refine the code documentation.
-4. ST: Version 0.6: Add basic matrix scaling functions.
-5. ST: Version 0.6: Add execution time tracking to the remaining theorem/problem unit tests.
-6. ST: Version 0.6: Add support for fast floating point math and check performance.
+4. ST: Version 0.60: Add basic matrix scaling functions.
+5. ST: Version 0.60: Add execution time tracking to the remaining theorem/problem unit tests.
+6. ST: Version 0.56: Complete basis material up to and including section 5.6.
 
 ## Running Unit Tests
 You can run the full set of unit tests from inside the project with the following command.<br>
