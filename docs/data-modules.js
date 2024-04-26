@@ -1,1 +1,1 @@
-var modules =[{"name":"XmtxUtils","file":0,"main":66,"table":{"std":1,"XmtxUtils":0}},{"name":"std","file":0,"main":67,"table":{}}];
+var modules =[{"name":"XmtxUtils","file":0,"main":66,"table":{"XmtxUtils":0,"std":1}},{"name":"std","file":0,"main":67,"table":{}}];

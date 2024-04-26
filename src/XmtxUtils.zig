@@ -4346,7 +4346,7 @@ pub fn prntXmtxNl(mtx: []f32, cols: usize) void {
         prntXvec(vec);
         i += 1;
     }
-    std.debug.print("\n", .{});
+    //std.debug.print("\n", .{});
 }
 
 test "XMTX: prntXmtxNl test" {
@@ -4367,7 +4367,6 @@ test "XMTX: prntXmtxNl test" {
 ///  vec = The vector to print.
 ///
 pub fn prntXvec(vec: []f32) void {
-    //std.debug.print("", .{});
     const l: usize = vec.len;
     var i: usize = 0;
     var c: u8 = '-';
@@ -4422,7 +4421,7 @@ pub fn prntXvecNl(vec: []f32) void {
         std.debug.print("{c}: {} ", .{ c, vec[i] });
         i += 1;
     }
-    std.debug.print("\n", .{});
+    //std.debug.print("\n", .{});
 }
 
 test "XMTX: prntXvecNl test" {
@@ -4738,38 +4737,6 @@ test "XMTX: nrmXvec test" {
     prntNl();
 }
 
-//TODO: needs
-//IGNORE isOrthInrPrdctSpcXmtx - NOT POSSIBLE doesn't use Euclidean or inner product
-//IGNORE adjXmtx - NOT POSSIBLE - NOT POSSIBLE needs to know the size of the matrix at compile time
-//DONE isLinIndInrPrdctSpcXvec
-//DONE isLinIndInrPrdctSpcXmtx
-//DONE isLinIndInrPrdctSpcXmtxRef
-//DONE isOrthonormalInrPrdctSpcXmtx
-//DONE isOrthogonalInrPrdctSpcXmtx
-//DONE cofXmtx2
-//DONE cofXmtxSign1
-//DONE cofXmtxSign1Ret
-//DONE adjXmtx1
-//DONE adjXmtx2
-//DONE cofXmtx1
-//DONE mnrXmtx1
-//DONE mnrXmtx1Ret
-//DONE rmvRowColXmtx2
-//
-//
-//NEEDED trnXmtxRectInl
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//TODO: current page here!!
-
 ///Projects vector P onto vector Q. Alters the vecQ argument.
 ///
 ///  vecP = The vector to project onto.
@@ -4821,8 +4788,7 @@ test "XMTX: projXvec_VecP_Onto_VecQ test" {
 ///
 ///  returns = The parameters of the vector P that projects onto Q, stored in vecQ.
 ///
-//progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1,
-//which simplifies the formula to <u,v>v
+///  NOTE: progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1, which simplifies the formula to <u,v>v.
 pub fn projUnitXvec_VecP_Onto_VecQ(vecP: []f32, vecQ: []f32) []f32 {
     //Larson, Edwards: Chapter 5: remark: pg 272
     const dotProd: f32 = dotPrdXvec(vecP, vecQ);
@@ -4930,9 +4896,6 @@ pub fn idnfXmtx(mtx: []f32, cols: usize, op: MTX_OPS) bool {
                 i += 1;
                 const vecR: []f32 = mtx[(i * cols)..((i * cols) + cols)];
                 if (!isLinIndXvec(vec, vecR)) {
-                    //prntXvecNl(vec);
-                    //prntXvecNl(vecR);
-                    //prntNl();
                     res = false;
                     break;
                 }
@@ -4940,9 +4903,6 @@ pub fn idnfXmtx(mtx: []f32, cols: usize, op: MTX_OPS) bool {
             } else {
                 const vecR: []f32 = mtx[0..cols];
                 if (!isLinIndXvec(vec, vecR)) {
-                    //prntXvecNl(vec);
-                    //prntXvecNl(vecR);
-                    //prntNl();
                     res = false;
                     break;
                 }
@@ -4996,6 +4956,11 @@ test "XMTX: idnfXmtx tests" {
 pub fn procXmtx(mtx: []f32, val: f32, cols: usize, op: MTX_OPS) void {
     const l: usize = mtx.len / cols;
     var i: usize = 0;
+
+    if (op == MTX_OPS.MTX_PRNT) {
+        std.debug.print("\n", .{});
+    }
+
     while (i < l) {
         const vec: []f32 = mtx[(i * cols)..((i * cols) + cols)];
         if (op == MTX_OPS.MTX_MUL) {
@@ -5008,7 +4973,7 @@ pub fn procXmtx(mtx: []f32, val: f32, cols: usize, op: MTX_OPS) void {
             subXvec(vec, val);
         } else if (op == MTX_OPS.MTX_PRNT) {
             std.debug.print("{}: ", .{i});
-            prntXvecNl(vec);
+            prntXvec(vec);
         } else if (op == MTX_OPS.MTX_NRM) {
             nrmXvec(vec);
         } else if (op == MTX_OPS.MTX_ABS) {
@@ -5138,8 +5103,7 @@ test "XMTX: procXmtx tests" {
     prntNl();
 }
 
-///Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
-///Alters the provided matrix inline.
+///Converts the provided matrix to reduced row eschelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse. Alters the provided matrix inline.
 ///
 ///  mtx = The matrix to reduce.
 ///
@@ -5182,25 +5146,25 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
 
     if (hasAug) {
         if (rows != (cols - diff)) {
-            std.debug.print("\n!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!", .{});
+            prntNlStr("!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!");
             return Error.InvalidLengths;
         }
     } else {
         if (rows != cols) {
-            std.debug.print("\n!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!", .{});
+            prntNlStr("!!Warning rdcXmtxInl matrix should be square or have rows + 1 columns !!");
             return Error.InvalidLengths;
         }
     }
 
     if (hasIdtMtx) {
         if (idtRows != idtCols) {
-            std.debug.print("\n!!Warning rdcXmtxInl identity matrix should be square !!", .{});
+            prntNlStr("!!Warning rdcXmtxInl identity matrix should be square !!");
             return Error.InvalidLengths;
         }
     }
 
     if (verbose) {
-        std.debug.print("\nStart Mtx", .{});
+        prntNlStr("Start Mtx");
         prntXmtxNl(mtx, cols);
         prntNl();
     }
@@ -5213,7 +5177,7 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
             fndRow = fndLgstRowAbsXmtx(mtx, cols, c, r);
             if (fndRow != r and fndRow != errRow) {
                 if (verbose) {
-                    std.debug.print("\nAlternate row {} with {}", .{ fndRow, r });
+                    prntNlStrArgs("Alternate row {} with {}", .{ fndRow, r });
                 }
 
                 altXmtxRowsInl(fndRow, r, cols, mtx);
@@ -5237,7 +5201,7 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
                 sclMul *= v;
 
                 if (verbose) {
-                    std.debug.print("\n{} Scalar multiply row: {} by {}", .{ c, r, tmp });
+                    prntNlStrArgs("{} Scalar multiply row: {} by {}", .{ c, r, tmp });
                 }
 
                 sclMulXmtxRowsInl(r, tmp, cols, mtx);
@@ -5264,7 +5228,7 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
                 const tmp2: f32 = -1.0;
                 const tmp3: f32 = mtx[((z * cols) + c)] * tmp2;
                 if (verbose) {
-                    std.debug.print("\n{} Add scalar multiple row: {} to row {} val {}, {}, {}", .{ c, r, z, tmp3, mtx[((z * cols) + c)], ((z * cols) + c) });
+                    prntNlStrArgs("{} Add scalar multiple row: {} to row {} val {}, {}, {}", .{ c, r, z, tmp3, mtx[((z * cols) + c)], ((z * cols) + c) });
                 }
 
                 addSclMulXmtxRowsInl(r, z, tmp3, cols, mtx);
@@ -5275,11 +5239,11 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
                 if (isZeroXvec(mtx[(z * cols)..((z * cols) + dim)])) {
                     if (hasAug == false or (hasAug == true and isEquF32(mtx[(z * cols) + (cols - 1)], 0, true) == false)) {
                         if (verbose) {
-                            std.debug.print("\nFound zero vector index start {} and stop {}", .{ (z * cols), ((z * cols) + cols - 1) });
+                            prntNlStrArgs("Found zero vector index start {} and stop {}", .{ (z * cols), ((z * cols) + cols - 1) });
                             prntXvecNl(mtx[(z * cols)..((z * cols) + cols - 1)]);
                             prntNl();
 
-                            std.debug.print("\nMatrix state:", .{});
+                            prntNlStrArgs("nMatrix state:", .{});
                             prntXmtxNl(mtx, cols);
                             prntNl();
                         }
@@ -5300,14 +5264,14 @@ pub fn rdcXmtxInl(mtx: []f32, cols: usize, hasAug: bool, hasIdtMtx: bool, idtMtx
         }
 
         if (verbose) {
-            std.debug.print("\nRow {} Mtx", .{r});
+            prntNlStrArgs("Row {} Mtx", .{r});
             prntXmtxNl(mtx, cols);
             prntNl();
         }
     }
 
     if (verbose) {
-        std.debug.print("\nScalar Multiple: {}", .{sclMul});
+        prntNlStrArgs("Scalar Multiple: {}", .{sclMul});
         prntXmtxNl(mtx, cols);
         prntNl();
     }
@@ -5398,7 +5362,7 @@ test "XMTX: rdcXmtxInl test" {
     prntNl();
 }
 
-///Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
+///Converts the provided matrix to reduced row eschelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
 ///
 ///  mtx = The matrix to reduce.
 ///
@@ -5462,7 +5426,7 @@ test "XMTX: rdcXmtx test" {
 
 ///Prints a new line followed by the given string and an ending new line.
 pub fn prntNlStr(comptime s: []const u8) void {
-    std.debug.print("\n {s}\n", .{s});
+    std.debug.print("\n {s}", .{s});
 }
 
 test "XMTX: prntNlStr test" {
@@ -5676,7 +5640,7 @@ pub fn isRdcFrmXmtx(mtx: []f32, cols: usize) bool {
     while (i < l) : (i += 1) {
         const row = i / cols;
         const col = i % cols;
-        //std.debug.print("\nRow: {} Col: {} Val: {}", .{row, col, mtx[i]});
+
         if (row > col) {
             if (mtx[i] != 0) {
                 return false;
@@ -6173,6 +6137,77 @@ test "XMTX: trnXmtxRect test" {
     prntXmtxNl(&bT, 3);
     prntNl();
     try std.testing.expectEqual(true, equXmtx(&bT, &expBt));
+    prntNl();
+}
+
+///Transposes the provided matrix into the mtx argument. Supports rectangular transposition using the return column argument.
+///
+///  mtx = The source matrix to run the transpose operation on and store the results to.
+///
+///  cols = The number of columns in the matrix.
+///
+///  retCols = The number of columns in the return matrix.
+///
+pub fn trnXmtxRectInl(mtx: []f32, cols: usize, retCols: usize, alloc: *const std.mem.Allocator) !void {
+    const l = mtx.len;
+    const rows: usize = (l / cols);
+    const lcols: usize = cols;
+    var r: usize = 0;
+    var c: usize = 0;
+    var ret: []f32 = try alloc.*.alloc(f32, mtx.len);
+    defer alloc.*.free(ret);
+
+    while (r < rows) : (r += 1) {
+        c = 0;
+        while (c < lcols) : (c += 1) {
+            ret[(c * retCols) + r] = mtx[(r * cols) + c];
+        }
+    }
+    cpyXmtx(ret, mtx);
+}
+
+test "XMTX: trnXmtxRectInl test" {
+    var a: [9]f32 = .{ 2, 1, -2, -1, 0, 3, 0, -2, 1 };
+    var b: [6]f32 = .{ 3, 1, 2, -1, 3, 0 };
+    var aT: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    var expAt: [9]f32 = .{ 2, -1, 0, 1, 0, -2, -2, 3, 1 };
+    var bT: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
+    var bT2: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
+    var expBt: [6]f32 = .{ 3, 2, 3, 1, -1, 0 };
+
+    prntXmtxNl(&a, 3);
+    prntNl();
+
+    trnXmtx(&a, 3, &aT);
+    prntXmtxNl(&aT, 3);
+    prntNl();
+    try std.testing.expectEqual(true, equXmtx(&aT, &expAt));
+
+    prntXmtxNl(&b, 2);
+    prntNl();
+
+    var start = try Instant.now();
+    trnXmtxRect(&b, 2, &bT, 3);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntrnXmtxRect: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("trnXmtxRect", elapsed1);
+
+    prntXmtxNl(&bT, 3);
+    try std.testing.expectEqual(true, equXmtx(&bT, &expBt));
+    prntNl();
+
+    cpyXmtx(&b, &bT2);
+
+    start = try Instant.now();
+    try trnXmtxRectInl(&bT2, 2, 3, &std.testing.allocator);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ntrnXmtxRectInl: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("trnXmtxRectInl", elapsed1);
+
+    prntXmtxNl(&bT2, 3);
+    try std.testing.expectEqual(true, equXmtx(&bT, &bT2));
     prntNl();
 }
 
@@ -7892,10 +7927,51 @@ pub fn getInvXmtx2(mtx: *[4]f32) ![4]f32 {
         prntNlStr("!! Warning the getInvXmtx2 function expects the mtx argument to be invertible, non singular !!");
         return Error.NonInvertibleMatrix;
     }
-    return mulXvec(.{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] }, (1.0 / ((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]))));
+
+    const nmtx: [4]f32 = .{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] };
+    mulXvec(@constCast(&nmtx), (1.0 / ((mtx[0] * mtx[3]) - (mtx[1] * mtx[2]))));
+    return nmtx;
 }
 
-//TODO: tests
+test "XMTX: getInvXmtx2 test" {
+    var m1: [4]f32 = .{ 2, 1, 7, 4 };
+    var invM1: [4]f32 = .{ 4, -1, -7, 2 };
+    var res: [4]f32 = std.mem.zeroes([4]f32);
+    var res2: [4]f32 = std.mem.zeroes([4]f32);
+    const detM1: f32 = detXmtx2(&m1);
+
+    var start = try Instant.now();
+    getInvFromDet2(&m1, detM1, &res);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetInvFromDet2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getInvFromDet2", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&res, &invM1));
+    prntNl();
+
+    start = try Instant.now();
+    res2 = try getInvXmtx2(&m1);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetInvXmtx2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getInvXmtx2", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&res2, &res));
+    prntNl();
+}
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//TODO: current page here!!
 
 ///Calculates the inverse of the provided 3x3 matrix using the determinant and stores the result in the return matrix.
 ///
