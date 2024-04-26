@@ -26,6 +26,8 @@ This project was built using the following books as a basis.<br>
 4. ST: Version 0.60: Add basic matrix scaling functions.
 5. ST: Version 0.60: Add execution time tracking to the remaining theorem/problem unit tests.
 6. ST: Version 0.56: Complete basis material up to and including section 5.6.
+7. ST: To complete the full function review and normalization at this phase of the library creation.
+8. ST: To complete all function documentation and unit tests.
 
 ## Running Unit Tests
 You can run the full set of unit tests from inside the project with the following command.<br>
