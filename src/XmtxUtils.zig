@@ -3247,8 +3247,22 @@ test "XMTX: isOrthogonalXmtx test" {
     const exp2: bool = false;
     const cols: usize = 3;
     const alloc = std.testing.allocator;
-    const b1: bool = try isOrthogonalXmtx(@constCast(&v1), cols, &alloc);
-    const b2: bool = try isOrthogonalXmtx(@constCast(&v2), cols, &alloc);
+    var b1: bool = false;
+    var b2: bool = false;
+
+    var start = try Instant.now();
+    b1 = try isOrthogonalXmtx(@constCast(&v1), cols, &alloc);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthogonalXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthogonalXmtx", elapsed1);
+
+    start = try Instant.now();
+    b2 = try isOrthogonalXmtx(@constCast(&v2), cols, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthogonalXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthogonalXmtx", elapsed1);
 
     prntNlStrArgs("B1: {} Exp1: {} B2: {} Exp2: {}", .{ b1, exp1, b2, exp2 });
     try std.testing.expectEqual(exp1, b1);
@@ -3280,10 +3294,38 @@ test "XMTX: isOrthogonalInrPrdctSpcXmtx test" {
     const cols: usize = 3;
     const alloc = std.testing.allocator;
     const prdct = dotPrdXvec;
-    const b1: bool = try isOrthogonalXmtx(@constCast(&v1), cols, &alloc);
-    const b2: bool = try isOrthogonalXmtx(@constCast(&v2), cols, &alloc);
-    const b3: bool = try isOrthogonalInrPrdctSpcXmtx(@constCast(&v1), cols, prdct, &alloc);
-    const b4: bool = try isOrthogonalInrPrdctSpcXmtx(@constCast(&v2), cols, prdct, &alloc);
+    var b1: bool = false;
+    var b2: bool = false;
+    var b3: bool = false;
+    var b4: bool = false;
+
+    var start = try Instant.now();
+    b1 = try isOrthogonalXmtx(@constCast(&v1), cols, &alloc);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthogonalXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthogonalXmtx", elapsed1);
+
+    start = try Instant.now();
+    b2 = try isOrthogonalXmtx(@constCast(&v2), cols, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthogonalXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthogonalXmtx", elapsed1);
+
+    start = try Instant.now();
+    b3 = try isOrthogonalInrPrdctSpcXmtx(@constCast(&v1), cols, prdct, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthogonalInrPrdctSpcXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthogonalInrPrdctSpcXmtx", elapsed1);
+
+    start = try Instant.now();
+    b4 = try isOrthogonalInrPrdctSpcXmtx(@constCast(&v2), cols, prdct, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthogonalInrPrdctSpcXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthogonalInrPrdctSpcXmtx", elapsed1);
 
     prntNlStrArgs("B1: {} Exp1: {} B2: {} Exp2: {} B3: {} B4: {}", .{ b1, exp1, b2, exp2, b3, b4 });
     try std.testing.expectEqual(exp1, b1);
@@ -3329,7 +3371,35 @@ pub fn isOrthonormalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocato
     return false;
 }
 
-//TODO: tests
+test "XMTX: isOrthonormalXmtx test" {
+    const v1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    const v2: [9]f32 = .{ 0, 2, 0, 0, 2, 0, 0, 2, 0 };
+    const exp1: bool = true;
+    const exp2: bool = false;
+    const cols: usize = 3;
+    const alloc = std.testing.allocator;
+    var b1: bool = false;
+    var b2: bool = false;
+
+    var start = try Instant.now();
+    b1 = try isOrthonormalXmtx(@constCast(&v1), cols, &alloc);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthonormalXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthonormalXmtx", elapsed1);
+
+    start = try Instant.now();
+    b2 = try isOrthonormalXmtx(@constCast(&v2), cols, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthonormalXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthonormalXmtx", elapsed1);
+
+    prntNlStrArgs("B1: {} Exp1: {} B2: {} Exp2: {}", .{ b1, exp1, b2, exp2 });
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    prntNl();
+}
 
 ///Returns true if the vectors of the given matrix, mtx, are orthonormal, linearly independent, using the given general inner product space with a magnitude of 1, when tested in series.
 ///
@@ -3369,7 +3439,54 @@ pub fn isOrthonormalInrPrdctSpcXmtx(mtx: []f32, cols: usize, prdct: *const fn (l
     return false;
 }
 
-//TODO: tests
+test "XMTX: isOrthonormalInrPrdctSpcXmtx test" {
+    const v1: [9]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    const v2: [9]f32 = .{ 0, 2, 0, 0, 2, 0, 0, 2, 0 };
+    const exp1: bool = true;
+    const exp2: bool = false;
+    const cols: usize = 3;
+    const alloc = std.testing.allocator;
+    const prdct = dotPrdXvec;
+    var b1: bool = false;
+    var b2: bool = false;
+    var b3: bool = false;
+    var b4: bool = false;
+
+    var start = try Instant.now();
+    b1 = try isOrthonormalXmtx(@constCast(&v1), cols, &alloc);
+    var end = try Instant.now();
+    var elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthonormalXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthonormalXmtx", elapsed1);
+
+    start = try Instant.now();
+    b2 = try isOrthonormalXmtx(@constCast(&v2), cols, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthonormalXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthonormalXmtx", elapsed1);
+
+    start = try Instant.now();
+    b3 = try isOrthonormalInrPrdctSpcXmtx(@constCast(&v1), cols, prdct, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthonormalInrPrdctSpcXmtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthonormalInrPrdctSpcXmtx", elapsed1);
+
+    start = try Instant.now();
+    b4 = try isOrthonormalInrPrdctSpcXmtx(@constCast(&v2), cols, prdct, &alloc);
+    end = try Instant.now();
+    elapsed1 = @floatFromInt(end.since(start));
+    std.debug.print("\nisOrthonormalInrPrdctSpcXmtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("isOrthonormalInrPrdctSpcXmtx", elapsed1);
+
+    prntNlStrArgs("B1: {} Exp1: {} B2: {} Exp2: {} B3: {} B4: {}", .{ b1, exp1, b2, exp2, b3, b4 });
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    try std.testing.expectEqual(b3, b1);
+    try std.testing.expectEqual(b4, b2);
+    prntNl();
+}
 
 ///Returns true if the vectors of the given matrix, mtx, are linearly independent, when tested in series.
 ///
@@ -3969,7 +4086,7 @@ test "XMTX: subXvec test" {
 ///
 ///  ret = The return vector where calculated results are stored.
 ///
-///  returns = A Boolean value indicating if the vector multiplication operation was successful.
+///  returns = A Boolean value indicating if the vector multiplication operation was successful or an error value.
 ///
 pub fn tmsXvec(vecL: []f32, vecR: []f32, ret: []f32) !bool {
     if (vecL.len != vecR.len) {
@@ -4011,38 +4128,119 @@ test "XMTX: tmsXvec test" {
     prntNl();
 }
 
-//TODO: docs
-pub fn tmsXvecRet(vecL: []f32, vecR: []f32, ret: *f32) !bool {
-    const r: []f32 = undefined;
-    const b: bool = try tmsXvec(vecL, vecR, r);
-    ret.* = r[0];
-    return b;
+///Performs vector multiplication on the provided vectors storing the result in the ret vector.
+///
+///  vecL = The left-hand vector in the multiplication process.
+///
+///  vecR = The right-hand vector in the multiplication process.
+///
+///  ret = The return vector where calculated results are stored.
+///
+///  returns = A Boolean value indicating if the vector multiplication operation was successful or an error value.
+///
+pub fn tmsXvecSclr(vecL: []f32, vecR: []f32, ret: *f32) !bool {
+    if (vecL.len != vecR.len) {
+        prntNlStr("!! Warning tmsXvec vector arguments are not the same legnth !!");
+        return Error.InvalidLengths;
+    }
+
+    const l: usize = vecL.len;
+    var i: usize = 0;
+    while (i < l) {
+        ret.* += (vecL[i] * vecR[i]);
+        i += 1;
+    }
+    return true;
 }
 
-//TODO: tests
+test "XMTX: tmsXvecSclr test" {
+    var v1: [3]f32 = .{ 3, 3, 3 };
+    var v2: [3]f32 = .{ 2, 2, 2 };
+    var v3: f32 = 0.0;
+    const exp: f32 = 18.0;
 
-//TODO: docs
+    const start = try Instant.now();
+    _ = try tmsXvecSclr(&v1, &v2, &v3);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntmsXvecSclr: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tmsXvecSclr", elapsed1);
+
+    prntXvecNl(&v1);
+    prntXvecNl(&v2);
+    prntNlStrArgs("v3: {}", .{v3});
+    try std.testing.expectEqual(exp, v3);
+    prntNl();
+}
+
+///Performs vector multiplication on the provided 1 vectors storing the result in the return 1 vector, ret.
+///
+///  vecL = The left-hand 1 vector in the multiplication process.
+///
+///  vecR = The right-hand 1 vector in the multiplication process.
+///
+///  returns = The return 1 vector where calculated results are stored.
+///
 pub fn tmsXvec1(vecL: *const [1]f32, vecR: *const [1]f32) f32 {
     return (vecL[0] * vecR[0]);
 }
 
-//TODO: tests
+test "XMTX: tmsXvec1 test" {
+    var v1: [1]f32 = .{3};
+    var v2: [1]f32 = .{2};
+    var v3: f32 = 0.0;
+    const exp: f32 = 6.0;
 
-//TODO: docs
+    const start = try Instant.now();
+    v3 = tmsXvec1(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntmsXvec1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tmsXvec1", elapsed1);
+
+    prntXvecNl(&v1);
+    prntXvecNl(&v2);
+    prntNlStrArgs("v3: {}", .{v3});
+    try std.testing.expectEqual(exp, v3);
+    prntNl();
+}
+
+///Performs vector multiplication on the provided 1x1 vectors storing the result in the return 2 vector, ret.
+///
+///  vecL = The left-hand 2 vector in the multiplication process.
+///
+///  vecR = The right-hand 2 vector in the multiplication process.
+///
+///  returns = The return 2 vector where calculated results are stored.
+///
 pub fn tmsXvec2(vecL: *const [2]f32, vecR: *const [2]f32) f32 {
     return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]));
 }
 
 //TODO: tests
 
-//TODO: docs
+///Performs vector multiplication on the provided 1x1 vectors storing the result in the return 3 vector, ret.
+///
+///  vecL = The left-hand 3 vector in the multiplication process.
+///
+///  vecR = The right-hand 3 vector in the multiplication process.
+///
+///  returns = The return 3 vector where calculated results are stored.
+///
 pub fn tmsXvec3(vecL: *const [3]f32, vecR: *const [3]f32) f32 {
     return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]) + (vecL[2] * vecR[2]));
 }
 
 //TODO: tests
 
-//TODO: docs
+///Performs vector multiplication on the provided 1x1 vectors storing the result in the return 4 vector, ret.
+///
+///  vecL = The left-hand 4 vector in the multiplication process.
+///
+///  vecR = The right-hand 4 vector in the multiplication process.
+///
+///  returns = The return 4 vector where calculated results are stored.
+///
 pub fn tmsXvec4(vecL: *const [4]f32, vecR: *const [4]f32) f32 {
     return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]) + (vecL[2] * vecR[2]) + (vecL[3] * vecR[3]));
 }
