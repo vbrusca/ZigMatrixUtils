@@ -32,14 +32,14 @@ comptime {
 const time = std.time;
 const Instant = time.Instant;
 
-///The percision to use when determining if a number is zero.
+///The percision to use when determining if a number is zero or when determining if two f32 values are equal.
 const ZERO_F32: f32 = 0.001;
 
-///A Boolean indicating if the library should use exact comparison, int values, or precision comparison, float.
+///A Boolean indicating if the library should use exact comparison of f32 values, or precision comparison using the value of ZERO_F32.
 const COMPARE_MODE_EXACT: bool = false;
 
 ///Error to use when invalid array lengths are encountered.
-const Error = error{ InvalidLengths, OperationFailed };
+const Error = error{ InvalidLengths, OperationFailed, DivideByZero };
 
 ///Identity for a 1x1 matrix.
 const iM1: [1]f32 = .{1};
@@ -89,7 +89,7 @@ const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
 ///An enumeration that describes the solution types, discriminant, of a third order polynomial.
 const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE_REAL_TWO_IMAGINARY };
 
-///An enumeration of matrix operations that are used by the idnfXmtx and procXmtx function.
+///An enumeration of matrix operations that are used by the idnfXmtx and procXmtx functions.
 const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS, MTX_IS_LIN_INDP, MTX_IS_INVERTIBLE, MTX_IS_ZERO };
 
 ///An enumeration that is used to describe the type of basis of a 3D set of vectors.
@@ -146,7 +146,7 @@ pub const EigVal3 = struct {
     }
 };
 
-///Used to hold a function's execution time.
+///Used to describe a function's average execution time.
 pub const ExecTime = struct {
     fncName: []const u8,
     fncTime: f64,
@@ -177,10 +177,11 @@ var execTimes: [MAX_EXEC_TIMES]ExecTime = undefined;
 ///A Boolean that controls verbose logging.
 var VERBOSE: bool = false;
 
-///A function to add a new key, value pair into the max execution times hashmap.
+///A function to add a new ExecTime struct into the execTimes array.
+///
 ///  key = A string representing the function name.
 ///
-///  value = A f64 value representing the execution time.
+///  value = An f64 value representing the execution time.
 ///
 pub fn addExecTime(key: []const u8, value: f64) void {
     if (execTimesCnt < MAX_EXEC_TIMES) {
@@ -194,19 +195,19 @@ pub fn addExecTime(key: []const u8, value: f64) void {
     }
 
     if (VERBOSE) {
-        std.debug.print("\nAdded a new entry, maxExecTime entry count is now {}.", .{execTimesCnt});
+        prntNlStrArgs("Added a new entry, maxExecTime entry count is now {}.", .{execTimesCnt});
     }
 }
 
 ///Returns the absolute value of the provided argument.
 ///
-///  v = The floating point number to calculate the absolute value of.
+///  v = The f32 value to calculate the absolute value of.
 ///
 ///  returns = The absolute value of the argument v.
 ///
 pub fn absF32(v: f32) f32 {
-    if (v < 0) {
-        return v * -1;
+    if (v < 0.0) {
+        return (v * -1.0);
     }
     return v;
 }
@@ -225,13 +226,13 @@ test "XMTX: absF32 test" {
     prntNl();
 }
 
-///Calculates and stores the absolute value of the given f32.
+///Calculates and stores the absolute value of the given f32 argument v in v.
 ///
-///  v = A reference to the floating point number to calculate and store the absolute value of.
+///  v = A reference to the f32 vaiable to calculate and store the absolute value of.
 ///
 pub fn absF32Ref(v: *f32) void {
-    if (v.* < 0) {
-        v.* *= -1;
+    if (v.* < 0.0) {
+        v.* *= -1.0;
     }
 }
 
@@ -252,11 +253,11 @@ test "XMTX: absF32Ref test" {
     prntNl();
 }
 
-///Calculates and stores the absolute value of the given f32.
+///Calculates and stores the absolute value of the given f32 argument v into the function argument ret.
 ///
-///  v = A constant reference to the floating point number to calculate and store the absolute value of.
+///  v = A constant reference to the f32 value to calculate the absolute value of.
 ///
-///  ret = A reference to the f32 variable that will store the absolute value result.
+///  ret = A reference to the f32 variable that will store the resulting absolute value.
 ///
 pub fn absF32Ret(v: *const f32, ret: *f32) void {
     ret.* = absF32(v.*);
@@ -287,7 +288,7 @@ test "XMTX: absF32Ret test" {
 ///
 ///  returns = The order of the polynomial expression.
 ///
-///  Description of how polynomials are represented as arrays.
+///  NOTE: Description of how polynomials are represented as arrays.
 ///
 ///  polyExp of len 2 = a& + b = 0                 ORDER 1
 ///
@@ -303,11 +304,10 @@ test "XMTX: absF32Ret test" {
 ///
 pub fn getPolyOrder(polyExp: []f32) f32 {
     const l: usize = polyExp.len;
-    if (l - 1 > 0) {
+    if ((l - 1) > 0) {
         return @floatFromInt(l - 1);
-    } else {
-        return 0;
     }
+    return 0.0;
 }
 
 test "XMTX: getPolyOrder test" {
@@ -345,7 +345,7 @@ test "XMTX: getPolyOrder test" {
     prntNl();
 }
 
-///Sets the order of the polynomial expression, represented as an f32 array, to the return variable reference.
+///Sets the order of the polynomial expression, polyExp - represented as an array of f32 values, to the return argument reference ret.
 ///
 ///  polyExp = The constant reference to the polynomial expression to process, represented as an f32 array.
 ///
@@ -407,9 +407,9 @@ test "XMTX: getPolyOrderRet test" {
     prntNl();
 }
 
-///Returns the first Z factors of the number x where Z = ret.len.
+///Returns the first Z factors of the number x where Z is equal to the length of the array argument ret.
 ///
-///  x   = The number, an integer value, that factors are searched for.
+///  x   = The f32 number, should hold an integer value, that factors are searched for.
 ///
 ///  ret = The array to store the factors, each factor is stored in its
 ///        associated array index, i.e. index = 0 would have a value of 1
@@ -448,9 +448,9 @@ test "XMTX: fndFactorsOf test" {
     prntNl();
 }
 
-///Returns the first Z factors of the number x where Z = ret.len.
+///Returns the first Z factors of the number x where Z is equal to the length of the array argument ret.
 ///
-///  x   = A reference to the constant number reference, an integer value, that factors are searched for.
+///  x   = The f32 number, should hold an integer value, that factors are searched for.
 ///
 ///  ret = The array to store the factors, each factor is stored in its
 ///        associated array index, i.e. index = 0 would have a value of 1
@@ -468,7 +468,7 @@ pub fn fndFactorsOfRef(x: *const f32, ret: []f32) f32 {
     while (i < t) : (i += 1) {
         if (i < l) {
             if (VERBOSE) {
-                std.debug.print("\nt = {}, (i + 1) = {}, (t % (i + 1)) = {}", .{ t, (i + 1), (t % (i + 1)) });
+                prntNlStrArgs("t = {}, (i + 1) = {}, (t % (i + 1)) = {}", .{ t, (i + 1), (t % (i + 1)) });
             }
 
             if ((t % (i + 1)) == 0) {
@@ -513,16 +513,16 @@ test "XMTX: fndFactorsOfRef test" {
 
 ///Returns the first Z factors of the number x where Z = ret.len.
 ///
-///  x   = The constant number reference, an integer value, that factors are searched for.
+///  x   = The f32 number, should hold an integer value, that factors are searched for.
 ///
 ///  ret = The array to store the factors, each factor is stored in its
 ///        associated array index, i.e. index = 0 would have a value of 1
 ///        if 1 is a factor of x.
 ///
-///  retc = A reference to the variabl that holds the number of factors found and stored in the ret argument.
+///  cnt = A reference to the variable that holds the number of factors found and stored in the ret argument.
 ///
-pub fn fndFactorsOfRet(x: *const f32, ret: []f32, retc: *f32) void {
-    retc.* = fndFactorsOfRef(x, ret);
+pub fn fndFactorsOfRet(x: *const f32, ret: []f32, cnt: *f32) void {
+    cnt.* = fndFactorsOfRef(x, ret);
 }
 
 test "XMTX: fndFactorsOfRet test" {
@@ -553,7 +553,7 @@ test "XMTX: fndFactorsOfRet test" {
     prntNl();
 }
 
-///Returns the order 1 polynomial and remainder of a polyinomial order 1 division of an order 2 polynomial.
+///Stores the order 1 polynomial and returns the remainder after a polynomial of order 1 divides a polynomial of order 2.
 ///
 ///  poly1 = A pointer to an order 1 polynomial.
 ///
@@ -563,7 +563,7 @@ test "XMTX: fndFactorsOfRet test" {
 ///
 ///  returns = The remainder after the synthetic division.
 ///
-pub fn synthDivPoly1IntoPoly2(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f32) f32 {
+pub fn synthDivPoly1IntoPoly2(poly1: *const [2]f32, poly2: *const [3]f32, retPoly1: *[2]f32) f32 {
     //  divPoly1    | poly2
     //              | wrkPoly2
     //              |__________________
@@ -629,7 +629,7 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
     prntNl();
 }
 
-///Returns the order 1 polynomial and remainder of a polyinomial order 1 division of an order 2 polynomial.
+///Stores the order 1 polynomial and remainder after a polynomial of order 1 divides a polynomial of order 2 in the retPoly1 function argument.
 ///
 ///  poly1 = A pointer to an order 1 polynomial.
 ///
@@ -639,7 +639,7 @@ test "XMTX: synthDivPoly1IntoPoly2 test" {
 ///
 ///  ret = Stores the remainder after the synthetic division.
 ///
-pub fn synthDivPoly1IntoPoly2Ret(poly1: *[2]f32, poly2: *[3]f32, retPoly1: *[2]f32, ret: *f32) void {
+pub fn synthDivPoly1IntoPoly2Ret(poly1: *const [2]f32, poly2: *const [3]f32, retPoly1: *[2]f32, ret: *f32) void {
     ret.* = synthDivPoly1IntoPoly2(poly1, poly2, retPoly1);
 }
 
@@ -682,7 +682,7 @@ test "XMTX: synthDivPoly1IntoPoly2Ret test" {
     prntNl();
 }
 
-///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
+///Stores the order 2 polynomial and returns the remainder after a polynomial of order 1 divides a polynomial of order 3.
 ///
 ///  poly1 = A pointer to an order 1 polynomial.
 ///
@@ -692,7 +692,7 @@ test "XMTX: synthDivPoly1IntoPoly2Ret test" {
 ///
 ///  returns = The remainder after the synthetic division.
 ///
-pub fn synthDivPoly1IntoPoly3(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f32) f32 {
+pub fn synthDivPoly1IntoPoly3(poly1: *const [2]f32, poly3: *const [4]f32, retPoly2: *[3]f32) f32 {
     //  divPoly1    | poly3
     //              | wrkPoly3
     //              |__________________
@@ -758,7 +758,7 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
     prntNl();
 }
 
-///Returns the order 2 polynomial and remainder of a polyinomial order 1 division of an order 3 polynomial.
+///Stores the order 2 polynomial and remainder after a polynomial of order 1 divides a polynomial of order 3 in the retPoly2 and ret function arguments.
 ///
 ///  poly1 = A pointer to an order 1 polynomial.
 ///
@@ -768,7 +768,7 @@ test "XMTX: synthDivPoly1IntoPoly3 test" {
 ///
 ///  ret = Stores the remainder after the synthetic division.
 ///
-pub fn synthDivPoly1IntoPoly3Ret(poly1: *[2]f32, poly3: *[4]f32, retPoly2: *[3]f32, ret: *f32) void {
+pub fn synthDivPoly1IntoPoly3Ret(poly1: *const [2]f32, poly3: *const [4]f32, retPoly2: *[3]f32, ret: *f32) void {
     ret.* = synthDivPoly1IntoPoly3(poly1, poly3, retPoly2);
 }
 
@@ -812,15 +812,15 @@ test "XMTX: synthDivPoly1IntoPoly3Ret test" {
 pub fn prntPolyExp(polyExp: []f32) void {
     const l: usize = polyExp.len;
     if (l == 4) {
-        std.debug.print("\n{}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
+        prntNlStrArgs("{}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
     } else if (l == 3) {
-        std.debug.print("\n{}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2] });
+        prntNlStrArgs("{}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2] });
     } else if (l == 2) {
-        std.debug.print("\n{}x + {}", .{ polyExp[0], polyExp[1] });
+        prntNlStrArgs("{}x + {}", .{ polyExp[0], polyExp[1] });
     } else if (l == 1) {
-        std.debug.print("\n{}", .{polyExp[0]});
+        prntNlStrArgs("{}", .{polyExp[0]});
     } else {
-        std.debug.print("\n{any}", .{polyExp});
+        prntNlStrArgs("{any}", .{polyExp});
     }
 }
 
@@ -844,9 +844,8 @@ test "XMTX: prntPolyExp test" {
 ///
 ///  returns = The value of the polynomial resolved for the given value of x.
 ///
-pub fn rslvPoly3(x: f32, polyExp3: *[4]f32) f32 {
+pub fn rslvPoly3(x: f32, polyExp3: *const [4]f32) f32 {
     return rslvPoly3Ref(&x, polyExp3);
-    //return (x * x * x * polyExp3[0]) + (x * x * polyExp3[1]) + (x * polyExp3[2]) + polyExp3[3];
 }
 
 test "XMTX: rslvPoly3 test" {
@@ -970,7 +969,7 @@ test "XMTX: rslvPoly3 test" {
     prntNl();
 }
 
-///Returns the value of the order 3 polynomial resolved with the provided value of x.
+///Stores the value of the order 3 polynomial resolved with the provided value of x.
 ///
 ///  x = A reference to the value to use for x.
 ///
@@ -978,8 +977,7 @@ test "XMTX: rslvPoly3 test" {
 ///
 ///  returns = The value of the polynomial resolved for the given value of x.
 ///
-pub fn rslvPoly3Ref(x: *const f32, polyExp3: *[4]f32) f32 {
-    //return rslvPoly3(&x, polyExp3);
+pub fn rslvPoly3Ref(x: *const f32, polyExp3: *const [4]f32) f32 {
     return (x.* * x.* * x.* * polyExp3[0]) + (x.* * x.* * polyExp3[1]) + (x.* * polyExp3[2]) + polyExp3[3];
 }
 
@@ -1104,15 +1102,15 @@ test "XMTX: rslvPoly3Ref test" {
     prntNl();
 }
 
-///Returns the value of the order 3 polynomial resolved with the provided value of x.
+///Stores the value of the order 3 polynomial resolved with the provided value of x.
 ///
 ///  x = A reference to the value to use for x.
 ///
 ///  polyExp3 = The 3rd order polynomial expression to resolve.
 ///
-///  ret = Stores the value of the polynomial resolved for the given value of x.
+///  ret = Stores the resolved value of the polynomial resolved for the given value of x.
 ///
-pub fn rslvPoly3Ret(x: *const f32, polyExp3: *[4]f32, ret: *f32) void {
+pub fn rslvPoly3Ret(x: *const f32, polyExp3: *const [4]f32, ret: *f32) void {
     ret.* = rslvPoly3Ref(x, polyExp3);
 }
 
@@ -1245,8 +1243,7 @@ test "XMTX: rslvPoly3Ret test" {
 ///
 ///  returns = The value of the polynomial resolved for the given value of x.
 ///
-pub fn rslvPoly2(x: f32, polyExp2: *[3]f32) f32 {
-    //return (x * x * polyExp2[0]) + (x * polyExp2[1]) + polyExp2[2];
+pub fn rslvPoly2(x: f32, polyExp2: *const [3]f32) f32 {
     return rslvPoly2Ref(&x, polyExp2);
 }
 
@@ -1333,9 +1330,8 @@ test "XMTX: rslvPoly2 test" {
 ///
 ///  returns = The value of the polynomial resolved for the given value of x.
 ///
-pub fn rslvPoly2Ref(x: *const f32, polyExp2: *[3]f32) f32 {
+pub fn rslvPoly2Ref(x: *const f32, polyExp2: *const [3]f32) f32 {
     return (x.* * x.* * polyExp2[0]) + (x.* * polyExp2[1]) + polyExp2[2];
-    //return rslvPoly2(&x, polyExp2);
 }
 
 test "XMTX: rslvPoly2Ref test" {
@@ -1413,7 +1409,7 @@ test "XMTX: rslvPoly2Ref test" {
     prntNl();
 }
 
-///Returns the value of the order 2 polynomial resolved with the provided value of x.
+///Stores the value of the order 2 polynomial resolved with the provided value of x.
 ///
 ///  x = A reference to the value to use for x.
 ///
@@ -1421,7 +1417,7 @@ test "XMTX: rslvPoly2Ref test" {
 ///
 ///  ret = Stores the value of the polynomial resolved for the given value of x.
 ///
-pub fn rslvPoly2Ret(x: *f32, polyExp2: *[3]f32, ret: *f32) void {
+pub fn rslvPoly2Ret(x: *const f32, polyExp2: *const [3]f32, ret: *f32) void {
     ret.* = rslvPoly2Ref(x, polyExp2);
 }
 
@@ -1511,36 +1507,38 @@ test "XMTX: rslvPoly2Ret test" {
 ///
 ///  factors = An array for storing the factors of the d term, used to find roots to the polynomial before synthetic division.
 ///
-///  returns = Up to three values that are roots of the polynomial expression, using f32_nan for imaginary numbers which aren' currently supported.
+///  returns = Up to three values that are roots of the polynomial expression, using f32_nan for imaginary numbers which aren't currently supported.
 ///
-pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
+pub fn rtsPoly3(polyExpIn: *const [4]f32, factors: []f32) [3]f32 {
     //p[0] = a*x^3, p[1] = b*x^2, p[2] = c*x, p[3] = d
     //check for two basic types of 3rd order polynomials one with a d and one without
-    var ret: [3]f32 = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32, std.math.nan_f32 };
+    //prep local copy of the polynomial argument because we will alter the values if d is present
+    var polyExpPrp: [4]f32 = .{ polyExpIn.*[0], polyExpIn.*[1], polyExpIn.*[2], polyExpIn.*[3] };
+    var polyExp: *[4]f32 = &polyExpPrp;
+
+    var ret: [3]f32 = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) };
     const hasD: bool = (polyExp[3] != 0.0);
     const origD: f32 = polyExp[3];
 
     if (VERBOSE) {
-        std.debug.print("\nAAA Found {}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
+        prntNlStrArgs("AAA Found {}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
     }
 
     if (polyExp[0] != 1.0) {
-        //std.debug.print("\nAAA", .{});
         if (polyExp[0] != 0.0) {
-            //std.debug.print("BBB\n", .{});
             polyExp[3] = (polyExp[3] / polyExp[0]);
             polyExp[2] = (polyExp[2] / polyExp[0]);
             polyExp[1] = (polyExp[1] / polyExp[0]);
             polyExp[0] = 1.0;
         } else {
-            std.debug.print("\n!! Warning expected polynomial to have a degree 3 coefficient !!", .{});
-            ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32, std.math.nan_f32 };
+            prntNlStr("!! Warning expected polynomial to have a degree 3 coefficient !!");
+            ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) };
             return ret;
         }
     }
 
     if (VERBOSE) {
-        std.debug.print("\nBBB Found {}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
+        prntNlStrArgs("BBB Found {}x^3 + {}x^2 + {}x + {}", .{ polyExp[0], polyExp[1], polyExp[2], polyExp[3] });
     }
 
     if (!hasD) {
@@ -1605,13 +1603,13 @@ pub fn rtsPoly3(polyExp: *[4]f32, factors: []f32) [3]f32 {
                 ret[2] = retPoly1[1];
                 return ret;
             } else {
-                std.debug.print("!! Warning expected remainder from synthetic division to be 0.0 !!\n", .{});
-                ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32, std.math.nan_f32 };
+                prntNlStr("!! Warning expected remainder from synthetic division to be 0.0 !!");
+                ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) };
                 return ret;
             }
         } else {
-            std.debug.print("\n!! Warning expected to find one root using factors of d !!", .{});
-            ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32, std.math.nan_f32 };
+            prntNlStr("!! Warning expected to find one root using factors of d !!");
+            ret = .{ std.math.nan(f32), std.math.nan(f32), std.math.nan(f32) };
             return ret;
         }
     }
@@ -1648,9 +1646,9 @@ test "XMTX: rtsPoly3 test" {
 ///
 ///  factors = An array for storing the factors of the d term, used to find roots to the polynomial before synthetic division.
 ///
-///  ret = Stores up to three values that are roots of the polynomial expression, using f32_nan for imaginary numbers which aren' currently supported.
+///  ret = Stores up to three values that are roots of the polynomial expression, using f32_nan for imaginary numbers which aren't currently supported.
 ///
-pub fn rtsPoly3Ret(polyExp: *[4]f32, factors: []f32, ret: *[3]f32) void {
+pub fn rtsPoly3Ret(polyExp: *const [4]f32, factors: []f32, ret: *[3]f32) void {
     ret.* = rtsPoly3(polyExp, factors);
 }
 
@@ -1687,13 +1685,13 @@ test "XMTX: rtsPoly3Ret test" {
 ///
 ///  returns = Up to two values that are roots of the polynomial expression.
 ///
-pub fn rtsPoly2(polyExp: *[3]f32) [2]f32 {
+pub fn rtsPoly2(polyExp: *const [3]f32) [2]f32 {
     //eigVal1 = ( -b + sqrt(b^2 - (4ac)) ) / (2a)
-    var ret: [2]f32 = .{ std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32 };
+    var ret: [2]f32 = .{ std.math.nan(f32), std.math.nan(f32) };
 
     if (polyExp.len != 3) {
-        std.debug.print("\n!! Warning expected a polynomial expression of order to to have a length of 3 !!", .{});
-        ret = .{ std.math.nan(f32), std.math.nan(f32) }; //.{ std.math.nan_f32, std.math.nan_f32 };
+        prntNlStr("!! Warning expected a polynomial expression of order to to have a length of 3 !!");
+        ret = .{ std.math.nan(f32), std.math.nan(f32) };
         return ret;
     }
 
@@ -1740,7 +1738,7 @@ test "XMTX: rtsPoly2 test" {
 ///
 ///  ret = Stores up to two values that are roots of the polynomial expression.
 ///
-pub fn rtsPoly2Ret(polyExp: *[3]f32, ret: *[2]f32) void {
+pub fn rtsPoly2Ret(polyExp: *const [3]f32, ret: *[2]f32) void {
     ret.* = rtsPoly2(polyExp);
 }
 
@@ -1773,7 +1771,7 @@ test "XMTX: rtsPoly2Ret test" {
 ///
 ///  returns = The type of solution to this cubic polynomial.
 ///
-pub fn dscrPoly3(polyExp: *[4]f32) POLY3_SOL_TYPE {
+pub fn dscrPoly3(polyExp: *const [4]f32) POLY3_SOL_TYPE {
     //d = 18abcd – 4b³d + b²c² – 4ac³ – 27a²d²
     //d > 0 => then the equation has three distinct real roots
     //d = 0 => hen the equation has a repeated root and all its roots are real
@@ -1855,7 +1853,7 @@ test "XMTX: dscrPoly2 test" {
 ///
 ///  returns = A boolean value indicating the success of the operation.
 ///
-pub fn fndEigVal3(mtx: []f32, evs: *EigVal3, factors: []f32) bool {
+pub fn fndEigVal3(mtx: *const [9]f32, evs: *EigVal3, factors: []f32) bool {
     //Given 3x3 matrix A
     //A = a b c     0 1 2
     //    d e f     3 4 5
@@ -1876,12 +1874,12 @@ pub fn fndEigVal3(mtx: []f32, evs: *EigVal3, factors: []f32) bool {
     //polyExp = 0         1                2                           3
     //position  T         Z                X                           Y
 
-    if (mtx.len != 9) {
-        std.debug.print("\n!! Warning fndEigVal3 requires 3x3 matrices !!", .{});
-        return false;
-    }
+    //if (mtx.len != 9) {
+    //    std.debug.print("\n!! Warning fndEigVal3 requires 3x3 matrices !!", .{});
+    //    return false;
+    //}
 
-    const lamda: f32 = std.math.nan(f32); //std.math.nan_f32;
+    const lamda: f32 = std.math.nan(f32);
     evs.*.lamdExp[0] = mtx[0];
     evs.*.lamdExp[1] = -lamda;
     evs.*.lamdExp[2] = mtx[4];
