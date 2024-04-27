@@ -39,7 +39,7 @@ const ZERO_F32: f32 = 0.001;
 const COMPARE_MODE_EXACT: bool = false;
 
 ///Error to use when invalid array lengths are encountered.
-const Error = error{ InvalidLengths, OperationFailed, DivideByZero, NonInvertibleMatrix };
+const Error = error{ InvalidLengths, OperationFailed, DivideByZero, NonInvertibleMatrix, AugmenedMatrixRequired, UnsupportedMarixDimension };
 
 ///Identity for a 1x1 matrix.
 const iM1: [1]f32 = .{1};
@@ -4217,7 +4217,25 @@ pub fn tmsXvec2(vecL: *const [2]f32, vecR: *const [2]f32) f32 {
     return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]));
 }
 
-//TODO: tests
+test "XMTX: tmsXvec2 test" {
+    var v1: [2]f32 = .{ 3, 3 };
+    var v2: [2]f32 = .{ 2, 2 };
+    var v3: f32 = 0.0;
+    const exp: f32 = 12.0;
+
+    const start = try Instant.now();
+    v3 = tmsXvec2(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntmsXvec2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tmsXvec2", elapsed1);
+
+    prntXvecNl(&v1);
+    prntXvecNl(&v2);
+    prntNlStrArgs("v3: {}", .{v3});
+    try std.testing.expectEqual(exp, v3);
+    prntNl();
+}
 
 ///Performs vector multiplication on the provided 1x1 vectors storing the result in the return 3 vector, ret.
 ///
@@ -4231,7 +4249,25 @@ pub fn tmsXvec3(vecL: *const [3]f32, vecR: *const [3]f32) f32 {
     return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]) + (vecL[2] * vecR[2]));
 }
 
-//TODO: tests
+test "XMTX: tmsXvec3 test" {
+    var v1: [3]f32 = .{ 3, 3, 3 };
+    var v2: [3]f32 = .{ 2, 2, 2 };
+    var v3: f32 = 0.0;
+    const exp: f32 = 18.0;
+
+    const start = try Instant.now();
+    v3 = tmsXvec3(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntmsXvec3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tmsXvec3", elapsed1);
+
+    prntXvecNl(&v1);
+    prntXvecNl(&v2);
+    prntNlStrArgs("v3: {}", .{v3});
+    try std.testing.expectEqual(exp, v3);
+    prntNl();
+}
 
 ///Performs vector multiplication on the provided 1x1 vectors storing the result in the return 4 vector, ret.
 ///
@@ -4245,7 +4281,25 @@ pub fn tmsXvec4(vecL: *const [4]f32, vecR: *const [4]f32) f32 {
     return ((vecL[0] * vecR[0]) + (vecL[1] * vecR[1]) + (vecL[2] * vecR[2]) + (vecL[3] * vecR[3]));
 }
 
-//TODO: tests
+test "XMTX: tmsXvec4 test" {
+    var v1: [4]f32 = .{ 3, 3, 3, 3 };
+    var v2: [4]f32 = .{ 2, 2, 2, 2 };
+    var v3: f32 = 0.0;
+    const exp: f32 = 24.0;
+
+    const start = try Instant.now();
+    v3 = tmsXvec4(&v1, &v2);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntmsXvec4: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tmsXvec4", elapsed1);
+
+    prntXvecNl(&v1);
+    prntXvecNl(&v2);
+    prntNlStrArgs("v3: {}", .{v3});
+    try std.testing.expectEqual(exp, v3);
+    prntNl();
+}
 
 ///Performs matrix multiplication on the provided matrices with results being stored in the ret matrix.
 ///
@@ -6866,7 +6920,27 @@ pub fn rmvRowColXmtx2(mtx: *[4]f32, row: f32, col: f32) [1]f32 {
     return dest;
 }
 
-//TODO: tests
+test "XMTX: rmvRowColXmtx2 test" {
+    var A: [4]f32 = .{ 1, 1, 2, 2 };
+    //A = 1  1
+    //    2  2
+    var expA: [1]f32 = .{2};
+    const r: f32 = 0.0;
+    const c: f32 = 0.0;
+    var res: [1]f32 = std.mem.zeroes([1]f32);
+
+    const start = try Instant.now();
+    res = rmvRowColXmtx2(&A, r, c);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nrmvRowColXmtx2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("rmvRowColXmtx2", elapsed1);
+
+    std.debug.print("\nrmvRowColXmtx2:", .{});
+    prntXmtxNl(&res, 2);
+    try std.testing.expectEqual(true, equXmtx(&expA, &res));
+    prntNl();
+}
 
 ///Returns the adjoint matrix for a given 4x4 matrix, mtx.
 ///
@@ -6932,13 +7006,29 @@ test "XMTX: adjXmtx3 test" {
 ///
 ///  returns = A new 2x2 matrix with the transpose of the cofactors of the original matrix, mtx.
 ///
-pub fn adjXmtx2(mtx: *[4]f32) [9]f32 {
+pub fn adjXmtx2(mtx: *[4]f32) [4]f32 {
     //|  d -b | or |  mtx[3] -mtx[1] |
     //| -c  a |    | -mtx[2]  mtx[0] |
     return [4]f32{ mtx[3], (-1.0 * mtx[1]), (-1.0 * mtx[2]), mtx[0] };
 }
 
-//TODO: tests
+test "XMTX: adjXmtx2 test" {
+    var A: [4]f32 = .{ -1, 3, 2, 0 };
+    //| -1  3 |
+    //|  2  0 |
+    var retA: [4]f32 = std.mem.zeroes([4]f32);
+
+    const start = try Instant.now();
+    retA = adjXmtx2(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nadjXmtx2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("adjXmtx2", elapsed1);
+
+    var expA: [4]f32 = .{ 0, -3, -2, -1 };
+    try std.testing.expectEqual(true, equXmtx(&expA, &retA));
+    prntNl();
+}
 
 ///Returns the adjoint of the given 1x1 matrix, mtx.
 ///
@@ -6950,7 +7040,21 @@ pub fn adjXmtx1(mtx: *[1]f32) [1]f32 {
     return [1]f32{mtx[0]};
 }
 
-//TODO: tests
+test "XMTX: adjXmtx1 test" {
+    var A: [1]f32 = .{-1};
+    var retA: [1]f32 = std.mem.zeroes([1]f32);
+
+    const start = try Instant.now();
+    retA = adjXmtx1(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nadjXmtx1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("adjXmtx1", elapsed1);
+
+    var expA: [1]f32 = .{-1};
+    try std.testing.expectEqual(true, equXmtx(&expA, &retA));
+    prntNl();
+}
 
 ///Returns a matrix of full co-factors, sign * minor for the given 4x4 matrix.
 ///
@@ -7075,7 +7179,30 @@ pub fn cofXmtx2(mtx: *[4]f32) [4]f32 {
     return mnr;
 }
 
-//TODO: tests
+test "XMTX: cofXmtx2 test" {
+    //A = 0  2
+    //    3  -1
+    var A: [4]f32 = .{ 0, 2, 3, -1 };
+    var exp: [4]f32 = .{ -1, -3, -2, 0 };
+    var cof: [4]f32 = undefined;
+
+    const start = try Instant.now();
+    cof = cofXmtx2(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx2", elapsed1);
+
+    std.debug.print("\nAAA cofXmtx2 test", .{});
+    prntXmtxNl(&cof, 2);
+    std.debug.print("\nBBB cofXmtx2 test", .{});
+    prntXmtxNl(&exp, 2);
+
+    const b: bool = equXmtx(&cof, &exp);
+    std.debug.print("\nCCC cofXmtx2: {}", .{b});
+    try std.testing.expectEqual(true, b);
+    prntNl();
+}
 
 ///Returns a matrix of full cofactors, sign * minor, for the given 1x1 matrix.
 ///
@@ -7088,7 +7215,29 @@ pub fn cofXmtx1(mtx: *[1]f32) [1]f32 {
     return [1]f32{1.0};
 }
 
-//TODO: tests
+test "XMTX: cofXmtx1 test" {
+    //A = 0
+    var A: [1]f32 = .{0};
+    var exp: [1]f32 = .{1};
+    var cof: [1]f32 = undefined;
+
+    const start = try Instant.now();
+    cof = cofXmtx1(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtx1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtx1", elapsed1);
+
+    std.debug.print("\nAAA cofXmtx1 test", .{});
+    prntXmtxNl(&cof, 1);
+    std.debug.print("\nBBB cofXmtx1 test", .{});
+    prntXmtxNl(&exp, 1);
+
+    const b: bool = equXmtx(&cof, &exp);
+    std.debug.print("\nCCC cofXmtx1: {}", .{b});
+    try std.testing.expectEqual(true, b);
+    prntNl();
+}
 
 ///Calculates a matrix of minors for the given 4x4 matrix.
 ///
@@ -7457,7 +7606,21 @@ pub fn mnrXmtx1Ret(mtx: *[1]f32, ret: *[1]f32) void {
     ret[0] = 1.0; //det[A] = a * det[] = a * 1
 }
 
-//TODO: tests
+test "XMTX: mnrXmtx1Ret test" {
+    var A: [1]f32 = .{8};
+    var mnrA: [1]f32 = std.mem.zeroes([1]f32);
+    var exp: [1]f32 = .{1};
+
+    const start = try Instant.now();
+    mnrXmtx1Ret(&A, &mnrA);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx1Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx1Ret", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
+}
 
 ///Returns a matrix of minors for the given 1x1 matrix.
 ///
@@ -7470,7 +7633,21 @@ pub fn mnrXmtx1(mtx: *[1]f32) [1]f32 {
     return .{1.0};
 }
 
-//TODO: tests
+test "XMTX: mnrXmtx1 test" {
+    var A: [1]f32 = .{8};
+    var mnrA: [1]f32 = std.mem.zeroes([1]f32);
+    var exp: [1]f32 = .{1};
+
+    const start = try Instant.now();
+    mnrA = mnrXmtx1(&A);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nmnrXmtx1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("mnrXmtx1", elapsed1);
+
+    try std.testing.expectEqual(true, equXmtx(&mnrA, &exp));
+    prntNl();
+}
 
 ///Returns a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 4x4 matrix.
 pub fn cofXmtxSign4() [16]f32 {
@@ -7696,14 +7873,38 @@ pub fn cofXmtxSign1() [1]f32 {
     return .{1};
 }
 
-//TODO: tests
+test "XMTX: cofXmtxSign1 test" {
+    var cofSgn: [1]f32 = undefined;
+
+    const start = try Instant.now();
+    cofSgn = cofXmtxSign1();
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign1", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
+    prntNl();
+}
 
 ///Calculates and stores, in ret, a matrix of signed values, 1 or -1, for the associated matrix of minors to determine the cofactor matrix for a given 1x1 matrix.
 pub fn cofXmtxSign1Ret(ret: *[1]f32) void {
     ret[0] = 1;
 }
 
-//TODO: tests
+test "XMTX: cofXmtxSign1Ret test" {
+    var cofSgn: [1]f32 = undefined;
+
+    const start = try Instant.now();
+    cofXmtxSign1Ret(&cofSgn);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ncofXmtxSign1Ret: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("cofXmtxSign1Ret", elapsed1);
+
+    try std.testing.expectEqual(@as(f32, 1.0), cofSgn[0]);
+    prntNl();
+}
 
 ///Returns the determinant of a 1x1 matrix.
 ///
@@ -8077,7 +8278,32 @@ pub fn getInvXmtx1(mtx: *[1]f32) [1]f32 {
     return .{(1.0 / mtx[0])};
 }
 
-//TODO: tests
+test "XMTX: getInvXmtx1 test" {
+    var m1: [1]f32 = .{7.0};
+    var invM1: [1]f32 = .{(1.0 / 7.0)};
+    var res: [1]f32 = std.mem.zeroes([1]f32);
+
+    const start = try Instant.now();
+    res = getInvXmtx1(&m1);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngetInvXmtx1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("getInvXmtx1", elapsed1);
+
+    clnXmtx(&res);
+    clnXmtx(&invM1);
+
+    prntNlStr("Res:");
+    prntXmtxNl(&res, 1);
+    prntNl();
+
+    prntNlStr("invM1:");
+    prntXmtxNl(&invM1, 1);
+    prntNl();
+
+    try std.testing.expectEqual(true, equXmtx(&res, &invM1));
+    prntNl();
+}
 
 ///Calculates the inverse of the provided 2x2 matrix using the determinant and stores the result in the return matrix.
 ///
@@ -8158,18 +8384,6 @@ test "XMTX: getInvXmtx2 test" {
     try std.testing.expectEqual(true, equXmtx(&res2, &res));
     prntNl();
 }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//TODO: current page here!!
 
 ///Calculates the inverse of the provided 3x3 matrix using the determinant and stores the result in the return matrix.
 ///
@@ -8568,24 +8782,24 @@ test "XMTX: getInvFromDet4 test" {
 ///
 ///  ret = The return matrix that has it's dstCol, destination column, replaced with the mtx matrix's constant values.
 ///
-///  returns = A Boolean value indicating if the operation was a success.
+///  returns = A Boolean value indicating if the operation was a success or an error.
 ///
-pub fn getCramerSupportXmtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usize, ret: []f32) bool {
+pub fn getCramerSupportXmtx(mtx: []f32, cols: usize, srcCol: usize, dstCol: usize, ret: []f32) !bool {
     const l: usize = mtx.len;
     const rows: usize = l / cols;
     if (rows >= cols) {
-        std.debug.print("\n!! Warning getCramerSupportMtx requires the augmented matrix, mtx, should have one more column than rows. !!", .{});
-        return false;
+        prntNlStr("!! Warning getCramerSupportMtx requires the augmented matrix, mtx, should have one more column than rows. !!");
+        return Error.AugmenedMatrixRequired;
     }
 
     if (srcCol != cols - 1) {
-        std.debug.print("\n!! Warning getCramerSupportMtx requires augmented matrix, mtx, specify constants, cols - 1, to create the necessary support matrix. !!", .{});
-        return false;
+        prntNlStr("!! Warning getCramerSupportMtx requires augmented matrix, mtx, specify constants, cols - 1, to create the necessary support matrix. !!");
+        return Error.AugmenedMatrixRequired;
     }
 
     if (dstCol < 0 or dstCol >= cols - 1) {
-        std.debug.print("\n!! Warning getCramerSupportMtx requires return matrix, ret, should have column count, (cols - 1). !!", .{});
-        return false;
+        prntNlStr("!! Warning getCramerSupportMtx requires return matrix, ret, should have column count, (cols - 1). !!");
+        return Error.InvalidLengths;
     }
 
     var i: usize = 0;
@@ -8623,7 +8837,7 @@ test "XMTX: getCramerSupportMtx test" {
     var expA1: [9]f32 = .{ 1, 2, -3, 0, 0, 1, 2, -4, 4 };
 
     var start = try Instant.now();
-    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
+    b = try getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
     var end = try Instant.now();
     var elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\ngetCramerSupportMtx #1: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8639,7 +8853,7 @@ test "XMTX: getCramerSupportMtx test" {
     var expA2: [9]f32 = .{ -1, 1, -3, 2, 0, 1, 3, 2, 4 };
 
     start = try Instant.now();
-    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
+    b = try getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
     end = try Instant.now();
     elapsed1 = @floatFromInt(end.since(start));
     std.debug.print("\ngetCramerSupportMtx #2: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8655,7 +8869,7 @@ test "XMTX: getCramerSupportMtx test" {
     var expA3: [9]f32 = .{ -1, 2, 1, 2, 0, 0, 3, -4, 2 };
 
     start = try Instant.now();
-    b = getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
+    b = try getCramerSupportXmtx(&A, cols, srcCol, dstCol, &A1);
     end = try Instant.now();
     elapsed1 = @floatFromInt(end.since(start));
     std.debug.print("\ngetCramerSupportMtx #3: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8686,19 +8900,19 @@ test "XMTX: getCramerSupportMtx test" {
 ///
 ///  returns = A Boolean value indicating if the operation was a success.
 ///
-pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi: []f32, ret: []f32) bool {
+pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi: []f32, ret: []f32) !bool {
     const l: usize = mtx.len;
     const rows: usize = l / cols;
     if (rows >= cols) {
-        std.debug.print("\n!! Warning rslvCramersRule requires the augmented matrix, mtx, should have one more column than rows. !!", .{});
-        return false;
+        prntNlStr("\n!! Warning rslvCramersRule requires the augmented matrix, mtx, should have one more column than rows. !!");
+        return Error.InvalidLengths;
     }
 
     const lA: usize = mtxA.len;
     const rowsA: usize = lA / colsA;
     if (rowsA != (cols - 1)) {
-        //error msg here
-        return false;
+        prntNlStr("!! Warning getCramerSupportMtx requires augmented matrix, mtx, specify constants, cols - 1, to create the necessary support matrix. !!");
+        return Error.AugmenedMatrixRequired;
     }
 
     var detAi: f32 = 0;
@@ -8712,8 +8926,8 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
     } else if (rowsA == 4) {
         detA = detXmtx4(@as(*[16]f32, @ptrCast(mtxA)));
     } else {
-        std.debug.print("\n!! Warning rslvCramersRule this function only supports matrix dimensions of 1, 2, 3, 4 for argument mtxA. !!", .{});
-        return false;
+        prntNlStr("!! Warning rslvCramersRule this function only supports matrix dimensions of 1, 2, 3, 4 for argument mtxA. !!");
+        return Error.UnsupportedMarixDimension;
     }
 
     //std.debug.print("\ndetA: {}", .{detA});
@@ -8722,10 +8936,10 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
     var i: usize = 0;
     while (i < colsA) : (i += 1) {
         //create cramer support matrix Ai
-        b = getCramerSupportXmtx(mtx, cols, (cols - 1), i, mtxAi);
+        b = try getCramerSupportXmtx(mtx, cols, (cols - 1), i, mtxAi);
         if (!b) {
-            std.debug.print("\n!! Warning rslvCramersRule could not populate the Cramer's rule support matrix for column {}. !!", .{i});
-            return false;
+            prntNlStrArgs("!! Warning rslvCramersRule could not populate the Cramer's rule support matrix for column {}. !!", .{i});
+            return Error.OperationFailed;
         }
 
         if (rowsA == 1) {
@@ -8737,8 +8951,8 @@ pub fn rslvCramersRule(mtx: []f32, cols: usize, mtxA: []f32, colsA: usize, mtxAi
         } else if (rowsA == 4) {
             detAi = detXmtx4(@as(*[16]f32, @ptrCast(mtxAi)));
         } else {
-            std.debug.print("\n!! Warning rslvCramersRule This function only supports matrix dimensions of 1, 2, 3, 4 for Cramer's rule support matrix, mtxAi. !!", .{});
-            return false;
+            prntNlStr("!! Warning rslvCramersRule This function only supports matrix dimensions of 1, 2, 3, 4 for Cramer's rule support matrix, mtxAi. !!");
+            return Error.UnsupportedMarixDimension;
         }
 
         //std.debug.print("\nDetAI:{} DetA:{} RowsA:{}", .{detAi, detA, rowsA});
@@ -8761,7 +8975,7 @@ test "XMTX: rslvCramersRule test" {
     const colsA: usize = 3;
 
     const start = try Instant.now();
-    b = rslvCramersRule(&mtx, cols, &A, colsA, &Ai, &ret);
+    b = try rslvCramersRule(&mtx, cols, &A, colsA, &Ai, &ret);
     const end = try Instant.now();
     const elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nrslvCramersRule: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -8811,7 +9025,7 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
     _ = isStd;
 
     if (cols != chgCols) {
-        std.debug.print("\n!! Warning expected column counts to match !!", .{});
+        prntNlStr("\n!! Warning expected column counts to match !!");
         return Error.InvalidLengths;
     }
 
@@ -8819,12 +9033,12 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
     if (chgIsStd) {
         b = true;
         if (verbose) {
-            std.debug.print("\nchgVecBasis:change basis is identity so conversion matrix = basis {}", .{b});
+            prntNlStrArgs("chgVecBasis:change basis is identity so conversion matrix = basis {}", .{b});
         }
     } else {
         b = try getBasisCnvXmtx(basis, cols, chgBasis, chgCols, ret, verbose);
         if (verbose) {
-            std.debug.print("\nchgVecBasis:getBasisCnvMtx {}", .{b});
+            prntNlStrArgs("chgVecBasis:getBasisCnvMtx {}", .{b});
         }
     }
 
@@ -8840,13 +9054,13 @@ pub fn chgXvecBasis(vec: []f32, basis: []f32, cols: usize, isStd: bool, chgBasis
     }
 
     if (!b) { // or equXmtx(ret, idtMtx) == false) {}
-        std.debug.print("\n!! Warning matrix reduction failed !!", .{});
+        prntNlStr("!! Warning matrix reduction failed !!");
         return Error.OperationFailed;
     }
 
     b = try tmsXmtx(basis, cols, vec, 1, nvec, 1);
     if (!b) {
-        std.debug.print("\n!! Warning matrix multiplication failed !!", .{});
+        prntNlStr("!! Warning matrix multiplication failed !!");
         return Error.OperationFailed;
     }
     return true;
@@ -8918,8 +9132,8 @@ test "XMTX: chgXvecBasis test" {
 ///
 pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usize, ret: []f32, verbose: bool) !bool {
     if (cols != chgCols) {
-        std.debug.print("\n!! Warning expected column counts to match !!", .{});
-        return false;
+        prntNlStr("!! Warning expected column counts to match !!");
+        return Error.InvalidLengths;
     }
 
     //Reduce the provided matrix to reduced row escelon form using Gauss-Jordan Elimination and optionaly calculate the matrix inverse.
@@ -8942,14 +9156,14 @@ pub fn getBasisCnvXmtx(basis: []f32, cols: usize, chgBasis: []f32, chgCols: usiz
     b = try rdcXmtx(chgBasis, chgCols, hasAug, ret, hasIdtMtx, basis, dim, triagRdcOnly, &sclr);
 
     if (verbose) {
-        std.debug.print("\ngetBasisCnvMtx:rdcXmtx {}", .{b});
+        prntNlStrArgs("getBasisCnvMtx:rdcXmtx {}", .{b});
         prntXmtxNl(ret, cols);
         prntNl();
     }
 
     if (!b) {
-        std.debug.print("\n!! Warning could not reduce the transfomation matrix !!", .{});
-        return false;
+        prntNlStr("!! Warning could not reduce the transfomation matrix !!");
+        return Error.OperationFailed;
     }
 
     return true;
@@ -9606,7 +9820,7 @@ test "XMTX: aglBtwnInrPrdctSpcXvec test" {
 pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: []f32, r: []f32) f32, alloc: *const std.mem.Allocator) !bool {
     if (u.len != v.len or u.len != w.len or v.len != w.len) {
         prntNlStrArgs("isInrPrdctSpc: test 0 u, v, and w must have the same number of components.", .{});
-        return false;
+        return Error.InvalidLengths;
     }
 
     const v1: f32 = prdct(u, v);
@@ -9662,6 +9876,8 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
     //alloc.*.free(t);
     return true;
 }
+
+//current page here
 
 test "XMTX: isInrPrdctSpc test" {
     var u: [3]f32 = .{ 1, 0, 0 };
@@ -13200,7 +13416,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Example 1, 3, 5 test" {
     const expX1: f32 = 2;
     const expX2: f32 = -1;
 
-    b = rslvCramersRule(&B, cols, &BA, colsA, &BAi, &Bret);
+    b = try rslvCramersRule(&B, cols, &BA, colsA, &BAi, &Bret);
     try std.testing.expectEqual(true, b);
     std.debug.print("Found Cramer's Rule Return Values:\n", .{});
     prntXvecNl(&Bret);
@@ -13246,7 +13462,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Theorem 11 test" {
     const cols: usize = 4;
     const colsA: usize = 3;
 
-    b = rslvCramersRule(&mtx, cols, &A, colsA, &Ai, &ret);
+    b = try rslvCramersRule(&mtx, cols, &A, colsA, &Ai, &ret);
     try std.testing.expectEqual(true, b);
 
     const expX: f32 = 4.0 / 5.0;
@@ -13446,7 +13662,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 15, 17, 29, 31 test" {
     var retB: [2]f32 = .{ 0, 0 };
     var b: bool = false;
     const expB: [2]f32 = .{ 1, 2 };
-    b = rslvCramersRule(&B, colsB, &BA, colsBA, &BAi, &retB);
+    b = try rslvCramersRule(&B, colsB, &BA, colsBA, &BAi, &retB);
     std.debug.print("Problem 29: pg. 151 Values:\n", .{});
     prntXvecNl(&retB);
     try std.testing.expectEqual(true, isEquF32(expB[0], retB[0], true));
@@ -13464,7 +13680,7 @@ test "XMTX: ELA - Larson, Edwards: 3.4 Problem 15, 17, 29, 31 test" {
     var retC: [2]f32 = .{ 0, 0 };
     b = false;
     const expC: [2]f32 = .{ 2, -2 };
-    b = rslvCramersRule(&C, colsC, &CA, colsCA, &CAi, &retC);
+    b = try rslvCramersRule(&C, colsC, &CA, colsCA, &CAi, &retC);
     std.debug.print("Problem 31: pg. 151 Values:\n", .{});
     prntXvecNl(&retC);
     try std.testing.expectEqual(true, isEquF32(expC[0], retC[0], true));
