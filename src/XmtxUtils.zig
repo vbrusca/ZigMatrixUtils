@@ -9877,8 +9877,6 @@ pub fn isInrPrdctSpc(u: []f32, v: []f32, w: []f32, c: f32, prdct: *const fn (l: 
     return true;
 }
 
-//current page here
-
 test "XMTX: isInrPrdctSpc test" {
     var u: [3]f32 = .{ 1, 0, 0 };
     var v: [3]f32 = .{ 0, 1, 0 };
