@@ -10296,7 +10296,14 @@ pub fn gramSchmidtOthogonal(basis: []f32, cols: usize, alloc: *const std.mem.All
     return bsPrm;
 }
 
+//TODO: tests
+
 //TODO: docs
+pub fn gramSchmidtOthonormal(basis: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
+    return nrmXvec(gramSchmidtOthogonal(basis, cols, alloc, prdct));
+}
+
+//TODO: tests
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
