@@ -10155,8 +10155,12 @@ test "XMTX: projXvec_VecP_Onto_VecQQ_InrPrdctSpc test" {
 ///
 ///  returns = The parameters of the vector P that projects onto Q, stored in vecQ.
 ///
-//progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1,
-//which simplifies the formula to <u,v>v
+/// Note:
+///
+/// progUontoV = progPontoQ; if v is a unit vector then <v,v> = ||v||^2 = 1,
+///
+/// which simplifies the formula to <u,v>v
+///
 pub fn projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc(vecP: []f32, vecQ: []f32, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
     //Larson, Edwards: Chapter 5: remark: pg 272
     const dotProd: f32 = prdct(vecP, vecQ);
@@ -10203,6 +10207,96 @@ test "XMTX: projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc test" {
     try std.testing.expectEqual(true, equXvecWrkr(ret2, @constCast(&exp), false));
     prntNl();
 }
+
+///Returns the area of the triangle given with R2 coordinates and a default value of 1 for the 3rd, Z, component.
+///The format of mtx is not checked. The caller is responsible for making sure the matrix is in the correct format.
+///
+///  Parameter mtx format:
+///
+///  |x1 y1 1|
+///
+///  |x2 y2 1|
+///
+///  |x3 y3 1|
+///
+///  mtx = The matrix of points to use for the calulation of the area of a triangle.
+///
+///  returns = A value indicating the area of the given triangle.
+///
+pub fn areaOfTriangle(mtx: *const [9]f32) f32 {
+    return absF32(@constCast(detXmtx3(mtx) * (1.0 / 2.0)));
+}
+
+//TODO: tests
+
+///Returns the volume of the tetrahedron given with R3 coordinates and a default value of 1 for the 4th, K, component.
+///The format of mtx is not checked. The caller is responsible for making sure the matrix is in the correct format.
+///
+///  Parameter mtx format:
+///
+///  |x1 y1 z1 1|
+///
+///  |x2 y2 z2 1|
+///
+///  |x3 y3 y3 1|
+///
+///  |x4 y4 y4 1|
+///
+///  mtx = The matrix of points to use for the calulation of the volume of a tetrahedron.
+///
+///  returns = A value indicating the volume of the given tetrahedron.
+///
+pub fn volumeOfTetrahedron(mtx: *const [16]f32) f32 {
+    return absF32(@constCast(detXmtx4(mtx) * (1.0 / 6.0)));
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn gramSchmidtOthogonal(basis: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
+    const rows: usize = basis.len / cols;
+    var row: usize = 0;
+    var sRow: usize = 0;
+    var bsPrm: []f32 = try alloc.*.alloc(f32, basis.len);
+    var s: usize = 0;
+    var e: usize = 0;
+    var sM: usize = 0;
+    var eM: usize = 0;
+    var Vrow: []f32 = try alloc.*.alloc(f32, cols);
+    var Wrow: []f32 = try alloc.*.alloc(f32, cols);
+    var tmpM: []f32 = try alloc.*.alloc(f32, cols);
+    var top: f32 = 0.0;
+    var bot: f32 = 0.0;
+
+    while (row < rows) : (row += 1) {
+        sM = (row * cols);
+        eM = (sM + cols);
+        Vrow = basis[sM..eM];
+        tmpM = Vrow[0..cols];
+        sRow = 0;
+
+        while (sRow <= row - 2) : (sRow += 1) {
+            s = (sRow * cols);
+            e = (s + cols);
+            Wrow = bsPrm[s..e];
+            top = prdct(Vrow, Wrow);
+            bot = prdct(Wrow, Wrow);
+            mulXvec(Wrow, (top / bot));
+            diff1Xvec(tmpM, Wrow);
+        }
+
+        //copy the tmpM values into basis prime matrix, bsPrm
+        //bsPrm[sM..eM] = tmpM[0..cols];
+        var i: usize = 0;
+        while (i < tmpM.len) : (i += 1) {
+            bsPrm[sM + i] = tmpM[i];
+        }
+    }
+
+    return bsPrm;
+}
+
+//TODO: docs
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
