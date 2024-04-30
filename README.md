@@ -21,13 +21,14 @@ This project was built using the following books as a basis.<br>
 
 ## Project Goals
 1. LT: Continuous development to complete the material covered in both books regarding linear algebra and matrix manipulations.<br>
-2. LT: To keep the project up to date with new versions of Zig as the language matures.
-3. LT: To complete and refine the code documentation.
-4. ST: Version 0.60: Add basic matrix scaling functions.
-5. ST: Version 0.60: Add execution time tracking to the remaining theorem/problem unit tests.
+2. LT: Normalize the use of const across all slice based function arguments.
+3. LT: To keep the project up to date with new versions of Zig as the language matures.
+4. LT: To complete and refine the code documentation.
+5. ST: Version 0.53: Complete basis material up to and including section 5.3.
 6. ST: Version 0.56: Complete basis material up to and including section 5.6.
-7. ST: To complete the full function review and normalization at this phase of the library creation.
-8. ST: To complete all function documentation and unit tests.
+7. ST: Version 0.60: Add basic matrix scaling functions.
+8. ST: Version 0.60: Add execution time tracking to the remaining theorem/problem unit tests.
+9. ST: To complete all missing function documentation and unit tests ... again.
 
 ## Running Unit Tests
 You can run the full set of unit tests from inside the project with the following command.<br>
