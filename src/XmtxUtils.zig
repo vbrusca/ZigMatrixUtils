@@ -175,7 +175,7 @@ const MAX_EXEC_TIMES: usize = 1024;
 var execTimes: [MAX_EXEC_TIMES]ExecTime = undefined;
 
 ///A Boolean that controls verbose logging.
-var VERBOSE: bool = false;
+var VERBOSE: bool = true;
 
 ///A function to add a new ExecTime struct into the execTimes array.
 ///
@@ -10176,16 +10176,19 @@ test "XMTX: projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc test" {
     var P: [3]f32 = .{ 1, -2, 0 };
     nrmXvec(&P);
 
+    var ret1: []f32 = undefined;
+    var ret2: []f32 = undefined;
+
     const exp: [3]f32 = .{ -1.76676996e-02, -1.76676996e-02, -8.83384980e-03 };
     var start = try Instant.now();
-    const ret1: []f32 = projXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
+    ret1 = projXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
     var end = try Instant.now();
     var elapsed1: f64 = @floatFromInt(end.since(start));
     std.debug.print("\nprojXvec_VecP_Onto_VecQ_InrPrdctSpc: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
     addExecTime("projXvec_VecP_Onto_VecQ_InrPrdctSpc", elapsed1);
 
     start = try Instant.now();
-    const ret2: []f32 = projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
+    ret2 = projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
     end = try Instant.now();
     elapsed1 = @floatFromInt(end.since(start));
     std.debug.print("\nprojUnitXvec_VecP_Onto_VecQ_InrPrdctSpc: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
@@ -10253,7 +10256,7 @@ pub fn volumeOfTetrahedron(mtx: *const [16]f32) f32 {
 //TODO: tests
 
 //TODO: docs
-pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, prdct: *const fn (l: []f32, r: []f32) f32) void {
+pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
     const rows: usize = basis.len / cols;
     var row: usize = 0;
     var sRow: usize = 0;
@@ -10261,13 +10264,16 @@ pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, prdct: *con
     var e: usize = 0;
     var sM: usize = 0;
     var eM: usize = 0;
-    var Vrow: []f32 = undefined;
-    var Wrow: []f32 = undefined;
-    var tmpM: []f32 = undefined;
+    var Vrow: []f32 = try alloc.*.alloc(f32, cols);
+    var Wrow: []f32 = try alloc.*.alloc(f32, cols);
+    var tmpM: []f32 = try alloc.*.alloc(f32, cols);
     var top: f32 = 0.0;
     var bot: f32 = 0.0;
+    var i: usize = 0;
 
     if (VERBOSE) {
+        prntNl();
+        prntNlStr("Start Inner");
         prntNlStr("Basis:");
         prntXmtxNl(basis, cols);
     }
@@ -10275,11 +10281,23 @@ pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, prdct: *con
     while (row < rows) : (row += 1) {
         sM = (row * cols);
         eM = (sM + cols);
-        Vrow = basis[sM..eM];
-        tmpM = Vrow[0..cols];
+
+        //Vrow = basis[sM..eM];
+        i = 0;
+        while (i < cols) : (i += 1) {
+            Vrow[i] = basis[sM + i];
+        }
+
+        //tmpM = Vrow[0..cols];
+        i = 0;
+        while (i < cols) : (i += 1) {
+            tmpM[i] = Vrow[i];
+        }
+
         sRow = 0;
 
         if (VERBOSE) {
+            prntNl();
             prntNlStrArgs("Row: {} sM: {} eM: {}", .{ row, sM, eM });
             prntNlStr("Vrow:");
             prntXvecNl(Vrow);
@@ -10288,17 +10306,23 @@ pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, prdct: *con
         }
 
         const lt: i32 = @as(i32, @intCast(row)) - 1;
-        //lt -= 1;
-        while (sRow < lt and lt >= 0) : (sRow += 1) {
+        while ((sRow < lt and lt >= 0) or (sRow == 0 and lt == 0)) : (sRow += 1) {
             s = (sRow * cols);
             e = (s + cols);
-            Wrow = bsPrm[s..e];
+
+            //Wrow = bsPrm[s..e];
+            i = 0;
+            while (i < cols) : (i += 1) {
+                Wrow[i] = bsPrm[s + i];
+            }
+
             top = prdct(Vrow, Wrow);
             bot = prdct(Wrow, Wrow);
             mulXvec(Wrow, (top / bot));
             diff1Xvec(tmpM, Wrow);
 
             if (VERBOSE) {
+                prntNl();
                 prntNlStrArgs("sRow: {} s: {} e: {}", .{ sRow, s, e });
                 prntNlStr("Wrow:");
                 prntXvecNl(Wrow);
@@ -10308,32 +10332,53 @@ pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, prdct: *con
             }
         }
 
+        if (VERBOSE) {
+            prntNl();
+            prntNlStr("End Inner 1");
+            prntNlStr("Vrow:");
+            prntXvecNl(Vrow);
+            prntNlStr("tmpM:");
+            prntXvecNl(tmpM);
+        }
+
         //copy the tmpM values into basis prime matrix, bsPrm
         //bsPrm[sM..eM] = tmpM[0..cols];
-        var i: usize = 0;
-        while (i < tmpM.len) : (i += 1) {
+        //diff1Xvec(Vrow, tmpM);
+        i = 0;
+        while (i < cols) : (i += 1) {
             bsPrm[sM + i] = tmpM[i];
         }
 
         if (VERBOSE) {
+            prntNl();
+            prntNlStr("End Inner 2");
             prntNlStr("basis Prime:");
             prntXmtxNl(bsPrm, cols);
-            prntNlStr("tmpM:");
-            prntXvecNl(tmpM);
+            //prntNlStr("tmpM:");
+            //prntXvecNl(tmpM);
         }
     }
+
+    defer alloc.*.free(Vrow);
+    defer alloc.*.free(Wrow);
+    defer alloc.*.free(tmpM);
 }
 
 test "XMTX: gramSchmidtOthogonal test" {
     //Example 6 page 282 1st half
     var basis: [4]f32 = .{ 1, 1, 0, 1 };
     const cols: usize = 2;
-    //const alloc = std.testing.allocator;
+    const alloc = std.testing.allocator;
     const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
     var res: [4]f32 = .{ 0, 0, 0, 0 };
     const exp: [4]f32 = .{ 1, 1, -0.5, 0.5 };
 
-    gramSchmidtOthogonal(&basis, &res, cols, prdct);
+    const start = try Instant.now();
+    try gramSchmidtOthogonal(&basis, &res, cols, &alloc, prdct);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngramSchmidtOthogonal: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("gramSchmidtOthogonal", elapsed1);
 
     prntNlStr("Basis:");
     prntXmtxNl(&basis, cols);
@@ -10341,6 +10386,9 @@ test "XMTX: gramSchmidtOthogonal test" {
     prntXmtxNl(&res, cols);
     prntNlStr("Exp:");
     prntXmtxNl(@constCast(&exp), cols);
+
+    try std.testing.expectEqual(true, equXvecWrkr(&res, @constCast(&exp), false));
+    prntNl();
 }
 
 //TODO: docs
