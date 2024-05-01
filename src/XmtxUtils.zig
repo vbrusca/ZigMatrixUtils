@@ -10253,20 +10253,24 @@ pub fn volumeOfTetrahedron(mtx: *const [16]f32) f32 {
 //TODO: tests
 
 //TODO: docs
-pub fn gramSchmidtOthogonal(basis: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
+pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, prdct: *const fn (l: []f32, r: []f32) f32) void {
     const rows: usize = basis.len / cols;
     var row: usize = 0;
     var sRow: usize = 0;
-    var bsPrm: []f32 = try alloc.*.alloc(f32, basis.len);
     var s: usize = 0;
     var e: usize = 0;
     var sM: usize = 0;
     var eM: usize = 0;
-    var Vrow: []f32 = try alloc.*.alloc(f32, cols);
-    var Wrow: []f32 = try alloc.*.alloc(f32, cols);
-    var tmpM: []f32 = try alloc.*.alloc(f32, cols);
+    var Vrow: []f32 = undefined;
+    var Wrow: []f32 = undefined;
+    var tmpM: []f32 = undefined;
     var top: f32 = 0.0;
     var bot: f32 = 0.0;
+
+    if (VERBOSE) {
+        prntNlStr("Basis:");
+        prntXmtxNl(basis, cols);
+    }
 
     while (row < rows) : (row += 1) {
         sM = (row * cols);
@@ -10275,7 +10279,17 @@ pub fn gramSchmidtOthogonal(basis: []f32, cols: usize, alloc: *const std.mem.All
         tmpM = Vrow[0..cols];
         sRow = 0;
 
-        while (sRow <= row - 2) : (sRow += 1) {
+        if (VERBOSE) {
+            prntNlStrArgs("Row: {} sM: {} eM: {}", .{ row, sM, eM });
+            prntNlStr("Vrow:");
+            prntXvecNl(Vrow);
+            prntNlStr("tmpM:");
+            prntXvecNl(tmpM);
+        }
+
+        const lt: i32 = @as(i32, @intCast(row)) - 1;
+        //lt -= 1;
+        while (sRow < lt and lt >= 0) : (sRow += 1) {
             s = (sRow * cols);
             e = (s + cols);
             Wrow = bsPrm[s..e];
@@ -10283,6 +10297,15 @@ pub fn gramSchmidtOthogonal(basis: []f32, cols: usize, alloc: *const std.mem.All
             bot = prdct(Wrow, Wrow);
             mulXvec(Wrow, (top / bot));
             diff1Xvec(tmpM, Wrow);
+
+            if (VERBOSE) {
+                prntNlStrArgs("sRow: {} s: {} e: {}", .{ sRow, s, e });
+                prntNlStr("Wrow:");
+                prntXvecNl(Wrow);
+                prntNlStrArgs("Top: {} Botttom: {} Top/Bottom: {}", .{ top, bot, (top / bot) });
+                prntNlStr("tmpM:");
+                prntXvecNl(tmpM);
+            }
         }
 
         //copy the tmpM values into basis prime matrix, bsPrm
@@ -10291,12 +10314,34 @@ pub fn gramSchmidtOthogonal(basis: []f32, cols: usize, alloc: *const std.mem.All
         while (i < tmpM.len) : (i += 1) {
             bsPrm[sM + i] = tmpM[i];
         }
-    }
 
-    return bsPrm;
+        if (VERBOSE) {
+            prntNlStr("basis Prime:");
+            prntXmtxNl(bsPrm, cols);
+            prntNlStr("tmpM:");
+            prntXvecNl(tmpM);
+        }
+    }
 }
 
-//TODO: tests
+test "XMTX: gramSchmidtOthogonal test" {
+    //Example 6 page 282 1st half
+    var basis: [4]f32 = .{ 1, 1, 0, 1 };
+    const cols: usize = 2;
+    //const alloc = std.testing.allocator;
+    const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
+    var res: [4]f32 = .{ 0, 0, 0, 0 };
+    const exp: [4]f32 = .{ 1, 1, -0.5, 0.5 };
+
+    gramSchmidtOthogonal(&basis, &res, cols, prdct);
+
+    prntNlStr("Basis:");
+    prntXmtxNl(&basis, cols);
+    prntNlStr("Res:");
+    prntXmtxNl(&res, cols);
+    prntNlStr("Exp:");
+    prntXmtxNl(@constCast(&exp), cols);
+}
 
 //TODO: docs
 pub fn gramSchmidtOthonormal(basis: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
