@@ -10306,7 +10306,7 @@ pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, alloc: *con
         }
 
         const lt: i32 = @as(i32, @intCast(row)) - 1;
-        while ((sRow < lt and lt >= 0) or (sRow == 0 and lt == 0)) : (sRow += 1) {
+        while ((sRow <= lt and lt >= 0) or (sRow == 0 and lt == 0)) : (sRow += 1) {
             s = (sRow * cols);
             e = (s + cols);
 
@@ -10365,7 +10365,7 @@ pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, alloc: *con
 }
 
 test "XMTX: gramSchmidtOthogonal test" {
-    //Example 6 page 282 1st half
+    //Larson, Edwards Chapter 5, Example 6 page 282 - 283 1st half
     var basis: [4]f32 = .{ 1, 1, 0, 1 };
     const cols: usize = 2;
     const alloc = std.testing.allocator;
@@ -10392,11 +10392,62 @@ test "XMTX: gramSchmidtOthogonal test" {
 }
 
 //TODO: docs
-pub fn gramSchmidtOthonormal(basis: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) []f32 {
-    return nrmXvec(gramSchmidtOthogonal(basis, cols, alloc, prdct));
+pub fn gramSchmidtOthonormal(basis: []f32, bsPrm: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
+    try gramSchmidtOthogonal(basis, bsPrm, cols, alloc, prdct);
+
+    const rows: usize = basis.len / cols;
+    var row: usize = 0;
+    var sM: usize = 0;
+    var eM: usize = 0;
+    var tmpM: []f32 = try alloc.*.alloc(f32, cols);
+    var i: usize = 0;
+
+    while (row < rows) : (row += 1) {
+        sM = (row * cols);
+        eM = (sM + cols);
+
+        i = 0;
+        while (i < cols) : (i += 1) {
+            tmpM[i] = bsPrm[sM + i];
+        }
+
+        nrmXvec(tmpM);
+
+        i = 0;
+        while (i < cols) : (i += 1) {
+            bsPrm[sM + i] = tmpM[i];
+        }
+    }
+
+    defer alloc.*.free(tmpM);
 }
 
-//TODO: tests
+test "XMTX: gramSchmidtOthonormal test" {
+    //Larson, Edwards Chapter 5, Example 6 page 282 - 283 2nd half
+    var basis: [4]f32 = .{ 1, 1, 0, 1 };
+    const cols: usize = 2;
+    const alloc = std.testing.allocator;
+    const prdct: *const fn (l: []f32, r: []f32) f32 = dotPrdXvec;
+    var res: [4]f32 = .{ 0, 0, 0, 0 };
+    const exp: [4]f32 = .{ std.math.sqrt(2.0) / 2.0, std.math.sqrt(2.0) / 2.0, -std.math.sqrt(2.0) / 2.0, std.math.sqrt(2.0) / 2.0 };
+
+    const start = try Instant.now();
+    try gramSchmidtOthonormal(&basis, &res, cols, &alloc, prdct);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ngramSchmidtOthonormal: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("gramSchmidtOthonormal", elapsed1);
+
+    prntNlStr("Basis:");
+    prntXmtxNl(&basis, cols);
+    prntNlStr("Res:");
+    prntXmtxNl(&res, cols);
+    prntNlStr("Exp:");
+    prntXmtxNl(@constCast(&exp), cols);
+
+    try std.testing.expectEqual(true, equXvecWrkr(&res, @constCast(&exp), false));
+    prntNl();
+}
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {

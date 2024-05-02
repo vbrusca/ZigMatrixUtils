@@ -818,6 +818,94 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Example 1 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.3 Example 6 test" {
+    //Chapter 5: Section 5.3: Example 6: page 282 - 283
+    var basis: [4]f32 = .{ 1, 1, 0, 1 };
+    const cols: usize = 2;
+    const alloc = std.testing.allocator;
+    const prdct: *const fn (l: []f32, r: []f32) f32 = xmu.dotPrdXvec;
+    var res: [4]f32 = .{ 0, 0, 0, 0 };
+    const exp: [4]f32 = .{ std.math.sqrt(2.0) / 2.0, std.math.sqrt(2.0) / 2.0, -std.math.sqrt(2.0) / 2.0, std.math.sqrt(2.0) / 2.0 };
+
+    try xmu.gramSchmidtOthonormal(&basis, &res, cols, &alloc, prdct);
+
+    xmu.prntNlStr("Basis:");
+    xmu.prntXmtxNl(&basis, cols);
+    xmu.prntNlStr("Res:");
+    xmu.prntXmtxNl(&res, cols);
+    xmu.prntNlStr("Exp:");
+    xmu.prntXmtxNl(@constCast(&exp), cols);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&res, @constCast(&exp), false));
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.3 Example 7 test" {
+    //Chapter 5: Section 5.3: Example 7: page 283 - 284
+    var basis: [9]f32 = .{ 1, 1, 0, 1, 2, 0, 0, 1, 2 };
+    const cols: usize = 3;
+    const alloc = std.testing.allocator;
+    const prdct: *const fn (l: []f32, r: []f32) f32 = xmu.dotPrdXvec;
+    var res: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    const exp: [9]f32 = .{ std.math.sqrt(2.0) / 2.0, std.math.sqrt(2.0) / 2.0, 0.0, -std.math.sqrt(2.0) / 2.0, std.math.sqrt(2.0) / 2.0, 0.0, 0.0, 0.0, 1.0 };
+
+    try xmu.gramSchmidtOthonormal(&basis, &res, cols, &alloc, prdct);
+
+    xmu.prntNlStr("Basis:");
+    xmu.prntXmtxNl(&basis, cols);
+    xmu.prntNlStr("Res:");
+    xmu.prntXmtxNl(&res, cols);
+    xmu.prntNlStr("Exp:");
+    xmu.prntXmtxNl(@constCast(&exp), cols);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&res, @constCast(&exp), false));
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.3 Example 8 test" {
+    //Chapter 5: Section 5.3: Example 8: page 284
+    var basis: [6]f32 = .{ 0, 1, 0, 1, 1, 1 };
+    const cols: usize = 3;
+    const alloc = std.testing.allocator;
+    const prdct: *const fn (l: []f32, r: []f32) f32 = xmu.dotPrdXvec;
+    var res: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
+    const exp: [6]f32 = .{ 0, 1, 0, std.math.sqrt(2.0) / 2.0, 0, std.math.sqrt(2.0) / 2.0 };
+
+    try xmu.gramSchmidtOthonormal(&basis, &res, cols, &alloc, prdct);
+
+    xmu.prntNlStr("Basis:");
+    xmu.prntXmtxNl(&basis, cols);
+    xmu.prntNlStr("Res:");
+    xmu.prntXmtxNl(&res, cols);
+    xmu.prntNlStr("Exp:");
+    xmu.prntXmtxNl(@constCast(&exp), cols);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&res, @constCast(&exp), false));
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.3 Example 10 test" {
+    //Chapter 5: Section 5.3: Example 10: page 285 - 286
+    var basis: [8]f32 = .{ -2, 2, 1, 0, 1, -8, 0, 1 };
+    const cols: usize = 4;
+    const alloc = std.testing.allocator;
+    const prdct: *const fn (l: []f32, r: []f32) f32 = xmu.dotPrdXvec;
+    var res: [8]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0 };
+    const exp: [8]f32 = .{ -2.0 / 3.0, 2.0 / 3.0, 1.0 / 3.0, 0, -3.0 / std.math.sqrt(30.0), -4.0 / std.math.sqrt(30.0), 2.0 / std.math.sqrt(30.0), 1.0 / std.math.sqrt(30.0) };
+
+    try xmu.gramSchmidtOthonormal(&basis, &res, cols, &alloc, prdct);
+
+    xmu.prntNlStr("Basis:");
+    xmu.prntXmtxNl(&basis, cols);
+    xmu.prntNlStr("Res:");
+    xmu.prntXmtxNl(&res, cols);
+    xmu.prntNlStr("Exp:");
+    xmu.prntXmtxNl(@constCast(&exp), cols);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&res, @constCast(&exp), false));
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
