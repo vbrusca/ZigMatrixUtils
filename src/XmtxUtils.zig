@@ -175,7 +175,7 @@ const MAX_EXEC_TIMES: usize = 1024;
 var execTimes: [MAX_EXEC_TIMES]ExecTime = undefined;
 
 ///A Boolean that controls verbose logging.
-var VERBOSE: bool = true;
+var VERBOSE: bool = false;
 
 ///A function to add a new ExecTime struct into the execTimes array.
 ///
@@ -10255,7 +10255,20 @@ pub fn volumeOfTetrahedron(mtx: *const [16]f32) f32 {
 
 //TODO: tests
 
-//TODO: docs
+///Returns the orthogonal set of vectors by storing their values in basis prime, the bsPrm function argument.
+///
+///  basis = A set of vectors that are considered a basis in the general inner product space defined by the argument prdct.
+///
+///  bsPrm = A matrix the same size as the basis argument used to hold the results of the algorithm.
+///
+///  cols = The number of columns in the matrix, basis, and subsequently bsPrm.
+///
+///  alloc = A constant pointer to a memory allocator.
+///
+///  prdct = A constant pointer to a function, with the given signature, that is used for the general inner product space.
+///
+///  returns = Usually void unless there was an error allocating memory for the algorithm.
+///
 pub fn gramSchmidtOthogonal(basis: []f32, bsPrm: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
     const rows: usize = basis.len / cols;
     var row: usize = 0;
@@ -10391,7 +10404,20 @@ test "XMTX: gramSchmidtOthogonal test" {
     prntNl();
 }
 
-//TODO: docs
+///Returns the orthonormal set of vectors by storing their values in basis prime, the bsPrm function argument.
+///
+///  basis = A set of vectors that are considered a basis in the general inner product space defined by the argument prdct.
+///
+///  bsPrm = A matrix the same size as the basis argument used to hold the results of the algorithm.
+///
+///  cols = The number of columns in the matrix, basis, and subsequently bsPrm.
+///
+///  alloc = A constant pointer to a memory allocator.
+///
+///  prdct = A constant pointer to a function, with the given signature, that is used for the general inner product space.
+///
+///  returns = Usually void unless there was an error allocating memory for the algorithm.
+///
 pub fn gramSchmidtOthonormal(basis: []f32, bsPrm: []f32, cols: usize, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
     try gramSchmidtOthogonal(basis, bsPrm, cols, alloc, prdct);
 
