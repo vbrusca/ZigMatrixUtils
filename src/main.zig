@@ -906,6 +906,39 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Example 10 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.3 Problem 1, 3, 5, 7, 9, 11 test" {
+    //Chapter 5: Section 5.3: Problem 1, 3, 5, 7, 9, 11: pg 286
+    //For problems 1 - 11 determine if the et of vectors in R^n is orthogonal, orthonormal, or neither.
+    //(1) neither
+    const mtx1: [4]f32 = .{ -4, 6, 5, 0 };
+    var cols: usize = 2;
+    const alloc = std.testing.allocator;
+    var b1: bool = false;
+    var b2: bool = false;
+    var exp1: bool = false;
+    var exp2: bool = false;
+
+    b1 = try xmu.isOrthogonalXmtx(@constCast(&mtx1), cols, &alloc);
+    b2 = try xmu.isOrthonormalXmtx(@constCast(&mtx1), cols, &alloc);
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    xmu.prntNl();
+
+    //(3) orthonormal
+
+    //(5) orthogonal
+
+    //(7) neither
+
+    //(9) orthonormal
+
+    //(11) orthonormal
+
+    exp1 = false;
+    exp2 = false;
+    cols = 0;
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

@@ -33,67 +33,67 @@ const time = std.time;
 const Instant = time.Instant;
 
 ///The percision to use when determining if a number is zero or when determining if two f32 values are equal.
-const ZERO_F32: f32 = 0.001;
+pub const ZERO_F32: f32 = 0.001;
 
 ///A Boolean indicating if the library should use exact comparison of f32 values, or precision comparison using the value of ZERO_F32.
-const COMPARE_MODE_EXACT: bool = false;
+pub const COMPARE_MODE_EXACT: bool = false;
 
 ///Error to use when invalid array lengths are encountered.
-const Error = error{ InvalidLengths, OperationFailed, DivideByZero, NonInvertibleMatrix, AugmenedMatrixRequired, UnsupportedMarixDimension };
+pub const Error = error{ InvalidLengths, OperationFailed, DivideByZero, NonInvertibleMatrix, AugmenedMatrixRequired, UnsupportedMarixDimension };
 
 ///Identity for a 1x1 matrix.
-const iM1: [1]f32 = .{1};
+pub const iM1: [1]f32 = .{1};
 
 ///Identity for a 2x2 matrix.
-const iM2: [4]f32 = .{ 1, 0, 0, 1 };
+pub const iM2: [4]f32 = .{ 1, 0, 0, 1 };
 
 ///Identity for a 3x3 matrix.
-const iM3: [3]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+pub const iM3: [3]f32 = .{ 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 
 ///Identity for a 4x4 matrix.
-const iM4: [4]f32 = .{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+pub const iM4: [4]f32 = .{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 
 ///i^ in 1x1 space
-const iH1: [1]f32 = .{1};
+pub const iH1: [1]f32 = .{1};
 
 ///i^ in 2x2 space
-const iH2: [2]f32 = .{ 1, 0 };
+pub const iH2: [2]f32 = .{ 1, 0 };
 
 ///j^ in 2x2 space
-const jH2: [2]f32 = .{ 0, 1 };
+pub const jH2: [2]f32 = .{ 0, 1 };
 
 ///i^ in 3x3 space
-const iH3: [3]f32 = .{ 1, 0, 0 };
+pub const iH3: [3]f32 = .{ 1, 0, 0 };
 
 ///j^ in 3x3 space
-const jH3: [3]f32 = .{ 0, 1, 0 };
+pub const jH3: [3]f32 = .{ 0, 1, 0 };
 
 ///k^ in 3x3 space
-const kH3: [3]f32 = .{ 0, 0, 1 };
+pub const kH3: [3]f32 = .{ 0, 0, 1 };
 
 ///i^ in 4x4 space
-const iH4: [4]f32 = .{ 1, 0, 0, 0 };
+pub const iH4: [4]f32 = .{ 1, 0, 0, 0 };
 
 ///j^ in 4x4 space
-const jH4: [4]f32 = .{ 0, 1, 0, 0 };
+pub const jH4: [4]f32 = .{ 0, 1, 0, 0 };
 
 ///k^ in 4x4 space
-const kH4: [4]f32 = .{ 0, 0, 1, 0 };
+pub const kH4: [4]f32 = .{ 0, 0, 1, 0 };
 
 ///l^ in 4x4 space
-const lH4: [4]f32 = .{ 0, 0, 0, 1 };
+pub const lH4: [4]f32 = .{ 0, 0, 0, 1 };
 
 ///An enumeration that describes the solution types, discriminant, of a second order polynomial.
-const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
+pub const POLY2_SOL_TYPE = enum { NONE, ONE_REAL, TWO_REAL };
 
 ///An enumeration that describes the solution types, discriminant, of a third order polynomial.
-const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE_REAL_TWO_IMAGINARY };
+pub const POLY3_SOL_TYPE = enum { NONE, ONE_REPEATED_REAL, THREE_DISTINCT_REALS, ONE_REAL_TWO_IMAGINARY };
 
 ///An enumeration of matrix operations that are used by the idnfXmtx and procXmtx functions.
-const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS, MTX_IS_LIN_INDP, MTX_IS_INVERTIBLE, MTX_IS_ZERO };
+pub const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM, MTX_ABS, MTX_IS_LIN_INDP, MTX_IS_INVERTIBLE, MTX_IS_ZERO };
 
 ///An enumeration that is used to describe the type of basis of a 3D set of vectors.
-const BASIS_HAND = enum { RIGHT, LEFT, ERROR_ZERO, ERROR_INVALID_MATRIX };
+pub const BASIS_HAND = enum { RIGHT, LEFT, ERROR_ZERO, ERROR_INVALID_MATRIX };
 
 ///Used in aiding the calculation of Eigen Values for a 2x2 matrix.
 pub const EigVal2 = struct {
@@ -166,16 +166,16 @@ pub const ExecTime = struct {
 };
 
 ///The current count of recorded function execution times.
-var execTimesCnt: usize = 0;
+pub var execTimesCnt: usize = 0;
 
 ///The maximum number of function execution times that can be recorded.
-const MAX_EXEC_TIMES: usize = 1024;
+pub const MAX_EXEC_TIMES: usize = 1024;
 
 ///Used to hold a series of function execution times.
-var execTimes: [MAX_EXEC_TIMES]ExecTime = undefined;
+pub var execTimes: [MAX_EXEC_TIMES]ExecTime = undefined;
 
 ///A Boolean that controls verbose logging.
-var VERBOSE: bool = false;
+pub var VERBOSE: bool = false;
 
 ///A function to add a new ExecTime struct into the execTimes array.
 ///
@@ -3621,7 +3621,7 @@ pub fn isLinIndXmtxRef(mtx: []f32, vecL: []f32, vecR: []f32, cols: usize) bool {
         vecLset = false;
         vecRset = false;
 
-        while (i < (rows - 1)) {
+        while (i < (rows - 0)) {
             if (vecLset == false) {
                 cpyLessColRowXmtx(mtx, vecL, 0, cols, i, i + 1, cols, cols);
                 vecLset = true;
