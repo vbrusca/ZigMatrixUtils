@@ -10178,8 +10178,8 @@ test "XMTX: projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc test" {
 
     var ret1: []f32 = undefined;
     var ret2: []f32 = undefined;
-
     const exp: [3]f32 = .{ -1.76676996e-02, -1.76676996e-02, -8.83384980e-03 };
+
     var start = try Instant.now();
     ret1 = projXvec_VecP_Onto_VecQ_InrPrdctSpc(&P, &Q, dotPrdXvec);
     var end = try Instant.now();
@@ -10227,10 +10227,24 @@ test "XMTX: projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc test" {
 ///  returns = A value indicating the area of the given triangle.
 ///
 pub fn areaOfTriangle(mtx: *const [9]f32) f32 {
-    return absF32(@constCast(detXmtx3(mtx) * (1.0 / 2.0)));
+    return absF32((detXmtx3(@constCast(mtx)) * (1.0 / 2.0)));
 }
 
-//TODO: tests
+test "XMTX: areaOfTriangle test" {
+    const mtx: [9]f32 = .{ 1, 0, 1, 2, 2, 1, 4, 3, 1 };
+    const exp: f32 = (3.0 / 2.0);
+    var res: f32 = 0.0;
+
+    const start = try Instant.now();
+    res = areaOfTriangle(&mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nareaOfTriangle: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("areaOfTriangle", elapsed1);
+
+    try std.testing.expectEqual(exp, res);
+    prntNl();
+}
 
 ///Returns the volume of the tetrahedron given with R3 coordinates and a default value of 1 for the 4th, K, component.
 ///The format of mtx is not checked. The caller is responsible for making sure the matrix is in the correct format.
@@ -10250,10 +10264,24 @@ pub fn areaOfTriangle(mtx: *const [9]f32) f32 {
 ///  returns = A value indicating the volume of the given tetrahedron.
 ///
 pub fn volumeOfTetrahedron(mtx: *const [16]f32) f32 {
-    return absF32(@constCast(detXmtx4(mtx) * (1.0 / 6.0)));
+    return absF32((detXmtx4(@constCast(mtx)) * (1.0 / 6.0)));
 }
 
-//TODO: tests
+test "XMTX: volumeOfTetrahedron test" {
+    const mtx: [16]f32 = .{ 0, 4, 1, 1, 4, 0, 0, 1, 3, 5, 2, 1, 2, 2, 5, 1 };
+    const exp: f32 = 12.0;
+    var res: f32 = 0.0;
+
+    const start = try Instant.now();
+    res = volumeOfTetrahedron(&mtx);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nvolumeOfTetrahedron: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("volumeOfTetrahedron", elapsed1);
+
+    try std.testing.expectEqual(exp, res);
+    prntNl();
+}
 
 ///Returns the orthogonal set of vectors by storing their values in basis prime, the bsPrm function argument.
 ///
