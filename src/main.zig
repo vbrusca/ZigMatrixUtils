@@ -910,33 +910,74 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 1, 3, 5, 7, 9, 11 test" {
     //Chapter 5: Section 5.3: Problem 1, 3, 5, 7, 9, 11: pg 286
     //For problems 1 - 11 determine if the et of vectors in R^n is orthogonal, orthonormal, or neither.
     //(1) neither
-    const mtx1: [4]f32 = .{ -4, 6, 5, 0 };
-    var cols: usize = 2;
+    var mtx1: [4]f32 = .{ -4, 6, 5, 0 };
+    var cols1: usize = 2;
     const alloc = std.testing.allocator;
     var b1: bool = false;
     var b2: bool = false;
     var exp1: bool = false;
     var exp2: bool = false;
 
-    b1 = try xmu.isOrthogonalXmtx(@constCast(&mtx1), cols, &alloc);
-    b2 = try xmu.isOrthonormalXmtx(@constCast(&mtx1), cols, &alloc);
+    b1 = try xmu.isOrthogonalXmtx(@constCast(&mtx1), cols1, &alloc);
+    b2 = try xmu.isOrthonormalXmtx(@constCast(&mtx1), cols1, &alloc);
     try std.testing.expectEqual(exp1, b1);
     try std.testing.expectEqual(exp2, b2);
     xmu.prntNl();
 
     //(3) orthonormal
+    mtx1 = [4]f32{ 3.0 / 5.0, 4.0 / 5.0, -4.0 / 5.0, 3.0 / 5.0 };
+    cols1 = 2;
+    exp1 = true;
+    exp2 = true;
+    b1 = try xmu.isOrthogonalXmtx(@constCast(&mtx1), cols1, &alloc);
+    b2 = try xmu.isOrthonormalXmtx(@constCast(&mtx1), cols1, &alloc);
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    xmu.prntNl();
 
     //(5) orthogonal
+    var mtx2: [9]f32 = .{ 4, -1, 1, -1, 0, 4, -4, -17, -1 };
+    cols1 = 3;
+    exp1 = true;
+    exp2 = false;
+    b1 = try xmu.isOrthogonalXmtx(@constCast(&mtx2), cols1, &alloc);
+    b2 = try xmu.isOrthonormalXmtx(@constCast(&mtx2), cols1, &alloc);
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    xmu.prntNl();
 
     //(7) neither
-
-    //(9) orthonormal
-
-    //(11) orthonormal
-
+    mtx2 = .{ std.math.sqrt(2.0) / 3.0, 0, std.math.sqrt(2.0) / -6.0, 0, (2.0 * std.math.sqrt(5.0)) / 5.0, std.math.sqrt(5.0) / -5.0, std.math.sqrt(5.0) / 5.0, 0, 1.0 / 2.0 };
+    cols1 = 3;
     exp1 = false;
     exp2 = false;
-    cols = 0;
+    b1 = try xmu.isOrthogonalXmtx(@constCast(&mtx2), cols1, &alloc);
+    b2 = try xmu.isOrthonormalXmtx(@constCast(&mtx2), cols1, &alloc);
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    xmu.prntNl();
+
+    //(9) orthonormal
+    var mtx3: [12]f32 = .{ std.math.sqrt(2.0) / 2.0, 0, 0, std.math.sqrt(2.0) / 2.0, 0, std.math.sqrt(2.0) / 2.0, std.math.sqrt(2.0) / 2.0, 0, -0.5, 0.5, -0.5, 0.5 };
+    cols1 = 4;
+    exp1 = true;
+    exp2 = true;
+    b1 = try xmu.isOrthogonalXmtx(@constCast(&mtx3), cols1, &alloc);
+    b2 = try xmu.isOrthonormalXmtx(@constCast(&mtx3), cols1, &alloc);
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    xmu.prntNl();
+
+    //(11) orthonormal
+    var mtx4: [16]f32 = .{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+    cols1 = 4;
+    exp1 = true;
+    exp2 = true;
+    b1 = try xmu.isOrthogonalInrPrdctSpcXmtx(@constCast(&mtx4), cols1, xmu.dotPrdXvec, &alloc);
+    b2 = try xmu.isOrthonormalInrPrdctSpcXmtx(@constCast(&mtx4), cols1, xmu.dotPrdXvec, &alloc);
+    try std.testing.expectEqual(exp1, b1);
+    try std.testing.expectEqual(exp2, b2);
+    xmu.prntNl();
 }
 
 //--------------------------------------------------------------------------------------
