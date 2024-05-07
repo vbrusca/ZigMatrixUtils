@@ -980,6 +980,88 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 1, 3, 5, 7, 9, 11 test" {
     xmu.prntNl();
 }
 
+//TODO: continue here
+test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
+    //Chapter 5: Section 5.3: Problem 13, 15, 17: pg 287
+    //Find the coordinates of x relative to the orthonormal basis in R^n.
+    //(13)
+    //B = {
+    //        ( ((-2.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)) ),
+    //        ( ((3.0 / 13.0) * std.math.sqrt(13)), ((2.0 / 13.0) * std.math.sqrt(13)) )
+    //    }
+    //x = (1,2)
+    const alloc = std.testing.allocator;
+    var B1: [4]f32 = .{ ((-2.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)), ((2.0 / 13.0) * std.math.sqrt(13)) };
+    var x1: [2]f32 = .{ 1.0, 2.0 };
+    var cols: usize = 2;
+    var res1: [2]f32 = .{ 0.0, 0.0 };
+    var exp1: [2]f32 = .{ ((4.0 / 13.0) * std.math.sqrt(13)), ((7.0 / 13.0) * std.math.sqrt(13)) };
+
+    try xmu.coordRelOrthBasis(&B1, cols, &x1, &res1, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 13:");
+    xmu.prntNlStr("Basis B1:");
+    xmu.prntXmtxNl(&B1, cols);
+    xmu.prntNlStr("Vector x1:");
+    xmu.prntXvecNl(&x1);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntXvecNl(&x1);
+    xmu.prntNlStr("Res1:");
+    xmu.prntXvecNl(&res1);
+    xmu.prntNlStr("Exp1:");
+    xmu.prntXvecNl(&exp1);
+
+    xmu.prntNl();
+
+    //(15)
+    var B2: [9]f32 = .{ ((1.0 / 10.0) * std.math.sqrt(10)), 0, ((3.0 / 10.0) * std.math.sqrt(10)), 0, 1, 0, ((-3.0 / 10.0) * std.math.sqrt(10)), 0, ((1.0 / 10.0) * std.math.sqrt(10)) };
+    var x2: [3]f32 = .{ 2, -2, 1 };
+    cols = 3;
+    var res2: [3]f32 = .{ 0.0, 0.0, 0.0 };
+    var exp2: [3]f32 = .{ ((1.0 / 2.0) * std.math.sqrt(10)), -2.0, ((-1.0 / 2.0) * std.math.sqrt(10)) };
+
+    try xmu.coordRelOrthBasis(&B2, cols, &x2, &res2, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 15:");
+    xmu.prntNlStr("Basis B2:");
+    xmu.prntXmtxNl(&B2, cols);
+    xmu.prntNlStr("Vector x2:");
+    xmu.prntXvecNl(&x2);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntXvecNl(&x2);
+    xmu.prntNlStr("Res2:");
+    xmu.prntXvecNl(&res2);
+    xmu.prntNlStr("Exp2:");
+    xmu.prntXvecNl(&exp2);
+
+    xmu.prntNl();
+
+    //(17)
+    var B3: [9]f32 = .{ (3.0 / 5.0), (4.0 / 5.0), 0, (-4.0 / 5.0), (3.0 / 5.0), 0, 0, 0, 1 };
+    var x3: [3]f32 = .{ 5, 10, 15 };
+    cols = 3;
+    var res3: [3]f32 = .{ 0.0, 0.0, 0.0 };
+    var exp3: [3]f32 = .{ 11.0, 2.0, 15.0 };
+
+    try xmu.coordRelOrthBasis(&B3, cols, &x3, &res3, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 17:");
+    xmu.prntNlStr("Basis B3:");
+    xmu.prntXmtxNl(&B3, cols);
+    xmu.prntNlStr("Vector x3:");
+    xmu.prntXvecNl(&x3);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntXvecNl(&x3);
+    xmu.prntNlStr("Res3:");
+    xmu.prntXvecNl(&res3);
+    xmu.prntNlStr("Exp3:");
+    xmu.prntXvecNl(&exp3);
+
+    xmu.prntNl();
+}
+
+//Section 5.3 remaining problems: 19, 21, 23, 25, 27, 29, 31
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

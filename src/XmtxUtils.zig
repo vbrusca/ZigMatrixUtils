@@ -10504,12 +10504,12 @@ test "XMTX: gramSchmidtOthonormal test" {
 }
 
 //TODO: docs
-pub fn coordRelOrthBasis(basis: []f32, cols: f32, coordRel: []f32, res: []f32, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
+pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
     if (cols != coordRel.len) {
         prntNlStr("!! coordRelOrthBasis: Error, the vector coordRel must have the same length as the matrix basis has cols !!");
         return Error.InvalidLengths;
-    } else if (basis.len % cols == 0) {
-        prntNlStr("!! coordRelOrthBasis: Error, the matrix basis length ,ust be evenly divisible by the given number of cols !!");
+    } else if (basis.len % cols != 0) {
+        prntNlStr("!! coordRelOrthBasis: Error, the matrix basis length must be evenly divisible by the given number of cols !!");
         return Error.InvalidLengths;
     } else if (cols != res.len) {
         prntNlStr("!! coordRelOrthBasis: Error, the vector res must have the same length as the matrix basis has cols !!");
@@ -10536,8 +10536,11 @@ pub fn coordRelOrthBasis(basis: []f32, cols: f32, coordRel: []f32, res: []f32, a
             Vrow[i] = basis[s + i];
         }
 
-        sum1Xvec(res, mulXvec(Vrow, prdct(Vrow, coordRel)));
+        mulXvec(Vrow, prdct(Vrow, coordRel));
+        sum1Xvec(res, Vrow);
     }
+
+    defer alloc.*.free(Vrow);
 }
 
 //TODO: tests
