@@ -10504,7 +10504,7 @@ test "XMTX: gramSchmidtOthonormal test" {
 }
 
 //TODO: docs
-pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
+pub fn coordRelOrthBasisInrPrdctSpc(basis: []f32, cols: usize, coordRel: []f32, res: []f32, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
     if (cols != coordRel.len) {
         prntNlStr("!! coordRelOrthBasis: Error, the vector coordRel must have the same length as the matrix basis has cols !!");
         return Error.InvalidLengths;
@@ -10537,6 +10537,48 @@ pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32,
         }
 
         mulXvec(Vrow, prdct(Vrow, coordRel));
+        sum1Xvec(res, Vrow);
+    }
+
+    defer alloc.*.free(Vrow);
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32, alloc: *const std.mem.Allocator) !void {
+    if (cols != coordRel.len) {
+        prntNlStr("!! coordRelOrthBasis: Error, the vector coordRel must have the same length as the matrix basis has cols !!");
+        return Error.InvalidLengths;
+    } else if (basis.len % cols != 0) {
+        prntNlStr("!! coordRelOrthBasis: Error, the matrix basis length must be evenly divisible by the given number of cols !!");
+        return Error.InvalidLengths;
+    } else if (cols != res.len) {
+        prntNlStr("!! coordRelOrthBasis: Error, the vector res must have the same length as the matrix basis has cols !!");
+        return Error.InvalidLengths;
+    }
+
+    const rows: usize = basis.len / cols;
+    var row: usize = 0;
+    var s: usize = 0;
+    var e: usize = 0;
+    var Vrow: []f32 = try alloc.*.alloc(f32, cols);
+    var i: usize = 0;
+
+    //clear out the res matrix
+    clrXvec(res);
+
+    while (row < rows) : (row += 1) {
+        s = (row * cols);
+        e = (s + cols);
+
+        //Vrow = basis[s..e];
+        i = 0;
+        while (i < cols) : (i += 1) {
+            Vrow[i] = basis[s + i];
+        }
+
+        mulXvec(Vrow, dotPrdXvec(Vrow, coordRel));
         sum1Xvec(res, Vrow);
     }
 

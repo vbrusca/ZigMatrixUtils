@@ -997,7 +997,7 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     var res1: [2]f32 = .{ 0.0, 0.0 };
     var exp1: [2]f32 = .{ ((4.0 / 13.0) * std.math.sqrt(13)), ((7.0 / 13.0) * std.math.sqrt(13)) };
 
-    try xmu.coordRelOrthBasis(&B1, cols, &x1, &res1, &alloc, xmu.dotPrdXvec);
+    try xmu.coordRelOrthBasisInrPrdctSpc(&B1, cols, &x1, &res1, &alloc, xmu.dotPrdXvec);
 
     xmu.prntNlStr("Problem 13:");
     xmu.prntNlStr("Basis B1:");
@@ -1020,7 +1020,7 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     var res2: [3]f32 = .{ 0.0, 0.0, 0.0 };
     var exp2: [3]f32 = .{ ((1.0 / 2.0) * std.math.sqrt(10)), -2.0, ((-1.0 / 2.0) * std.math.sqrt(10)) };
 
-    try xmu.coordRelOrthBasis(&B2, cols, &x2, &res2, &alloc, xmu.dotPrdXvec);
+    try xmu.coordRelOrthBasisInrPrdctSpc(&B2, cols, &x2, &res2, &alloc, xmu.dotPrdXvec);
 
     xmu.prntNlStr("Problem 15:");
     xmu.prntNlStr("Basis B2:");
@@ -1043,7 +1043,7 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     var res3: [3]f32 = .{ 0.0, 0.0, 0.0 };
     var exp3: [3]f32 = .{ 11.0, 2.0, 15.0 };
 
-    try xmu.coordRelOrthBasis(&B3, cols, &x3, &res3, &alloc, xmu.dotPrdXvec);
+    try xmu.coordRelOrthBasisInrPrdctSpc(&B3, cols, &x3, &res3, &alloc, xmu.dotPrdXvec);
 
     xmu.prntNlStr("Problem 17:");
     xmu.prntNlStr("Basis B3:");
