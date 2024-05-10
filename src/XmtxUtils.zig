@@ -10503,7 +10503,18 @@ test "XMTX: gramSchmidtOthonormal test" {
     prntNl();
 }
 
-//TODO: docs
+///Returns the coordinate relative to the given basis and relative coordinate, coordRel, for the given inner product space.
+///
+///  basis: A matrix of vectors that form the given basis.
+///
+///  cols: The number of columns in the given matrix, basis.
+///
+///  coordRel: The coordinate relative to the basis.
+///
+///  alloc: Allocation used to create a temporary vector for the calculation.
+///
+///  prdct: The function to use to calculate the inner product space.
+///
 pub fn coordRelOrthBasisInrPrdctSpc(basis: []f32, cols: usize, coordRel: []f32, res: []f32, alloc: *const std.mem.Allocator, prdct: *const fn (l: []f32, r: []f32) f32) !void {
     if (cols != coordRel.len) {
         prntNlStr("!! coordRelOrthBasis: Error, the vector coordRel must have the same length as the matrix basis has cols !!");
@@ -10519,16 +10530,16 @@ pub fn coordRelOrthBasisInrPrdctSpc(basis: []f32, cols: usize, coordRel: []f32, 
     const rows: usize = basis.len / cols;
     var row: usize = 0;
     var s: usize = 0;
-    var e: usize = 0;
+    //var e: usize = 0;
     var Vrow: []f32 = try alloc.*.alloc(f32, cols);
     var i: usize = 0;
 
     //clear out the res matrix
-    clrXvec(res);
+    //clrXvec(res);
 
     while (row < rows) : (row += 1) {
         s = (row * cols);
-        e = (s + cols);
+        //e = (s + cols);
 
         //Vrow = basis[s..e];
         i = 0;
@@ -10536,16 +10547,58 @@ pub fn coordRelOrthBasisInrPrdctSpc(basis: []f32, cols: usize, coordRel: []f32, 
             Vrow[i] = basis[s + i];
         }
 
-        mulXvec(Vrow, prdct(Vrow, coordRel));
-        sum1Xvec(res, Vrow);
+        res[row] = prdct(Vrow, coordRel);
+        //mulXvec(Vrow, prdct(Vrow, coordRel));
+        //sum1Xvec(res, Vrow);
     }
 
     defer alloc.*.free(Vrow);
 }
 
-//TODO: tests
+test "XMTX: coordRelOrthBasisInrPrdctSpc test" {
+    //Chapter 5: Section 5.3: Problem 13, 15, 17: pg 287
+    //Find the coordinates of x relative to the orthonormal basis in R^n.
 
-//TODO: docs
+    //(13)
+    //B = {
+    //        ( ((-2.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)) ),
+    //        ( ((3.0 / 13.0) * std.math.sqrt(13)), ((2.0 / 13.0) * std.math.sqrt(13)) )
+    //    }
+    //x = (1,2)
+    const alloc = std.testing.allocator;
+    var B1: [4]f32 = .{ ((-2.0 * std.math.sqrt(13.0)) / 13.0), ((3.0 * std.math.sqrt(13.0)) / 13.0), ((3.0 * std.math.sqrt(13.0)) / 13.0), ((2.0 * std.math.sqrt(13.0)) / 13.0) };
+    var x1: [2]f32 = .{ 1.0, 2.0 };
+    const cols: usize = 2;
+    var res1: [2]f32 = .{ 0.0, 0.0 };
+    var exp1: [2]f32 = .{ ((4.0 * std.math.sqrt(13.0)) / 13.0), ((7.0 * std.math.sqrt(13.0)) / 13.0) };
+
+    try coordRelOrthBasisInrPrdctSpc(&B1, cols, &x1, &res1, &alloc, dotPrdXvec);
+
+    prntNlStr("Problem 13:");
+    prntNlStr("Basis B1:");
+    prntXmtxNl(&B1, cols);
+    prntNlStr("Vector x1:");
+    prntXvecNl(&x1);
+    prntNlStrArgs("Cols: {}", .{cols});
+    prntNlStr("Res1:");
+    prntXvecNl(&res1);
+    prntNlStr("Exp1:");
+    prntXvecNl(&exp1);
+
+    try std.testing.expectEqual(true, equXvecWrkr(&exp1, &res1, false));
+    prntNl();
+}
+
+///Returns the coordinate relative to the given basis and relative coordinate, coordRel.
+///
+///  basis: A matrix of vectors that form the given basis.
+///
+///  cols: The number of columns in the given matrix, basis.
+///
+///  coordRel: The coordinate relative to the basis.
+///
+///  alloc: Allocation used to create a temporary vector for the calculation.
+///
 pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32, alloc: *const std.mem.Allocator) !void {
     if (cols != coordRel.len) {
         prntNlStr("!! coordRelOrthBasis: Error, the vector coordRel must have the same length as the matrix basis has cols !!");
@@ -10561,7 +10614,7 @@ pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32,
     const rows: usize = basis.len / cols;
     var row: usize = 0;
     var s: usize = 0;
-    var e: usize = 0;
+    //var e: usize = 0;
     var Vrow: []f32 = try alloc.*.alloc(f32, cols);
     var i: usize = 0;
 
@@ -10570,7 +10623,7 @@ pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32,
 
     while (row < rows) : (row += 1) {
         s = (row * cols);
-        e = (s + cols);
+        //e = (s + cols);
 
         //Vrow = basis[s..e];
         i = 0;
@@ -10578,14 +10631,47 @@ pub fn coordRelOrthBasis(basis: []f32, cols: usize, coordRel: []f32, res: []f32,
             Vrow[i] = basis[s + i];
         }
 
-        mulXvec(Vrow, dotPrdXvec(Vrow, coordRel));
-        sum1Xvec(res, Vrow);
+        res[row] = dotPrdXvec(Vrow, coordRel);
+        //mulXvec(Vrow, dotPrdXvec(Vrow, coordRel));
+        //sum1Xvec(res, Vrow);
     }
 
     defer alloc.*.free(Vrow);
 }
 
-//TODO: tests
+test "XMTX: coordRelOrthBasis test" {
+    //Chapter 5: Section 5.3: Problem 13, 15, 17: pg 287
+    //Find the coordinates of x relative to the orthonormal basis in R^n.
+
+    //(13)
+    //B = {
+    //        ( ((-2.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)) ),
+    //        ( ((3.0 / 13.0) * std.math.sqrt(13)), ((2.0 / 13.0) * std.math.sqrt(13)) )
+    //    }
+    //x = (1,2)
+    const alloc = std.testing.allocator;
+    var B1: [4]f32 = .{ ((-2.0 * std.math.sqrt(13.0)) / 13.0), ((3.0 * std.math.sqrt(13.0)) / 13.0), ((3.0 * std.math.sqrt(13.0)) / 13.0), ((2.0 * std.math.sqrt(13.0)) / 13.0) };
+    var x1: [2]f32 = .{ 1.0, 2.0 };
+    const cols: usize = 2;
+    var res1: [2]f32 = .{ 0.0, 0.0 };
+    var exp1: [2]f32 = .{ ((4.0 * std.math.sqrt(13.0)) / 13.0), ((7.0 * std.math.sqrt(13.0)) / 13.0) };
+
+    try coordRelOrthBasis(&B1, cols, &x1, &res1, &alloc);
+
+    prntNlStr("Problem 13:");
+    prntNlStr("Basis B1:");
+    prntXmtxNl(&B1, cols);
+    prntNlStr("Vector x1:");
+    prntXvecNl(&x1);
+    prntNlStrArgs("Cols: {}", .{cols});
+    prntNlStr("Res1:");
+    prntXvecNl(&res1);
+    prntNlStr("Exp1:");
+    prntXvecNl(&exp1);
+
+    try std.testing.expectEqual(true, equXvecWrkr(&exp1, &res1, false));
+    prntNl();
+}
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {

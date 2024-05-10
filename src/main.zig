@@ -980,10 +980,10 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 1, 3, 5, 7, 9, 11 test" {
     xmu.prntNl();
 }
 
-//TODO: continue here
 test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     //Chapter 5: Section 5.3: Problem 13, 15, 17: pg 287
     //Find the coordinates of x relative to the orthonormal basis in R^n.
+
     //(13)
     //B = {
     //        ( ((-2.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)) ),
@@ -991,11 +991,11 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     //    }
     //x = (1,2)
     const alloc = std.testing.allocator;
-    var B1: [4]f32 = .{ ((-2.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)), ((3.0 / 13.0) * std.math.sqrt(13)), ((2.0 / 13.0) * std.math.sqrt(13)) };
+    var B1: [4]f32 = .{ ((-2.0 * std.math.sqrt(13.0)) / 13.0), ((3.0 * std.math.sqrt(13.0)) / 13.0), ((3.0 * std.math.sqrt(13.0)) / 13.0), ((2.0 * std.math.sqrt(13.0)) / 13.0) };
     var x1: [2]f32 = .{ 1.0, 2.0 };
     var cols: usize = 2;
     var res1: [2]f32 = .{ 0.0, 0.0 };
-    var exp1: [2]f32 = .{ ((4.0 / 13.0) * std.math.sqrt(13)), ((7.0 / 13.0) * std.math.sqrt(13)) };
+    var exp1: [2]f32 = .{ ((4.0 * std.math.sqrt(13.0)) / 13.0), ((7.0 * std.math.sqrt(13.0)) / 13.0) };
 
     try xmu.coordRelOrthBasisInrPrdctSpc(&B1, cols, &x1, &res1, &alloc, xmu.dotPrdXvec);
 
@@ -1005,12 +1005,12 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     xmu.prntNlStr("Vector x1:");
     xmu.prntXvecNl(&x1);
     xmu.prntNlStrArgs("Cols: {}", .{cols});
-    xmu.prntXvecNl(&x1);
     xmu.prntNlStr("Res1:");
     xmu.prntXvecNl(&res1);
     xmu.prntNlStr("Exp1:");
     xmu.prntXvecNl(&exp1);
 
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp1, &res1, false));
     xmu.prntNl();
 
     //(15)
@@ -1028,12 +1028,12 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     xmu.prntNlStr("Vector x2:");
     xmu.prntXvecNl(&x2);
     xmu.prntNlStrArgs("Cols: {}", .{cols});
-    xmu.prntXvecNl(&x2);
     xmu.prntNlStr("Res2:");
     xmu.prntXvecNl(&res2);
     xmu.prntNlStr("Exp2:");
     xmu.prntXvecNl(&exp2);
 
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &res2, false));
     xmu.prntNl();
 
     //(17)
@@ -1051,12 +1051,12 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     xmu.prntNlStr("Vector x3:");
     xmu.prntXvecNl(&x3);
     xmu.prntNlStrArgs("Cols: {}", .{cols});
-    xmu.prntXvecNl(&x3);
     xmu.prntNlStr("Res3:");
     xmu.prntXvecNl(&res3);
     xmu.prntNlStr("Exp3:");
     xmu.prntXvecNl(&exp3);
 
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp3, &res3, false));
     xmu.prntNl();
 }
 
