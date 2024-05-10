@@ -1060,7 +1060,116 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 13, 15, 17 test" {
     xmu.prntNl();
 }
 
-//Section 5.3 remaining problems: 19, 21, 23, 25, 27, 29, 31
+test "XMTX: ELA - Larson, Edwards: 5.3 Problem 19, 21, 23, 25 test" {
+    //Chapter 5: Section 5.3: Problem 19, 21, 23, 25: pg 287
+    //Use Gram Schmidt orthonormalization process to transform the given basis for R^n into an orthonormal
+    //basis. Use the Euclidean inner product for R^n.
+
+    //(19)
+    //B = {(3,4), (1,0)}
+    //exp = {
+    //      (3/5, 4/5),
+    //      (4/5, -3/5)
+    //}
+    const alloc = std.testing.allocator;
+    var B1: [4]f32 = .{ 3, 4, 1, 0 };
+    var cols: usize = 2;
+    var res1: [4]f32 = .{ 0, 0, 0, 0 };
+    var exp1: [4]f32 = .{ (3.0 / 5.0), (4.0 / 5.0), (4.0 / 5.0), (-3.0 / 5.0) };
+
+    try xmu.gramSchmidtOthonormal(&B1, &res1, cols, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 19:");
+    xmu.prntNlStr("Basis B1:");
+    xmu.prntXmtxNl(&B1, cols);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntNlStr("Res1:");
+    xmu.prntXvecNl(&res1);
+    xmu.prntNlStr("Exp1:");
+    xmu.prntXvecNl(&exp1);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp1, &res1, false));
+    xmu.prntNl();
+
+    //(21)
+    //B = {(1,-1), (1,1)}
+    //exp = {
+    //      (sqrt(2)/2, -sqrt(2)/2),
+    //      (sqrt(2)/2, sqrt(2)/2)
+    //}
+    var B2: [4]f32 = .{ 1, -1, 1, 1 };
+    cols = 2;
+    var res2: [4]f32 = .{ 0, 0, 0, 0 };
+    var exp2: [4]f32 = .{ ((std.math.sqrt(2.0)) / 2.0), ((-1.0 * std.math.sqrt(2.0)) / 2.0), ((std.math.sqrt(2.0)) / 2.0), ((std.math.sqrt(2.0)) / 2.0) };
+
+    try xmu.gramSchmidtOthonormal(&B2, &res2, cols, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 21:");
+    xmu.prntNlStr("Basis B2:");
+    xmu.prntXmtxNl(&B2, cols);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntNlStr("Res2:");
+    xmu.prntXvecNl(&res2);
+    xmu.prntNlStr("Exp2:");
+    xmu.prntXvecNl(&exp2);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &res2, false));
+    xmu.prntNl();
+
+    //(23)
+    //B = {(4,-3,0), (1,2,0), (0,0,4)}
+    //exp = {
+    //      (4/5, -3/5, 0),
+    //      (3/5, 4/5, 0),
+    //      (0, 0, 1)
+    //}
+    var B3: [9]f32 = .{ 4, -3, 0, 1, 2, 0, 0, 0, 4 };
+    cols = 3;
+    var res3: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    var exp3: [9]f32 = .{ 4.0 / 5.0, -3.0 / 5.0, 0, 3.0 / 5.0, 4.0 / 5.0, 0, 0, 0, 1.0 };
+
+    try xmu.gramSchmidtOthonormal(&B3, &res3, cols, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 23:");
+    xmu.prntNlStr("Basis B3:");
+    xmu.prntXmtxNl(&B3, cols);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntNlStr("Res3:");
+    xmu.prntXvecNl(&res3);
+    xmu.prntNlStr("Exp3:");
+    xmu.prntXvecNl(&exp3);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp3, &res3, false));
+    xmu.prntNl();
+
+    //(25)
+    //B = {(0,1,1), (1,1,0), (1,0,1)}
+    //exp = {
+    //      (0, sqrt(2)/2, sqrt(2)/2),
+    //      (sqrt(6)/3, sqrt(6)/6, -sqrt(6)/6),
+    //      (sqrt(3)/3, -sqrt(3)/3, sqrt(3)/3)
+    //}
+    var B4: [9]f32 = .{ 0, 1, 1, 1, 1, 0, 1, 0, 1 };
+    cols = 3;
+    var res4: [9]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    var exp4: [9]f32 = .{ 0, ((std.math.sqrt(2.0)) / 2.0), ((std.math.sqrt(2.0)) / 2.0), ((std.math.sqrt(6.0)) / 3.0), ((std.math.sqrt(6.0)) / 6.0), ((-1.0 * std.math.sqrt(6.0)) / 6.0), ((std.math.sqrt(3.0)) / 3.0), ((-1.0 * std.math.sqrt(3.0)) / 3.0), ((std.math.sqrt(3.0)) / 3.0) };
+
+    try xmu.gramSchmidtOthonormal(&B4, &res4, cols, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 25:");
+    xmu.prntNlStr("Basis B4:");
+    xmu.prntXmtxNl(&B4, cols);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntNlStr("Res4:");
+    xmu.prntXvecNl(&res4);
+    xmu.prntNlStr("Exp4:");
+    xmu.prntXvecNl(&exp4);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp4, &res4, false));
+    xmu.prntNl();
+}
+
+//TODO: Section 5.3 Problem 27, 29, 31
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
