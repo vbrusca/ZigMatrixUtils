@@ -1169,7 +1169,95 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 19, 21, 23, 25 test" {
     xmu.prntNl();
 }
 
-//TODO: Section 5.3 Problem 27, 29, 31
+test "XMTX: ELA - Larson, Edwards: 5.3 Problem 27, 29, 31 test" {
+    //Chapter 5: Section 5.3: Problem 27, 29, 31: pg 287
+    //Use Gram Schmidt orthonormalization process to transform the given basis for a subspace of R^n
+    //into an orthonormal basis for the subspace.
+
+    //(27)
+    //B = {(-8, 3, 5)}
+    //exp = {
+    //      (-4.0 * sqrt(2.0)) / 7.0,
+    //      ( 3.0 * sqrt(2.0)) / 14.0,
+    //      ( 5.0 * sqrt(2.0)) / 14.0
+    //}
+    const alloc = std.testing.allocator;
+    var cols: usize = 3;
+    var B1: [3]f32 = .{ -8, 3, 5 };
+    var res1: [3]f32 = .{ 0, 0, 0 };
+    var exp1: [3]f32 = .{ (-4.0 * std.math.sqrt(2.0)) / 7.0, (3.0 * std.math.sqrt(2.0)) / 14.0, (5.0 * std.math.sqrt(2.0)) / 14.0 };
+
+    try xmu.gramSchmidtOthonormal(&B1, &res1, cols, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 27:");
+    xmu.prntNlStr("Basis B1:");
+    xmu.prntXmtxNl(&B1, cols);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntNlStr("Res1:");
+    xmu.prntXvecNl(&res1);
+    xmu.prntNlStr("Exp1:");
+    xmu.prntXvecNl(&exp1);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp1, &res1, false));
+    xmu.prntNl();
+
+    //(29)
+    //B = {(3, 4, 0), (1, 0, 0)}
+    //exp = {
+    //      (3.0/5.0, 4.0/5.0, 0.0),
+    //      (4.0/5.0, -3.0/5.0, 0.0)
+    //}
+    cols = 3;
+    var B2: [6]f32 = .{ 3, 4, 0, 1, 0, 0 };
+    var res2: [6]f32 = .{ 0, 0, 0, 0, 0, 0 };
+    var exp2: [6]f32 = .{ 3.0 / 5.0, 4.0 / 5.0, 0.0, 4.0 / 5.0, -3.0 / 5.0, 0.0 };
+
+    try xmu.gramSchmidtOthonormal(&B2, &res2, cols, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 29:");
+    xmu.prntNlStr("Basis B2:");
+    xmu.prntXmtxNl(&B2, cols);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntNlStr("Res2:");
+    xmu.prntXvecNl(&res2);
+    xmu.prntNlStr("Exp2:");
+    xmu.prntXvecNl(&exp2);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &res2, false));
+    xmu.prntNl();
+
+    //(31)
+    //B = {(1, 2, -1, 0), (2, 2, 0, 1)}
+    //exp = {
+    //      std.math.sqrt(6.0)/6.0,
+    //      std.math.sqrt(6.0)/3.0,
+    //      (-1.0 * std.math.sqrt(6.0))/6.0,
+    //      0,
+    //      std.math.sqrt(3.0)/3.0,
+    //      0,
+    //      std.math.sqrt(3.0)/3.0,
+    //      std.math.sqrt(3.0)/3.0
+    //}
+
+    cols = 4;
+    var B3: [8]f32 = .{ 1, 2, -1, 0, 2, 2, 0, 1 };
+    var res3: [8]f32 = .{ 0, 0, 0, 0, 0, 0, 0, 0 };
+    var exp3: [8]f32 = .{ std.math.sqrt(6.0) / 6.0, std.math.sqrt(6.0) / 3.0, (-1.0 * std.math.sqrt(6.0)) / 6.0, 0, std.math.sqrt(3.0) / 3.0, 0, std.math.sqrt(3.0) / 3.0, std.math.sqrt(3.0) / 3.0 };
+
+    try xmu.gramSchmidtOthonormal(&B3, &res3, cols, &alloc, xmu.dotPrdXvec);
+
+    xmu.prntNlStr("Problem 31:");
+    xmu.prntNlStr("Basis B3:");
+    xmu.prntXmtxNl(&B3, cols);
+    xmu.prntNlStrArgs("Cols: {}", .{cols});
+    xmu.prntNlStr("Res3:");
+    xmu.prntXvecNl(&res3);
+    xmu.prntNlStr("Exp3:");
+    xmu.prntXvecNl(&exp3);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp3, &res3, false));
+    xmu.prntNl();
+}
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
