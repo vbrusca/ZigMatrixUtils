@@ -26,7 +26,7 @@
 const std = @import("std");
 
 comptime {
-    @setFloatMode(std.builtin.FloatMode.Optimized);
+    @setFloatMode(std.builtin.FloatMode.optimized);
 }
 
 const time = std.time;
@@ -444,7 +444,7 @@ test "XMTX: fndFactorsOf test" {
             try std.testing.expectEqual(exp[i], ret[i]);
         }
     }
-    try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+    try std.testing.expectEqual(cnt, @as(usize, @intFromFloat(fnd)));
     prntNl();
 }
 
@@ -507,7 +507,7 @@ test "XMTX: fndFactorsOfRef test" {
             try std.testing.expectEqual(exp[i], ret[i]);
         }
     }
-    try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+    try std.testing.expectEqual(cnt, @as(usize, @intFromFloat(fnd)));
     prntNl();
 }
 
@@ -549,7 +549,7 @@ test "XMTX: fndFactorsOfRet test" {
             try std.testing.expectEqual(exp[i], ret[i]);
         }
     }
-    try std.testing.expectEqual(cnt, @intFromFloat(fnd));
+    try std.testing.expectEqual(cnt, @as(usize, @intFromFloat(fnd)));
     prntNl();
 }
 

@@ -9,7 +9,7 @@ const std = @import("std");
 const xmu = @import("./XmtxUtils.zig");
 
 comptime {
-    @setFloatMode(std.builtin.FloatMode.Optimized);
+    @setFloatMode(std.builtin.FloatMode.optimized);
 }
 
 pub fn main() !void {
