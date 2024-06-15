@@ -1263,20 +1263,31 @@ test "XMTX: ELA - Larson, Edwards: 5.4 Problem 1, 3 test" {
     //In Ex 1, 3, determine whether the given sets are orthogonal.
     //1) S1 = span{ [2, 1, -1], [0, 1, 1]}, S2 = span{[-1, 2, 0]}
     const alloc = std.testing.allocator;
-    const cols: usize = 3;    
+
+    //we'll setup the matrices that help us run comparisons for linear independece in series.
+    const cols1: usize = 3;
     const mtx1: [6]f32 = .{2, 1, -1, -1, 2, 0};
     const mtx2: [6]f32 = .{0, 1, 1, -1, 2, 0};
-    const b1: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx1), cols, &alloc);
-    const b2: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx2), cols, &alloc); 
-
+    const b1: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx1), cols1, &alloc);
+    const b2: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx2), cols1, &alloc); 
     xmu.prntNlStrArgs("B1: {}, B2: {}", .{b1, b2});
-
     try std.testing.expectEqual(true, b1);
     try std.testing.expectEqual(false, b2);    
     xmu.prntNl();
 
+    //3) S1 = span{[1, 1, 1, 1]}, S2 = {[-1, 1, -1, 1], [0, 2, -2, 0]}
+    //we'll setup the matrices that help us run comparisons for linear independece in series.
+    const cols2: usize = 4;
+    const mtx3: [8]f32 = .{1, 1, 1, 1, -1, 1, -1, 1};
+    const mtx4: [8]f32 = .{1, 1, 1, 1, 0, 2, -2, 0};
+    const b3: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx3), cols2, &alloc);
+    const b4: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx4), cols2, &alloc); 
 
-    //3) S1 = span{[], []}, S2 = {[]}
+    xmu.prntNlStrArgs("B3: {}, B4: {}", .{b3, b4});
+
+    try std.testing.expectEqual(true, b3);
+    try std.testing.expectEqual(true, b4);    
+    xmu.prntNl();    
 }
 
 //--------------------------------------------------------------------------------------
