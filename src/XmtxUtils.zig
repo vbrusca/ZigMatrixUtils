@@ -3237,6 +3237,9 @@ test "XMTX: isLinIndInrPrdctSpcXvec test" {
 ///  returns = A Boolean indicating if the matrix is made up of linearly independent vectors, orthogonal or an error.
 ///
 pub fn isOrthogonalXmtx(mtx: []f32, cols: usize, alloc: *const std.mem.Allocator) !bool {
+    if(mtx.len / cols == 1) {
+        return true;
+    }
     return try isLinIndXmtx(mtx, cols, alloc);
 }
 
@@ -3614,7 +3617,7 @@ pub fn isLinIndXmtxRef(mtx: []f32, vecL: []f32, vecR: []f32, cols: usize) bool {
     var j: i64 = -1;
     var vecLset: bool = false;
     var vecRset: bool = false;
-    var lind: bool = false;
+    var lind: bool = false;    
 
     while (j < (rows - 1)) {
         i = @as(usize, @intCast((j + 1)));

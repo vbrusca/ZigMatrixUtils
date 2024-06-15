@@ -1259,6 +1259,26 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 27, 29, 31 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.4 Problem 1, 3 test" {
+    //In Ex 1, 3, determine whether the given sets are orthogonal.
+    //1) S1 = span{ [2, 1, -1], [0, 1, 1]}, S2 = span{[-1, 2, 0]}
+    const alloc = std.testing.allocator;
+    const cols: usize = 3;    
+    const mtx1: [6]f32 = .{2, 1, -1, -1, 2, 0};
+    const mtx2: [6]f32 = .{0, 1, 1, -1, 2, 0};
+    const b1: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx1), cols, &alloc);
+    const b2: bool = try xmu.isOrthogonalXmtx(@constCast(&mtx2), cols, &alloc); 
+
+    xmu.prntNlStrArgs("B1: {}, B2: {}", .{b1, b2});
+
+    try std.testing.expectEqual(true, b1);
+    try std.testing.expectEqual(false, b2);    
+    xmu.prntNl();
+
+
+    //3) S1 = span{[], []}, S2 = {[]}
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
