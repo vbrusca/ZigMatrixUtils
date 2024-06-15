@@ -10589,7 +10589,7 @@ test "XMTX: coordRelOrthBasisInrPrdctSpc test" {
     prntNl();
 }
 
-///Returns the coordinate relative to the given basis and relative coordinate, coordRel.
+///Returns the coordinate relative to the given orthogonal basis and relative coordinate, coordRel.
 ///
 ///  basis: A matrix of vectors that form the given basis.
 ///
@@ -10671,6 +10671,57 @@ test "XMTX: coordRelOrthBasis test" {
 
     try std.testing.expectEqual(true, equXvecWrkr(&exp1, &res1, false));
     prntNl();
+}
+
+//TODO: docs
+pub fn projXvec_VecV_Onto_SubspaceS(vecV: []f32, mtxBasis: []f32, colsBasis: usize, res: []f32, alloc: *const std.mem.Allocator) !void {
+    const lenBasis: usize = mtxBasis.len;
+    const rowsBasis: usize = lenBasis / colsBasis;
+    const mtxOrthoBasis: []f32 = try alloc.*.alloc(f32, lenBasis);
+    try gramSchmidtOthonormal(mtxBasis, mtxOrthoBasis, colsBasis, alloc, dotPrdXvec);
+
+    var val: f32 = 0.0;
+    var cnt: usize = 0;
+    const vecU: []f32 = try alloc.*.alloc(f32, colsBasis);
+    //clrXvec(vecU);
+
+    while(cnt < rowsBasis) : (cnt += 1) {
+        cpyLessColRowXmtx(mtxOrthoBasis, @constCast(vecU), 0, colsBasis, cnt, (cnt + 1), colsBasis, colsBasis);
+        val = dotPrdXvec(vecV, vecU);
+        mulXvec(vecU, val);
+        sum1Xvec(res, vecU);
+    }
+
+    defer alloc.*.free(mtxOrthoBasis);
+    defer alloc.*.free(vecU);
+}
+
+test "XMTX: projXvec_VecV_Onto_SubspaceS test" {
+    //Find the projection of the vector v = [1, 1, 3] 
+    //onto the subspace S of R^3 spanned by the vectors
+    //w1 = [0, 3, 1] and w2 = [2, 0, 0]
+    //which normalize to [0, 3/sqrt(10), 1/sqrt(10)], [1, 0, 0]
+
+    const alloc = std.testing.allocator;
+    var vecV: [3]f32 = .{1, 1, 3};
+    var mtxBasis: [6]f32 = .{0, 3.0 / std.math.sqrt(10.0), 1.0 / std.math.sqrt(10.0), 1, 0, 0};
+    const colsBasis: usize = 3;
+    var res: [3]f32 = .{0, 0, 0};
+    var exp: [3]f32 = .{1.0, (9.0 / 5.0), (3.0 / 5.0)};
+    try projXvec_VecV_Onto_SubspaceS(&vecV, &mtxBasis, colsBasis, &res, &alloc);
+
+    prntNlStr("Example 5:");
+    prntNlStr("Basis:");
+    prntXmtxNl(&mtxBasis, colsBasis);
+    prntNlStr("Vector V:");
+    prntXvecNl(&vecV);
+    prntNlStr("Res:");
+    prntXvecNl(&res);
+    prntNlStr("Exp:");
+    prntXvecNl(&exp);
+
+    try std.testing.expectEqual(true, equXvecWrkr(&exp, &res, false));
+    prntNl();    
 }
 
 //Compile function execution summary
