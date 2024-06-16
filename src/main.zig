@@ -1290,6 +1290,7 @@ test "XMTX: ELA - Larson, Edwards: 5.4 Problem 1, 3 test" {
     xmu.prntNl();    
 }
 
+//TODO: debug and verify these tests
 test "XMTX: ELA - Larson, Edwards: 5.4 Problem 11, 13 test" {
     //In Ex 11 - 14 find the projection of the vector v onto the subspace S.
     //11) s = span{[0, 0, -1, 1], [0, 1, 1, 1]} v = [1, 0, 1, 1]
