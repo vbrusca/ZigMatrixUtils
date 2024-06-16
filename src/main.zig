@@ -1290,6 +1290,56 @@ test "XMTX: ELA - Larson, Edwards: 5.4 Problem 1, 3 test" {
     xmu.prntNl();    
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.4 Problem 11, 13 test" {
+    //In Ex 11 - 14 find the projection of the vector v onto the subspace S.
+    //11) s = span{[0, 0, -1, 1], [0, 1, 1, 1]} v = [1, 0, 1, 1]
+    const alloc = std.testing.allocator;
+    var mtxBasis1:[8]f32 = .{0, 0, -1, 1, 0, 1, 1, 1};
+    xmu.nrmXvec(&mtxBasis1);
+
+    var vecV1: [4]f32 = .{1, 0, 1, 1};
+    const colsBasis1: usize = 4;
+    var res1: [4]f32 = .{0, 0, 0, 0};
+    var exp1: [4]f32 = .{0, (2.0 / 3.0), (2.0 / 3.0), (2.0 / 3.0)};
+    try xmu.projXvec_VecV_Onto_SubspaceS(&vecV1, &mtxBasis1, colsBasis1, &res1, &alloc);
+
+    xmu.prntNlStr("Problem 11:");
+    xmu.prntNlStr("Basis1:");
+    xmu.prntXmtxNl(&mtxBasis1, colsBasis1);
+    xmu.prntNlStr("Vector V1:");
+    xmu.prntXvecNl(&vecV1);
+    xmu.prntNlStr("Res1:");
+    xmu.prntXvecNl(&res1);
+    xmu.prntNlStr("Exp1:");
+    xmu.prntXvecNl(&exp1);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp1, &res1, false));
+    xmu.prntNl();
+
+    //13) s = span{[1, 0, 1], [0, 1, 1]} v = [2, 3, 4]
+    var mtxBasis2:[6]f32 = .{1, 0, 1, 0, 1, 1};
+    xmu.nrmXvec(&mtxBasis2);
+
+    var vecV2: [3]f32 = .{2, 3, 4};
+    const colsBasis2: usize = 3;
+    var res2: [3]f32 = .{0, 0, 0};
+    var exp2: [3]f32 = .{(5.0 / 3.0), (8.0 / 3.0), (13.0 / 3.0)};
+    try xmu.projXvec_VecV_Onto_SubspaceS(&vecV2, &mtxBasis2, colsBasis2, &res2, &alloc);
+
+    xmu.prntNlStr("Problem 13:");
+    xmu.prntNlStr("Basis2:");
+    xmu.prntXmtxNl(&mtxBasis2, colsBasis2);
+    xmu.prntNlStr("Vector V2:");
+    xmu.prntXvecNl(&vecV2);
+    xmu.prntNlStr("Res2:");
+    xmu.prntXvecNl(&res2);
+    xmu.prntNlStr("Exp2:");
+    xmu.prntXvecNl(&exp2);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &res2, false));
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
