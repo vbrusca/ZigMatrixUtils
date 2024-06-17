@@ -2493,8 +2493,34 @@ pub fn cpyXmtxSqr(mtxSrc: []f32, mtxSrcCols: usize, mtxRet: []f32, mtxRetCols: u
     }
 }
 
-test "XMTX: cpyXmtxSqr test" {
-    //TODO: finish unit test
+test "XMTX: cpyXmtxSqr test" {    
+    // mtxSrc = | 1  2  3 |
+    //          | 4  5  6 |
+    //          | 7  8  9 |
+    var mtxSrc: [9]f32 = .{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    const mtxSrcCols: usize = 3;
+    var mtxRet: [4]f32 = .{1, 2, 3, 4};
+    const mtxRetCols: usize = 2;
+    const exp: [4]f32 = .{1, 2, 4, 5};
+
+    const strtSrcCol: usize = 0;
+    const strtSrcRow: usize = 0;
+    const endSrcCol: usize = 2;
+    const endSrcRow: usize = 2;
+    const strtRetRow: usize = 0;
+    const strtRetCol: usize = 0;
+
+    cpyXmtxSqr(&mtxSrc, mtxSrcCols, &mtxRet, mtxRetCols, strtSrcCol, endSrcCol, strtSrcRow, endSrcRow, strtRetCol, strtRetRow);
+
+    prntNlStr("MtxSrc:");
+    prntXmtx(&mtxSrc, mtxSrcCols);
+    prntNlStr("MtxRet:");
+    prntXmtx(&mtxRet, mtxRetCols);
+    prntNlStr("Exp:");
+    prntXmtx(@constCast(&exp), mtxRetCols);
+
+    try std.testing.expectEqual(true, equXvec(&mtxRet, @constCast(&exp)));
+    prntNl();
 }
 
 ///Copies data from the matrix mtx at startCol, startRow to endCol, endRow to ret 0,0 to (endCol - startCol), (endRow - strtRow).
@@ -10780,25 +10806,55 @@ pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc
     const rowsB: usize = (lenB / colsB);
 
     var mtxATrn: []f32 = try alloc.*.alloc(f32, lenA);
+    const lenATrn: usize = mtxATrn.len;
     const colsATrn: usize = rowsA;
     const rowsATrn: usize = colsA;
 
     var mtxATrnA: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsA));
+    const lenATrnA: usize = mtxATrnA.len;
     const colsATrnA: usize = colsA;
     const rowsATrnA: usize = rowsATrn;
 
     var mtxATrnB: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsB));
+    const lenATrnB: usize = mtxATrnB.len;
     const colsATrnB: usize = colsB;
     const rowsATrnB: usize = rowsATrn;    
 
     var sclr: f32 = 0.0;
     var b: bool = false;
     var mtxAug: []f32 = try alloc.*.alloc(f32, (mtxATrnA.len + mtxATrnB.len));
+    const lenAug: usize = mtxAug.len;
     const colsAug: usize = (colsATrnA + 1);
     const rowsAug: usize = (rowsATrnA);
 
-    _ = rowsB;
-    _ = rowsAug;
+    if(VERBOSE or true) {
+        prntNlStr("MtxA:");
+        prntNlStrArgs("LenA: {}, ColsA: {}, RowsA: {}", .{lenA, colsA, rowsA});    
+        prntXmtx(mtxA, colsA);
+
+        prntNlStr("VecB:");
+        prntNlStrArgs("LenB: {}, ColsB: {}, RowsB: {}", .{lenB, colsB, rowsB});    
+        prntXmtx(vecB, colsB);
+
+        prntNlStr("mtxATrn:");
+        prntNlStrArgs("LenATrn: {}, ColsATrn: {}, RowsAtrn: {}", .{lenATrn, colsATrn, rowsATrn});    
+        prntXmtx(mtxATrn, colsATrn);
+
+        prntNlStr("mtxATrnA:");
+        prntNlStrArgs("LenATrnA: {}, ColsATrnA: {}, RowsAtrnA: {}", .{lenATrnA, colsATrnA, rowsATrnA});    
+        prntXmtx(mtxATrnA, colsATrnA);
+
+        prntNlStr("mtxATrnB:");
+        prntNlStrArgs("LenATrnB: {}, ColsATrnB: {}, RowsAtrnB: {}", .{lenATrnB, colsATrnB, rowsATrnB});    
+        prntXmtx(mtxATrnB, colsATrnB);
+
+        prntNlStr("mtxAug:");
+        prntNlStrArgs("LenAug: {}, ColsAug: {}, RowsAug: {}", .{lenAug, colsAug, rowsAug});    
+        prntXmtx(mtxAug, colsAug);
+    }
+
+    //_ = rowsB;
+    //_ = rowsAug;
 
     std.mem.zeroes(&mtxATrn);
     std.mem.zeroes(&mtxATrnA);
@@ -10826,7 +10882,9 @@ pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc
     return false;
 }
 
-//TODO: tests
+test "XMTX: leastSquaresSol process" {
+    //TODO: finish tests
+}
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
