@@ -2391,13 +2391,13 @@ test "XMTX: cpyLessXmtx test" {
 ///
 ///  endRow = The ending row in the mtx matrix.
 ///
-///  mtxCols = The number of colmns in the mtx matrix.
+///  mtxCols = The number of columns in the mtx matrix.
 ///
 ///  cpyCols = The number of columns in the ret matrix.
 ///
 pub fn cpyLessColRowXmtx(mtx: []f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
-    const mtxRows: usize = mtx.len / mtxCols;
-    _ = mtxRows;
+    //const mtxRows: usize = mtx.len / mtxCols;
+    //_ = mtxRows;
     var r: usize = strtRow;
     var dstR: usize = 0;
     var c: usize = 0;
@@ -2452,6 +2452,31 @@ test "XMTX: cpyLessColRowXmtx test" {
     try std.testing.expectEqual(true, equXvec(&ret, &exp2));
     prntNl();
 }
+
+//TODO: docs
+pub fn cpyXmtxSqr(mtxSrc: []f32, mtxSrcCols: usize, mtxRet: []f32, mtxRetCols: usize, strtSrcCol: usize, endSrcCol: usize, strtSrcRow: usize, endSrcRow: usize, strtRetCol: usize, strtRetRow: usize) void {
+    //const mtxRows: usize = mtx.len / mtxCols;
+    //_ = mtxRows;
+    var r: usize = strtSrcRow;
+    var dstR: usize = strtRetRow;
+    var c: usize = 0;
+    var dstC: usize = 0;
+    while (r < endSrcRow) : (r += 1) {
+        if (r >= strtSrcRow) {
+            c = strtSrcCol;
+            dstC = strtRetCol;
+            while (c < endSrcCol) : (c += 1) {
+                if (c >= strtSrcCol) {
+                    mtxRet[((dstR * mtxRetCols) + dstC)] = mtxSrc[((r * mtxSrcCols) + c)];
+                    dstC += 1;
+                }
+            }
+            dstR += 1;
+        }
+    }
+}
+
+//TODO: tests
 
 ///Copies data from the matrix mtx at startCol, startRow to endCol, endRow to ret 0,0 to (endCol - startCol), (endRow - strtRow).
 ///
@@ -10686,7 +10711,6 @@ pub fn projXvec_VecV_Onto_SubspaceS(vecV: []f32, mtxBasis: []f32, colsBasis: usi
     var val: f32 = 0.0;
     var cnt: usize = 0;
     const vecU: []f32 = try alloc.*.alloc(f32, colsBasis);
-    //clrXvec(vecU);
 
     while(cnt < rowsBasis) : (cnt += 1) {
         cpyLessColRowXmtx(mtxOrthoBasis, @constCast(vecU), 0, colsBasis, cnt, (cnt + 1), colsBasis, colsBasis);
@@ -10726,6 +10750,64 @@ test "XMTX: projXvec_VecV_Onto_SubspaceS test" {
     try std.testing.expectEqual(true, equXvecWrkr(&exp, &res, false));
     prntNl();    
 }
+
+//TODO: docs
+pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc: *const std.testing.allocator) !bool {
+    const lenA: usize = mtxA.len;
+    const rowsA: usize = (lenA / colsA);
+
+    const lenB: usize = vecB.len;
+    const colsB: usize = 1;
+    const rowsB: usize = (lenB / colsB);
+
+    var mtxATrn: []f32 = try alloc.*.alloc(f32, lenA);
+    const colsATrn: usize = rowsA;
+    const rowsATrn: usize = colsA;
+
+    var mtxATrnA: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsA));
+    const colsATrnA: usize = colsA;
+    const rowsATrnA: usize = rowsATrn;
+
+    var mtxATrnB: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsB));
+    const colsATrnB: usize = colsB;
+    const rowsATrnB: usize = rowsATrn;    
+
+    var sclr: f32 = 0.0;
+    var b: bool = false;
+    var mtxAug: []f32 = try alloc.*.alloc(f32, (mtxATrnA.len + mtxATrnB.len));
+    const colsAug: usize = (colsATrnA + 1);
+    const rowsAug: usize = (rowsATrnA);
+
+    _ = rowsB;
+    _ = rowsAug;
+
+    std.mem.zeroes(&mtxATrn);
+    std.mem.zeroes(&mtxATrnA);
+    std.mem.zeroes(&mtxATrnB);    
+    std.mem.zeroes(&mtxAug);
+
+    trnXmtx(mtxA, colsA, mtxATrn);
+    tmsXmtx(mtxA, colsA, mtxATrn, colsATrn, mtxATrnA, colsATrnA);
+    tmsXmtx(vecB, colsB, mtxATrn, colsATrn, mtxATrnB, colsATrnB);
+
+    cpyXmtxSqr(mtxATrnA, colsATrnA, mtxAug, colsAug, 0, colsATrnA, 0, rowsATrnA, 0, 0);
+    cpyXmtxSqr(mtxATrnB, colsATrnB, mtxAug, colsAug, 0, colsATrnB, 0, rowsATrnB, colsATrnA, 0);
+
+    defer alloc.*.free(mtxATrnA);
+    defer alloc.*.free(mtxATrnB);
+    defer alloc.*.free(mtxATrn);
+    defer alloc.*.free(mtxAug);
+
+    b = rdcXmtxInl(mtxAug, colsAug, true, false, null, colsA, false, &sclr);
+    if(b) {
+        cpyXmtxSqr(mtxAug, colsA + 1, res, 1, colsA, (colsA + 1), 0, rowsA, 0, 0);
+        return true;
+    }
+
+    return false;
+}
+
+//TODO: tests
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
