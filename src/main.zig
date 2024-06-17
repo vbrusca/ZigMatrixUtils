@@ -1264,7 +1264,43 @@ test "XMTX: ELA - Larson, Edwards: 5.4 Example 8 test" {
     //onto the column space S of the matrix 
     //A  = | 0  2 |
     //     | 3  0 |
-    //     | 1  0 |    
+    //     | 1  0 |
+    const alloc = std.testing.allocator;
+    var mtxA: [6]f32 = .{0, 2, 3, 0, 1, 0};
+    var vecB: [3]f32 = .{1, 1, 3};
+    const colsA: usize = 2;
+    var res: [2]f32 = .{0, 0};
+    var exp: [2]f32 = .{(3.0 / 5.0), (1.0 / 2.0)};
+    var b: bool = false;
+
+    b = try xmu.leastSquaresSol(&mtxA, colsA, &vecB, &res, &alloc);
+
+    xmu.prntNlStr("Example 8:");
+    xmu.prntNlStr("mtxA:");
+    xmu.prntNl();
+    xmu.prntXmtxNl(&mtxA, colsA);
+    xmu.prntNlStr("Vector B:");
+    xmu.prntXvecNl(&vecB);
+    xmu.prntNlStr("Res:");
+    xmu.prntXvecNl(&res);
+    xmu.prntNlStr("Exp:");
+    xmu.prntXvecNl(&exp);
+    xmu.prntNlStrArgs("LeastSquaresSol Result: {}", .{b});
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &res, false));
+    xmu.prntNl();
+
+    var res2: [3]f32 = .{0, 0, 0};
+    var exp2: [3]f32 = .{1, (9.0 / 5.0), (3.0 / 5.0)};
+    b = try xmu.tmsXmtx(&mtxA, colsA, &res, 1, &res2, 1);
+
+    xmu.prntNlStr("Res2:");
+    xmu.prntXvecNl(&res2);
+    xmu.prntNlStr("Exp2:");
+    xmu.prntXvecNl(&exp2);
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &res2, false));
+    xmu.prntNl();
 }
 
 test "XMTX: ELA - Larson, Edwards: 5.4 Problem 1, 3 test" {

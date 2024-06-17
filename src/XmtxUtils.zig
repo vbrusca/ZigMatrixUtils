@@ -10908,7 +10908,7 @@ pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc
     return false;
 }
 
-test "XMTX: leastSquaresSol process" {
+test "XMTX: leastSquaresSol test" {
     //Section 5.4 Example 7
     //Find the solution to the least squares problem Ax = b.
     //| 1  1 | | c0 | = | 0 |
@@ -10927,6 +10927,7 @@ test "XMTX: leastSquaresSol process" {
 
     prntNlStr("Example 7:");
     prntNlStr("mtxA:");
+    prntNl();
     prntXmtxNl(&mtxA, colsA);
     prntNlStr("Vector B:");
     prntXvecNl(&vecB);
