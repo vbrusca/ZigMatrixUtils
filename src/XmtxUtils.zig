@@ -10797,7 +10797,7 @@ test "XMTX: projXvec_VecV_Onto_SubspaceS test" {
 }
 
 //TODO: docs
-pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc: *const std.testing.allocator) !bool {
+pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc: *const std.mem.Allocator) !bool {
     const lenA: usize = mtxA.len;
     const rowsA: usize = (lenA / colsA);
 
@@ -10805,85 +10805,139 @@ pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc
     const colsB: usize = 1;
     const rowsB: usize = (lenB / colsB);
 
-    var mtxATrn: []f32 = try alloc.*.alloc(f32, lenA);
+    const mtxATrn: []f32 = try alloc.*.alloc(f32, lenA);
     const lenATrn: usize = mtxATrn.len;
     const colsATrn: usize = rowsA;
     const rowsATrn: usize = colsA;
 
-    var mtxATrnA: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsA));
+    const mtxATrnA: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsA));
     const lenATrnA: usize = mtxATrnA.len;
     const colsATrnA: usize = colsA;
     const rowsATrnA: usize = rowsATrn;
 
-    var mtxATrnB: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsB));
+    const mtxATrnB: []f32 = try alloc.*.alloc(f32, (rowsATrn * colsB));
     const lenATrnB: usize = mtxATrnB.len;
     const colsATrnB: usize = colsB;
     const rowsATrnB: usize = rowsATrn;    
 
     var sclr: f32 = 0.0;
     var b: bool = false;
-    var mtxAug: []f32 = try alloc.*.alloc(f32, (mtxATrnA.len + mtxATrnB.len));
+
+    const mtxAug: []f32 = try alloc.*.alloc(f32, (mtxATrnA.len + mtxATrnB.len));
     const lenAug: usize = mtxAug.len;
     const colsAug: usize = (colsATrnA + 1);
     const rowsAug: usize = (rowsATrnA);
 
+    const idtMtx: []f32 = try alloc.*.alloc(f32, mtxATrnA.len);
+
+    clrXmtx(mtxATrn);
+    clrXmtx(mtxATrnA);
+    clrXmtx(mtxATrnB);    
+    clrXmtx(mtxAug);
+    
+    trnXmtxRect(@constCast(mtxA), colsA, @constCast(mtxATrn), colsATrn);
     if(VERBOSE or true) {
-        prntNlStr("MtxA:");
-        prntNlStrArgs("LenA: {}, ColsA: {}, RowsA: {}", .{lenA, colsA, rowsA});    
-        prntXmtx(mtxA, colsA);
-
-        prntNlStr("VecB:");
-        prntNlStrArgs("LenB: {}, ColsB: {}, RowsB: {}", .{lenB, colsB, rowsB});    
-        prntXmtx(vecB, colsB);
-
-        prntNlStr("mtxATrn:");
+        prntNlStr("mtxATrn AAA:");
         prntNlStrArgs("LenATrn: {}, ColsATrn: {}, RowsAtrn: {}", .{lenATrn, colsATrn, rowsATrn});    
-        prntXmtx(mtxATrn, colsATrn);
-
-        prntNlStr("mtxATrnA:");
-        prntNlStrArgs("LenATrnA: {}, ColsATrnA: {}, RowsAtrnA: {}", .{lenATrnA, colsATrnA, rowsATrnA});    
-        prntXmtx(mtxATrnA, colsATrnA);
-
-        prntNlStr("mtxATrnB:");
-        prntNlStrArgs("LenATrnB: {}, ColsATrnB: {}, RowsAtrnB: {}", .{lenATrnB, colsATrnB, rowsATrnB});    
-        prntXmtx(mtxATrnB, colsATrnB);
-
-        prntNlStr("mtxAug:");
-        prntNlStrArgs("LenAug: {}, ColsAug: {}, RowsAug: {}", .{lenAug, colsAug, rowsAug});    
-        prntXmtx(mtxAug, colsAug);
+        prntNl(); 
+        prntXmtx(@constCast(mtxATrn), colsATrn);        
     }
 
-    //_ = rowsB;
-    //_ = rowsAug;
+    b = try tmsXmtx(@constCast(mtxATrn), colsATrn, @constCast(mtxA), colsA, @constCast(mtxATrnA), colsATrnA);
+    if(!b) {
+        return Error.OperationFailed;
+    }
 
-    std.mem.zeroes(&mtxATrn);
-    std.mem.zeroes(&mtxATrnA);
-    std.mem.zeroes(&mtxATrnB);    
-    std.mem.zeroes(&mtxAug);
+    b = try tmsXmtx( @constCast(mtxATrn), colsATrn, @constCast(vecB), colsB, @constCast(mtxATrnB), colsATrnB);
+    if(!b) {
+        return Error.OperationFailed;        
+    }
 
-    trnXmtx(mtxA, colsA, mtxATrn);
-    tmsXmtx(mtxA, colsA, mtxATrn, colsATrn, mtxATrnA, colsATrnA);
-    tmsXmtx(vecB, colsB, mtxATrn, colsATrn, mtxATrnB, colsATrnB);
-
-    cpyXmtxSqr(mtxATrnA, colsATrnA, mtxAug, colsAug, 0, colsATrnA, 0, rowsATrnA, 0, 0);
-    cpyXmtxSqr(mtxATrnB, colsATrnB, mtxAug, colsAug, 0, colsATrnB, 0, rowsATrnB, colsATrnA, 0);
+    cpyXmtxSqr(@constCast(mtxATrnA), colsATrnA, @constCast(mtxAug), colsAug, 0, colsATrnA, 0, rowsATrnA, 0, 0);
+    cpyXmtxSqr(@constCast(mtxATrnB), colsATrnB, @constCast(mtxAug), colsAug, 0, colsATrnB, 0, rowsATrnB, colsATrnA, 0);
 
     defer alloc.*.free(mtxATrnA);
     defer alloc.*.free(mtxATrnB);
     defer alloc.*.free(mtxATrn);
     defer alloc.*.free(mtxAug);
+    defer alloc.*.free(idtMtx);    
 
-    b = rdcXmtxInl(mtxAug, colsAug, true, false, null, colsA, false, &sclr);
+    b = try rdcXmtxInl(@constCast(mtxAug), colsAug, true, false, idtMtx, (colsAug - 1), false, &sclr);
+    if(VERBOSE) {
+        prntNlStr("MtxA:");
+        prntNlStrArgs("LenA: {}, ColsA: {}, RowsA: {}", .{lenA, colsA, rowsA});
+        prntNl(); 
+        prntXmtx(@constCast(mtxA), colsA);
+
+        prntNlStr("VecB:");
+        prntNlStrArgs("LenB: {}, ColsB: {}, RowsB: {}", .{lenB, colsB, rowsB});    
+        prntNl(); 
+        prntXmtx(vecB, colsB);
+
+        prntNlStr("mtxATrn:");
+        prntNlStrArgs("LenATrn: {}, ColsATrn: {}, RowsAtrn: {}", .{lenATrn, colsATrn, rowsATrn});    
+        prntNl(); 
+        prntXmtx(@constCast(mtxATrn), colsATrn);
+
+        prntNlStr("mtxATrnA:");
+        prntNlStrArgs("LenATrnA: {}, ColsATrnA: {}, RowsAtrnA: {}", .{lenATrnA, colsATrnA, rowsATrnA});    
+        prntNl(); 
+        prntXmtx(@constCast(mtxATrnA), colsATrnA);
+
+        prntNlStr("mtxATrnB:");
+        prntNlStrArgs("LenATrnB: {}, ColsATrnB: {}, RowsAtrnB: {}", .{lenATrnB, colsATrnB, rowsATrnB});    
+        prntNl(); 
+        prntXmtx(@constCast(mtxATrnB), colsATrnB);
+
+        prntNlStr("mtxAug:");
+        prntNlStrArgs("LenAug: {}, ColsAug: {}, RowsAug: {}", .{lenAug, colsAug, rowsAug});    
+        prntNl(); 
+        prntXmtx(@constCast(mtxAug), colsAug);
+    }
+
+    //_ = rowsB;
+    //_ = rowsAug;
+
     if(b) {
-        cpyXmtxSqr(mtxAug, colsA + 1, res, 1, colsA, (colsA + 1), 0, rowsA, 0, 0);
+        cpyXmtxSqr(@constCast(mtxAug), colsAug, res, 1, colsATrnA, (colsATrnA + 1), 0, rowsATrnA, 0, 0);
         return true;
+    } else {
+        return Error.OperationFailed;
     }
 
     return false;
 }
 
 test "XMTX: leastSquaresSol process" {
-    //TODO: finish tests
+    //Section 5.4 Example 7
+    //Find the solution to the least squares problem Ax = b.
+    //| 1  1 | | c0 | = | 0 |
+    //| 1  2 | | c1 |   | 1 |
+    //| 1  3 |          | 3 |
+
+    const alloc = std.testing.allocator;
+    var mtxA: [6]f32 = .{1, 1, 1, 2, 1, 3};
+    var vecB: [3]f32 = .{0, 1, 3};
+    const colsA: usize = 2;
+    var res: [2]f32 = .{0, 0};
+    var exp: [2]f32 = .{(-5.0 / 3.0), (3.0 / 2.0)};
+    var b: bool = false;
+
+    b = try leastSquaresSol(&mtxA, colsA, &vecB, &res, &alloc);
+
+    prntNlStr("Example 7:");
+    prntNlStr("mtxA:");
+    prntXmtxNl(&mtxA, colsA);
+    prntNlStr("Vector B:");
+    prntXvecNl(&vecB);
+    prntNlStr("Res:");
+    prntXvecNl(&res);
+    prntNlStr("Exp:");
+    prntXvecNl(&exp);
+    prntNlStrArgs("LeastSquaresSol Result: {}", .{b});
+
+    try std.testing.expectEqual(true, equXvecWrkr(&exp, &res, false));
+    prntNl();
 }
 
 //Compile function execution summary

@@ -1259,6 +1259,14 @@ test "XMTX: ELA - Larson, Edwards: 5.3 Problem 27, 29, 31 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.4 Example 8 test" {
+    //Find the orthogonal projection of the vector b = [1, 1, 3] 
+    //onto the column space S of the matrix 
+    //A  = | 0  2 |
+    //     | 3  0 |
+    //     | 1  0 |    
+}
+
 test "XMTX: ELA - Larson, Edwards: 5.4 Problem 1, 3 test" {
     //In Ex 1, 3, determine whether the given sets are orthogonal.
     //1) S1 = span{ [2, 1, -1], [0, 1, 1]}, S2 = span{[-1, 2, 0]}
