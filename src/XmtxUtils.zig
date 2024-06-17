@@ -2396,8 +2396,6 @@ test "XMTX: cpyLessXmtx test" {
 ///  cpyCols = The number of columns in the ret matrix.
 ///
 pub fn cpyLessColRowXmtx(mtx: []f32, ret: []f32, strtCol: usize, endCol: usize, strtRow: usize, endRow: usize, mtxCols: usize, cpyCols: usize) void {
-    //const mtxRows: usize = mtx.len / mtxCols;
-    //_ = mtxRows;
     var r: usize = strtRow;
     var dstR: usize = 0;
     var c: usize = 0;
@@ -2453,10 +2451,29 @@ test "XMTX: cpyLessColRowXmtx test" {
     prntNl();
 }
 
-//TODO: docs
+///Copies data from the matrix mtx at strtSrcCol, strtSrcRow to endSrcCol, endSrcRow to ret strtRetCol, strtRetRow copying this many rows and columns into the region, (endCol - startCol), (endRow - strtRow).
+///
+///  mtxSrc = The src matrix data to copy into the ret matrix.
+///
+///  mtxSrcCols = The number of columns in the mtxSrc argument.
+/// 
+///  mtxRet = The matrix that holds the return data.
+///
+///  mtxRetCols = The number of columns in the mtxRet argument.
+///
+///  strtSrcCol = The starting column in the mtxSrc matrix.
+///
+///  endSrcCol = The end column in the mtxSrc matrix.
+///
+///  strtSrcRow = The starting row in the mtxSrc matrix.
+///
+///  endSrcRow = The ending row in the mtxSrc matrix.
+///
+///  strtRetCol = The starting column to copy the region into the retMtx matrix.
+///
+///  strtRetRow = The starting row to copy the region into the retMtx matrix.
+/// 
 pub fn cpyXmtxSqr(mtxSrc: []f32, mtxSrcCols: usize, mtxRet: []f32, mtxRetCols: usize, strtSrcCol: usize, endSrcCol: usize, strtSrcRow: usize, endSrcRow: usize, strtRetCol: usize, strtRetRow: usize) void {
-    //const mtxRows: usize = mtx.len / mtxCols;
-    //_ = mtxRows;
     var r: usize = strtSrcRow;
     var dstR: usize = strtRetRow;
     var c: usize = 0;
@@ -2476,7 +2493,9 @@ pub fn cpyXmtxSqr(mtxSrc: []f32, mtxSrcCols: usize, mtxRet: []f32, mtxRetCols: u
     }
 }
 
-//TODO: tests
+test "XMTX: cpyXmtxSqr test" {
+    //TODO: finish unit test
+}
 
 ///Copies data from the matrix mtx at startCol, startRow to endCol, endRow to ret 0,0 to (endCol - startCol), (endRow - strtRow).
 ///
