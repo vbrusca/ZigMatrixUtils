@@ -10746,7 +10746,18 @@ test "XMTX: coordRelOrthBasis test" {
     prntNl();
 }
 
-//TODO: docs
+///Finds the projection of vector V, vecV, onto the Subspace S, defined by the basis matrix mtxBasis.
+///
+///  vecV: The vector that we're finding the projection for, onto a subspace.
+///  
+///  mtxBasis: A matrix of vectors that form the given basis.
+///
+///  colsBasis: The number of columns in the given matrix, basis.
+///
+///  res: A matrix used to store the result of the calculation.
+///
+///  alloc: Allocation used to create a temporary vector for the calculation.
+///
 pub fn projXvec_VecV_Onto_SubspaceS(vecV: []f32, mtxBasis: []f32, colsBasis: usize, res: []f32, alloc: *const std.mem.Allocator) !void {
     const lenBasis: usize = mtxBasis.len;
     const rowsBasis: usize = lenBasis / colsBasis;
@@ -10796,7 +10807,19 @@ test "XMTX: projXvec_VecV_Onto_SubspaceS test" {
     prntNl();    
 }
 
-//TODO: docs
+///Finds the least squares solution given the matrix A, mtxA, and the vector B, vecB.
+///
+///  mtxA: The matrix A, mtxA, that is used as the set of data driving the least squares solution.
+/// 
+///  colA: The number of columns in the matrix A, mtxA.
+/// 
+///  vecB: The target vector to find the least squares solution that is closest to.
+///  
+///
+///  res: A matrix used to store the result of the calculation.
+///
+///  alloc: Allocation used to create a temporary vector for the calculation.
+///
 pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc: *const std.mem.Allocator) !bool {
     const lenA: usize = mtxA.len;
     const rowsA: usize = (lenA / colsA);
