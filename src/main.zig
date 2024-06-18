@@ -1384,6 +1384,128 @@ test "XMTX: ELA - Larson, Edwards: 5.4 Problem 11, 13 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.4 Problem 21, 23 test" {
+    //In Ex 21 - 24, find the least squares solution to Ax = b.
+    //21) b = | 2, 0, -3 |
+    //A  = | 2  1 |
+    //     | 1  2 |
+    //     | 1  1 |
+    const alloc = std.testing.allocator;
+    var mtxA: [6]f32 = .{2, 1, 1, 2, 1, 1};
+    var vecB: [3]f32 = .{2, 0, -3};
+    const colsA: usize = 2;
+    var res: [2]f32 = .{0, 0};
+    var exp: [2]f32 = .{1, -1};
+    var b: bool = false;
+
+    b = try xmu.leastSquaresSol(&mtxA, colsA, &vecB, &res, &alloc);
+
+    xmu.prntNlStr("Problem 21:");
+    xmu.prntNlStr("mtxA:");
+    xmu.prntNl();
+    xmu.prntXmtxNl(&mtxA, colsA);
+    xmu.prntNlStr("Vector B:");
+    xmu.prntXvecNl(&vecB);
+    xmu.prntNlStr("Res:");
+    xmu.prntXvecNl(&res);
+    xmu.prntNlStr("Exp:");
+    xmu.prntXvecNl(&exp);
+    xmu.prntNlStrArgs("LeastSquaresSol Result: {}", .{b});
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &res, false));
+    xmu.prntNl();
+
+    //23) b = | 4, -1, 0, 1 |
+    //A  = | 1  0  1 |
+    //     | 1  1  1 |
+    //     | 0  1  1 |
+    //     | 1  1  0 |
+    var mtxA2: [12]f32 = .{1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0};
+    var vecB2: [4]f32 = .{4, -1, 0, 1};
+    const colsA2: usize = 3;
+    var res2: [3]f32 = .{0, 0, 0};
+    var exp2: [3]f32 = .{2, -2, 1};
+    b = false;
+
+    b = try xmu.leastSquaresSol(&mtxA2, colsA2, &vecB2, &res2, &alloc);
+
+    xmu.prntNlStr("Problem 23:");
+    xmu.prntNlStr("mtxA2:");
+    xmu.prntNl();
+    xmu.prntXmtxNl(&mtxA2, colsA2);
+    xmu.prntNlStr("Vector B2:");
+    xmu.prntXvecNl(&vecB2);
+    xmu.prntNlStr("Res2:");
+    xmu.prntXvecNl(&res2);
+    xmu.prntNlStr("Exp2:");
+    xmu.prntXvecNl(&exp2);
+    xmu.prntNlStrArgs("LeastSquaresSol Result: {}", .{b});
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &res2, false));
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.4 Problem 25, 27 test" {
+    //In Ex 25 - 28, find the least squares solution for the given data.
+    //25) b = | 1, 0, -3 |
+    //A  = | 1 -1 |
+    //     | 1  1 |
+    //     | 1  3 |
+    const alloc = std.testing.allocator;
+    var mtxA: [6]f32 = .{1, -1, 1, 1, 1, 3};
+    var vecB: [3]f32 = .{1, 0, -3};
+    const colsA: usize = 2;
+    var res: [2]f32 = .{0, 0};
+    var exp: [2]f32 = .{(1.0 / 3.0), -1};
+    var b: bool = false;
+
+    b = try xmu.leastSquaresSol(&mtxA, colsA, &vecB, &res, &alloc);
+
+    xmu.prntNlStr("Problem 25:");
+    xmu.prntNlStr("mtxA:");
+    xmu.prntNl();
+    xmu.prntXmtxNl(&mtxA, colsA);
+    xmu.prntNlStr("Vector B:");
+    xmu.prntXvecNl(&vecB);
+    xmu.prntNlStr("Res:");
+    xmu.prntXvecNl(&res);
+    xmu.prntNlStr("Exp:");
+    xmu.prntXvecNl(&exp);
+    xmu.prntNlStrArgs("LeastSquaresSol Result: {}", .{b});
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &res, false));
+    xmu.prntNl();
+
+    //27) b = | -3, -2, 0, 2 |
+    //A  = | 1 -3 |
+    //     | 1 -2 |
+    //     | 1  0 |
+    //     | 1  1 |
+    var mtxA2: [8]f32 = .{1, -3, 1, -2, 1, 0, 1, 1};
+    var vecB2: [4]f32 = .{-3, -2, 0, 2};
+    const colsA2: usize = 2;
+    var res2: [2]f32 = .{0, 0};
+    var exp2: [2]f32 = .{0.45, 1.2};
+    b = false;
+
+    b = try xmu.leastSquaresSol(&mtxA2, colsA2, &vecB2, &res2, &alloc);
+
+    xmu.prntNlStr("Problem 27:");
+    xmu.prntNlStr("mtxA2:");
+    xmu.prntNl();
+    xmu.prntXmtxNl(&mtxA2, colsA2);
+    xmu.prntNlStr("Vector B2:");
+    xmu.prntXvecNl(&vecB2);
+    xmu.prntNlStr("Res2:");
+    xmu.prntXvecNl(&res2);
+    xmu.prntNlStr("Exp2:");
+    xmu.prntXvecNl(&exp2);
+    xmu.prntNlStrArgs("LeastSquaresSol Result: {}", .{b});
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &res2, false));
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
