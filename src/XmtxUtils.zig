@@ -10284,6 +10284,74 @@ test "XMTX: projUnitXvec_VecP_Onto_VecQ_InrPrdctSpc test" {
     prntNl();
 }
 
+///Returns the triple scalar product, u * (v X w), for the given vector 3 arguments.
+/// 
+/// u: The u vector in this calculation.
+/// 
+/// v: The v vector in this calculation.
+/// 
+/// w: The w vector in this calculation.
+/// 
+/// returns: The triple scalar product of the vector 3's, u, v, w.
+/// 
+pub fn tripleScalarProduct(u: *const [3]f32, v: *const [3]f32, w: *const [3]f32) f32 {
+    const crs: [3]f32 = crsPrdXvec3(v, w);
+    return dotPrdXvec3(u, &crs);
+}
+
+test "XMTX: tripleScalarProduct test" {
+    const u: [3]f32 = .{ 1, 0, 0 };
+    const v: [3]f32 = .{ 0, 1, 0 };
+    const w: [3]f32 = .{ 0, 0, 1 };        
+    const exp: f32 = 1.0;
+    var res: f32 = 0.0;
+
+    const start = try Instant.now();
+    res = tripleScalarProduct(&u, &v, &w);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\ntripleScalarProduct: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("tripleScalarProduct", elapsed1);
+
+    prntNlStrArgs("Res: {} Exp: {}", .{res, exp});
+
+    try std.testing.expectEqual(true, isEquF32(res, exp, false));
+    prntNl();
+}
+
+///Returns the area of the parallelogram described by the two adjacent vectors provided.
+/// 
+/// vecLeftAdjSide: A vector representing the left adjacent side of the parallelogram, together both vectors should describe a corner of the shape.
+/// 
+/// vecRightAdjSide: A vector representing the right adjacent side of the parallelogram, together both vectors should describe a corner of the shape.
+/// 
+/// returns: The area of the described parallelogram.
+/// 
+pub fn areaOfParallelogram(vecLeftAdjSide: *const [3]f32, vecRightAdjSide: *const[3]f32) !f32 {
+    const crs: [3]f32 = try crsPrdXvec(@constCast(vecLeftAdjSide), @constCast(vecRightAdjSide));
+    return magXvec(@constCast(&crs));
+}
+
+test "XMTX: areaOfParallelogram test" {
+    //Section 5.5 Example 3
+    const vecLeftAdjSide: [3]f32 = .{ -3, 4, 1 };
+    const vecRightAdjSide: [3]f32 = .{ 0, -2, 6 };    
+    const exp: f32 = std.math.sqrt(1036.0);
+    var res: f32 = 0.0;
+
+    const start = try Instant.now();
+    res = try areaOfParallelogram(&vecLeftAdjSide, &vecRightAdjSide);
+    const end = try Instant.now();
+    const elapsed1: f64 = @floatFromInt(end.since(start));
+    std.debug.print("\nareaOfParallelogram: Time elapsed is: {d:.3}ms, {d:.3}ns", .{ elapsed1 / time.ns_per_ms, elapsed1 });
+    addExecTime("areaOfParallelogram", elapsed1);
+
+    prntNlStrArgs("Res: {} Exp: {}", .{res, exp});
+
+    try std.testing.expectEqual(true, isEquF32(res, exp, false));
+    prntNl();
+}
+
 ///Returns the area of the triangle given with R2 coordinates and a default value of 1 for the 3rd, Z, component.
 ///The format of mtx is not checked. The caller is responsible for making sure the matrix is in the correct format.
 ///

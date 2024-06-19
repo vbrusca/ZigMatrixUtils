@@ -1506,6 +1506,93 @@ test "XMTX: ELA - Larson, Edwards: 5.4 Problem 25, 27 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 5.5 Example 1 test" {
+    //TODO
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.5 Example 2 test" {
+    //TODO
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.5 Problem 1, 3, 5 test" {
+    //Problem 1
+    const lu1: [3]f32 = .{ 1, 0, 0 };
+    const lv1: [3]f32 = .{ 0, 1, 0 };
+    var crs1: [3]f32 = .{0, 0, 0};
+    const exp1: f32 = 0.0;
+    var res1: f32 = 0.0;
+
+    crs1 = xmu.crsPrdXvec3(&lu1, &lv1);
+    res1 = xmu.dotPrdXvec3(&crs1, &lu1);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, true));
+    xmu.prntNl();
+    res1 = xmu.dotPrdXvec3(&crs1, &lv1);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, true));
+    xmu.prntNl();
+
+    //Problem 3
+    const lu3: [3]f32 = .{ 0, 1, 0 };
+    const lv3: [3]f32 = .{ 0, 0, 1 };
+    crs1 = .{0, 0, 0};
+
+    crs1 = xmu.crsPrdXvec3(&lu3, &lv3);
+    res1 = xmu.dotPrdXvec3(&crs1, &lu3);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, true));
+    xmu.prntNl();
+    res1 = xmu.dotPrdXvec3(&crs1, &lv3);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, true));
+    xmu.prntNl();
+
+    //Problem 5
+    const lu5: [3]f32 = .{ 1, 1, 1 };
+    const lv5: [3]f32 = .{ 2, 1, -1 };
+    crs1 = .{0, 0, 0};
+
+    crs1 = xmu.crsPrdXvec3(&lu5, &lv5);
+    res1 = xmu.dotPrdXvec3(&crs1, &lu5);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, true));
+    xmu.prntNl();
+    res1 = xmu.dotPrdXvec3(&crs1, &lv5);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, true));
+    xmu.prntNl(); 
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.5 Problem 11, 13 test" {
+    //Problem 11
+    const lu1: [3]f32 = .{ 0, 1, 0 };
+    const lv1: [3]f32 = .{ 0, 1, 1 };
+    var exp1: f32 = 1.0;
+    var res1: f32 = 0.0;
+
+    res1 = try xmu.areaOfParallelogram(&lu1, &lv1);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, true));
+    xmu.prntNl();
+
+    //Problem 13
+    const lu3: [3]f32 = .{ 3, 2, -1 };
+    const lv3: [3]f32 = .{ 1, 2, 3 };
+    exp1 = (6.0 * std.math.sqrt(5.0));
+
+    res1 = try xmu.areaOfParallelogram(&lu3, &lv3);
+    try std.testing.expectEqual(true, xmu.isEquF32(res1, exp1, false));
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 5.5 Problem 17 test" {
+    //Problem 17
+    const u: [3]f32 = .{ 2, 0, 1 };
+    const v: [3]f32 = .{ 0, 3, 0 };
+    const w: [3]f32 = .{ 0, 0, 1 };        
+    const exp: f32 = 6.0;
+    var res: f32 = 0.0;
+
+    res = xmu.tripleScalarProduct(&u, &v, &w);
+    xmu.prntNlStrArgs("Res: {} Exp: {}", .{res, exp});
+
+    try std.testing.expectEqual(true, xmu.isEquF32(res, exp, false));
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
