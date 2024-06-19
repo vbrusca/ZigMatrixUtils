@@ -1507,11 +1507,36 @@ test "XMTX: ELA - Larson, Edwards: 5.4 Problem 25, 27 test" {
 }
 
 test "XMTX: ELA - Larson, Edwards: 5.5 Example 1 test" {
-    //TODO
+    //Find the cross product of the two vectors u = [1, -2, 1] and v = [3, 1, -2]
+    const u: [3]f32 = .{1, -2, 1};
+    const v: [3]f32 = .{3, 1, -2};
+    var uXv: [3]f32 = xmu.crsPrdXvec3(&u, &v);
+    var vXu: [3]f32 = xmu.crsPrdXvec3(&v, &u);
+    var vXv: [3]f32 = xmu.crsPrdXvec3(&v, &v);
+    var exp: [3]f32 = .{0, 0, 0};
+
+    exp = .{3, 5, 7};
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&uXv, &exp, false));
+
+    exp = .{-3, -5, -7};
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&vXu, &exp, false));
+
+    exp = .{0, 0, 0};    
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&vXv, &exp, false));
+
+    xmu.prntNl();
 }
 
 test "XMTX: ELA - Larson, Edwards: 5.5 Example 2 test" {
-    //TODO
+    //Find an orthogonal unit vector given u = [1, -4, 1] and v = [2, 3, 0]
+    const u: [3]f32 = .{1, -4, 1};
+    const v: [3]f32 = .{2, 3, 0};
+    var crs: [3]f32 = xmu.crsPrdXvec3(&u, &v);
+    const exp: [3]f32 = .{(-3.0 / std.math.sqrt(134.0)), (2.0 / std.math.sqrt(134.0)), (11.0 / std.math.sqrt(134.0))};
+
+    xmu.nrmXvec(&crs);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&crs, @constCast(&exp), false));
+    xmu.prntNl();
 }
 
 test "XMTX: ELA - Larson, Edwards: 5.5 Problem 1, 3, 5 test" {
