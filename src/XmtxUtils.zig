@@ -10875,6 +10875,169 @@ test "XMTX: projXvec_VecV_Onto_SubspaceS test" {
     prntNl();    
 }
 
+///Determines if the given transformation matrix, mtx, is a linear translation matrix with regard to vectors u, v in the same vector space as mtx.
+///
+/// mtx: The transformation matrix to test.
+/// 
+/// cols: The number of columns in the matrix, mtx, should also be the number of entries in u and v.
+/// 
+/// v: A vector in the same vector space as mtx to use in the test.
+/// 
+/// u: A vector in the same vector space as mtx to use in the test.
+/// 
+/// alloc: A memory allocator for creating a number of test vectors.
+/// 
+/// returns: A boolean value indicating if the given matrix is a linear transformation or an error.
+/// 
+pub fn isLinXform(mtx: []f32, cols: usize, v: []f32, u: []f32, alloc: *const std.mem.Allocator) !bool {
+    if(!isSqrXmtx(mtx, cols)) {
+        prntNlStr("isLinXform: Error: This function exptexts the matrix transformation, mtx, to be a square matrix.");
+        return Error.UnsupportedMarixDimension;
+    } else if(v.len != u.len) {
+        prntNlStr("isLinXform: Error: The vectors v and u must have a equal length.");        
+        return Error.InvalidLengths;
+    } else if(v.len != (mtx.len / cols)) {
+        prntNlStr("isLinXform: Error: The vectors v and u must have a length equal to the number of rows in mtx.");        
+        return Error.InvalidLengths;
+    }
+
+    var b: bool = false;
+    const vecLen: usize = v.len;
+    const uPlusV: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(uPlusV);
+    sum2Xvec(@constCast(uPlusV), u, v);
+
+    const mtxU: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(mtxU);
+    b = try tmsXmtx(u, cols, mtx, cols, @constCast(mtxU), cols);
+    if(!b) {
+        prntNlStr("isLinXform: Error: There was an error calling tmsXmtx(u, cols, mtx, cols mtxU, cols);.");        
+        return Error.OperationFailed;
+    }
+
+    const mtxV: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(mtxV);    
+    b = try tmsXmtx(v, cols, mtx, cols, @constCast(mtxV), cols);
+    if(!b) {
+        prntNlStr("isLinXform: Error: There was an error calling tmsXmtx(v, cols, mtx, cols mtxV, cols);.");        
+        return Error.OperationFailed;
+    }
+
+    const addMtxUV: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(addMtxUV);    
+    sum2Xvec(addMtxUV, mtxU, mtxV);
+
+    const mtxUplusV: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(mtxUplusV);    
+    b = try tmsXmtx(@constCast(uPlusV), cols, mtx, cols, @constCast(mtxUplusV), cols);    
+    if(!b) {
+        prntNlStr("isLinXform: Error: There was an error calling tmsXmtx(uPlusV, cols, mtx, cols mtxUplusV, cols);.");        
+        return Error.OperationFailed;
+    }
+
+    const c: f32 = 7.0;
+    const cu: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(cu);    
+    cpyXmtx(u, cu);
+    mulXvec(cu, c);
+
+    const mulMtxUC: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(mulMtxUC);    
+    cpyXmtx(mtxU, mulMtxUC);
+    mulXvec(mulMtxUC, c);
+
+    const mtxCU: []f32 = try alloc.*.alloc(f32, vecLen);
+    defer alloc.*.free(mtxCU);    
+    b = try tmsXmtx(@constCast(cu), cols, mtx, cols, @constCast(mtxCU), cols);
+    if(!b) {
+        prntNlStr("isLinXform: Error: There was an error calling tmsXmtx(cu, cols, mtx, cols mtxCU, cols);.");        
+        return Error.OperationFailed;
+    }
+
+    if(VERBOSE) {
+        prntNlStrArgs("Cols: {} VecLen: {} c: {}", .{cols, vecLen, c});
+        prntNlStr("Mtx:");
+        prntNl();                
+        prntXmtx(mtx, cols);
+        prntNl();
+
+        prntNlStr("u:");
+        prntNl();
+        prntXvec(u);
+        prntNl();
+
+        prntNlStr("v:");
+        prntNl();
+        prntXvec(v);
+        prntNl();
+
+        prntNlStr("uPlusV:");
+        prntNl();
+        prntXvec(uPlusV);
+        prntNl();
+
+        prntNlStr("mtxU:");
+        prntNl();
+        prntXvec(mtxU);
+        prntNl();        
+
+        prntNlStr("mtxV:");
+        prntNl();
+        prntXvec(mtxV);
+        prntNl();
+
+        prntNlStr("mtxUplusV:");
+        prntNl();
+        prntXvec(mtxUplusV);
+        prntNl();
+
+        prntNlStr("cu:");
+        prntNl();
+        prntXvec(cu);
+        prntNl();  
+
+        prntNlStr("mtxCU:");
+        prntNl();
+        prntXvec(mtxCU);
+        prntNl();
+
+        prntNlStr("addMtxUV:");
+        prntNl();
+        prntXvec(addMtxUV);
+        prntNl();        
+
+        prntNlStr("mulMtxUC:");
+        prntNl();
+        prntXvec(mulMtxUC);
+        prntNl();                
+    }
+
+    if(!equXmtx(mtxUplusV, addMtxUV)) {
+        prntNlStr("isLinXform: mtxUplusV is not equal to addMtxUV.");
+        return false;
+    }
+
+    if(!equXmtx(mtxCU, mulMtxUC)) {
+        prntNlStr("isLinXform: mtxCU is not equal to mulMtxUC.");
+        return false;
+    }
+
+    return true;
+}
+
+test  "XMTX: isLinXform test" {
+    //Lar. Ed. Section 6.1 Example 2
+    var mtx: [4]f32 =  .{1, 1, -1, 2};
+    var u: [2]f32 = .{1, 1};
+    var v: [2]f32 = .{1, 2};
+    const cols: usize = 2;
+    var b: bool = false;
+    const alloc = std.testing.allocator;
+    b = try isLinXform(&mtx, cols, &v, &u, &alloc);
+    try std.testing.expectEqual(true, b);
+    prntNl();    
+}
+
 ///Finds the least squares solution given the matrix A, mtxA, and the vector B, vecB.
 ///
 ///  mtxA: The matrix A, mtxA, that is used as the set of data driving the least squares solution.
@@ -11000,7 +11163,7 @@ pub fn leastSquaresSol(mtxA: []f32, colsA: usize, vecB: []f32, res: []f32, alloc
 }
 
 test "XMTX: leastSquaresSol test" {
-    //Section 5.4 Example 7
+    //Lar. Ed. Section 5.4 Example 7
     //Find the solution to the least squares problem Ax = b.
     //| 1  1 | | c0 | = | 0 |
     //| 1  2 | | c1 |   | 1 |
