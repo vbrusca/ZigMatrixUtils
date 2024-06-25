@@ -11038,6 +11038,36 @@ test  "XMTX: isLinXform test" {
     prntNl();    
 }
 
+///Rotates the given vector, vec, about the origin in a counter clockwise direction the number of radians specified, angleInRad.
+/// 
+/// vec: A vector to rotate about the origin. 
+/// 
+/// angleInRad: The angle in radian to rotate about the given vector origin.
+/// 
+/// ret: The vector to hold the new, rotated, vector values.
+/// 
+pub fn rotCntrClckAboutOriginXvec2(vec: [2]f32, angleInRad: f32, ret: [2]f32) void {
+    var rotMtx: [4]f32 = .{std.math.cos(angleInRad), (-1.0 * std.math.sin(angleInRad)), std.math.sin(angleInRad), std.math.cos(angleInRad)};
+    const cols: usize = 2;
+    tmsXmtx(&vec, cols, &rotMtx, cols, &ret, cols);
+}
+
+//TODO: tests
+
+///Projects a given vector 3 onto the Z plane.
+/// 
+/// vec: The vector in R^3 to project onto the Z plane. 
+/// 
+/// ret: The vector to hold the new, projected, vector values.
+/// 
+pub fn projOntoZplaneXvec3(vec: [3]f32, ret: [3]f32) void {
+    var projMtx: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 0};
+    const cols: usize = 3;
+    tmsXmtx(&vec, cols, &projMtx, cols, &ret, cols);
+}
+
+//TODO: tests
+
 ///Finds the least squares solution given the matrix A, mtxA, and the vector B, vecB.
 ///
 ///  mtxA: The matrix A, mtxA, that is used as the set of data driving the least squares solution.

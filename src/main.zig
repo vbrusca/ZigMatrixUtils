@@ -1618,6 +1618,47 @@ test "XMTX: ELA - Larson, Edwards: 5.5 Problem 17 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 6.1 Example 7 test" {
+    const angleInRad: f32 = 7.0;
+    const cols: usize = 2;
+    var rotMtx: [4]f32 = .{std.math.cos(angleInRad), (-1.0 * std.math.sin(angleInRad)), std.math.sin(angleInRad), std.math.cos(angleInRad)};
+    var u: [2]f32 = .{1, 1};
+    var v: [2]f32 = .{1, 2};
+    var b: bool = false;
+    const alloc = std.testing.allocator;    
+    b = try xmu.isLinXform(&rotMtx, cols, &v, &u, &alloc);
+    try std.testing.expectEqual(true, b);
+    xmu.prntNl();    
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.1 Example 8 test" {
+    const cols: usize = 3;
+    var projMtx: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 0};
+    var u: [3]f32 = .{1, 1, 1};
+    var v: [3]f32 = .{3, 2, 3};
+    var b: bool = false;
+    const alloc = std.testing.allocator;    
+    b = try xmu.isLinXform(&projMtx, cols, &v, &u, &alloc);
+    try std.testing.expectEqual(true, b);
+    xmu.prntNl();    
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.1 Problem 11 test" {
+    //11 Determine if the matrix transformation is linear.
+    // | 0  0  1 |
+    // | 0  1  0 |
+    // | 1  0  0 |
+    const cols: usize = 3;
+    var projMtx: [9]f32 = .{0, 0, 1, 0, 1, 0, 1, 0, 0};
+    var u: [3]f32 = .{1, 1, 1};
+    var v: [3]f32 = .{3, 2, 3};
+    var b: bool = false;
+    const alloc = std.testing.allocator;    
+    b = try xmu.isLinXform(&projMtx, cols, &v, &u, &alloc);
+    try std.testing.expectEqual(true, b);
+    xmu.prntNl();    
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
