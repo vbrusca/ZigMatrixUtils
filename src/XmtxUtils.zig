@@ -11046,13 +11046,39 @@ test  "XMTX: isLinXform test" {
 /// 
 /// ret: The vector to hold the new, rotated, vector values.
 /// 
-pub fn rotCntrClckAboutOriginXvec2(vec: [2]f32, angleInRad: f32, ret: [2]f32) void {
+pub fn rotCntrClckAboutOriginXvec2(vec: *const [2]f32, angleInRad: f32, ret: *const [2]f32) !void {
     var rotMtx: [4]f32 = .{std.math.cos(angleInRad), (-1.0 * std.math.sin(angleInRad)), std.math.sin(angleInRad), std.math.cos(angleInRad)};
     const cols: usize = 2;
-    tmsXmtx(&vec, cols, &rotMtx, cols, &ret, cols);
+    const b: bool = try tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);
+    if(!b) {
+        prntNlStr("rotCntrClckAboutOriginXvec2: Error: Failed operation: tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);");
+        return Error.OperationFailed;
+    }
 }
 
-//TODO: tests
+test  "XMTX: rotCntrClckAboutOriginXvec2 test" {
+    //Lar. Ed. Section 6.1 Example 7
+    var vec: [2]f32 = .{1, 0};
+    const angleInRad: f32 = deg2Rad(-90.0);
+    var exp: [2]f32 = .{0, 1};
+    var ret: [2]f32 = .{0, 0};
+
+    try rotCntrClckAboutOriginXvec2(@constCast(&vec), angleInRad, @constCast(&ret));
+
+    prntNlStrArgs("AngleInRad: {}", .{angleInRad});
+    prntNlStr("Vec:");
+    prntXvec(&vec);
+    prntNl();
+    prntNlStr("Exp:");
+    prntXvec(&exp);
+    prntNl();
+    prntNlStr("Ret:");
+    prntXvec(&ret);
+    prntNl();    
+
+    try std.testing.expectEqual(true, equXvecWrkr(@constCast(&exp), @constCast(&ret), false));
+    prntNl();
+}
 
 ///Projects a given vector 3 onto the Z plane.
 /// 
@@ -11060,13 +11086,36 @@ pub fn rotCntrClckAboutOriginXvec2(vec: [2]f32, angleInRad: f32, ret: [2]f32) vo
 /// 
 /// ret: The vector to hold the new, projected, vector values.
 /// 
-pub fn projOntoZplaneXvec3(vec: [3]f32, ret: [3]f32) void {
+pub fn projOntoZplaneXvec3(vec: *const [3]f32, ret: *const [3]f32) !void {
     var projMtx: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 0};
     const cols: usize = 3;
-    tmsXmtx(&vec, cols, &projMtx, cols, &ret, cols);
+    const b: bool = try tmsXmtx(@constCast(vec), cols, &projMtx, cols, @constCast(ret), cols);
+    if(!b) {
+        prntNlStr("projOntoZplaneXvec3: Error: Failed operation: tmsXmtx(@constCast(vec), cols, &projMtx, cols, @constCast(ret), cols);");
+        return Error.OperationFailed;
+    }    
 }
 
-//TODO: tests
+test  "XMTX: projOntoZplaneXvec3 test" {
+    //Lar. Ed. Section 6.1 Example 8
+    var vec: [3]f32 = .{1, 1, 1};
+    var exp: [3]f32 = .{1, 1, 0};
+    var ret: [3]f32 = .{0, 0, 0};
+    try projOntoZplaneXvec3(@constCast(&vec), @constCast(&ret));
+
+    prntNlStr("Vec:");
+    prntXvec(&vec);
+    prntNl();
+    prntNlStr("Exp:");
+    prntXvec(&exp);
+    prntNl();
+    prntNlStr("Ret:");
+    prntXvec(&ret);
+    prntNl();
+
+    try std.testing.expectEqual(true, equXvec(@constCast(&exp), @constCast(&ret)));
+    prntNl();
+}
 
 ///Finds the least squares solution given the matrix A, mtxA, and the vector B, vecB.
 ///
