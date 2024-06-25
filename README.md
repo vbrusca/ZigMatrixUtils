@@ -24,8 +24,8 @@ This project was built using the following books as a basis.<br>
 2. LT: Normalize the use of const across all slice based function arguments.
 3. LT: To keep the project up to date with new versions of Zig as the language matures.
 4. LT: To complete and refine the code documentation.
-6. ST: Version 0.61 - 0.65: Complete basis material up to and including sections 6.1 to 6.5.
-8. ST: Version 0.60: Add execution time tracking to the remaining theorem/problem unit tests.
+6. ST: Version 0.62 - 0.65: Complete base material for chapter 6 including the remaining sections 6.2 to 6.5.
+8. ST: Add execution time tracking to the remaining theorem, problem, and unit tests.
 9. ST: To complete all missing function documentation, unit tests, and extended tests.
 
 ## Running Unit Tests
