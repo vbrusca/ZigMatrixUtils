@@ -1659,6 +1659,69 @@ test "XMTX: ELA - Larson, Edwards: 6.1 Problem 11 test" {
     xmu.prntNl();    
 }
 
+test "XMTX: ELA - Larson, Edwards: 6.2 Example 7 test" {
+    //Find the rank and nullity of the linear transformation.
+    // | 1  0  2  0 -1 |
+    // | 0  1 -1  0 -2 |
+    // | 0  0  0  1  4 |
+    // | 0  0  0  0  0 |
+    var mtx: [20]f32 = .{1, 0, 2, 0, -1, 0, 1, -1, 0, -2, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 5;
+    const dim: usize = 5;
+    const rows: usize = (mtx.len / cols);
+    const ret = xmu.RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(xmu.RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(xmu.RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try xmu.scanRdcXmtx(@constCast(&mtx), cols, false, dim, &ret);
+
+    xmu.prntNlStr("Mtx:");
+    xmu.prntXmtxNl(@constCast(&mtx), cols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    xmu.prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    xmu.prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        xmu.prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        xmu.prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        xmu.prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    xmu.prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        xmu.prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        xmu.prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        xmu.prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
+    try std.testing.expectEqual(3, ret.rdcRowInf[0].notRdcColCount);
+    xmu.prntNl();
+    try std.testing.expectEqual(3, ret.rdcRowInf[0].notZeroRowCount);
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

@@ -11402,15 +11402,15 @@ test "XMTX: scanRdcXmtx test" {
         prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
     }
 
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
     try std.testing.expectEqual(1, ret.rdcRowInf[0].notRdcColCount);
     prntNl();
     try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
     prntNl();
-
-    r = 0;
-    while(r < rows): (r += 1) {
-        defer allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
-    }
 }
 
 //Compile function execution summary
