@@ -95,6 +95,28 @@ pub const MTX_OPS = enum { MTX_MUL, MTX_DIV, MTX_ADD, MTX_SUB, MTX_PRNT, MTX_NRM
 ///An enumeration that is used to describe the type of basis of a 3D set of vectors.
 pub const BASIS_HAND = enum { RIGHT, LEFT, ERROR_ZERO, ERROR_INVALID_MATRIX };
 
+//TODO: docs
+pub const RdcColScanInf = struct {
+    colIdx: usize = 0,
+    isRdcCol: bool = false,
+    reqParams: bool = false,   
+};
+
+//TODO: docs
+pub const RdcRowScanInf = struct {
+    rowIdx: usize = 0,
+    isZeroRow: bool = false,
+    rhsVars: []bool,
+    notZeroRowCount: usize = 0,
+    notRdcColCount: usize = 0,    
+};
+
+//TODO: docs
+pub const RdcMtxScanInf = struct {
+    rdcRowInf: []RdcRowScanInf,
+    rdcColInf: []RdcColScanInf,
+};
+
 ///Used in aiding the calculation of Eigen Values for a 2x2 matrix.
 pub const EigVal2 = struct {
     lamdExp: [5]f32 = .{ 0, 0, 0, 0, 0 }, //a, -&, d, -&, (-cd)
@@ -10890,10 +10912,12 @@ test "XMTX: projXvec_VecV_Onto_SubspaceS test" {
 /// returns: A boolean value indicating if the given matrix is a linear transformation or an error.
 /// 
 pub fn isLinXform(mtx: []f32, cols: usize, v: []f32, u: []f32, alloc: *const std.mem.Allocator) !bool {
-    if(!isSqrXmtx(mtx, cols)) {
-        prntNlStr("isLinXform: Error: This function exptexts the matrix transformation, mtx, to be a square matrix.");
-        return Error.UnsupportedMarixDimension;
-    } else if(v.len != u.len) {
+    //if(!isSqrXmtx(mtx, cols)) {
+    //    prntNlStr("isLinXform: Error: This function exptexts the matrix transformation, mtx, to be a square matrix.");
+    //    return Error.UnsupportedMarixDimension;
+    //} else 
+    
+    if(v.len != u.len) {
         prntNlStr("isLinXform: Error: The vectors v and u must have a equal length.");        
         return Error.InvalidLengths;
     } else if(v.len != (mtx.len / cols)) {
@@ -11272,6 +11296,121 @@ test "XMTX: leastSquaresSol test" {
 
     try std.testing.expectEqual(true, equXvecWrkr(&exp, &res, false));
     prntNl();
+}
+
+//TODO: docs
+pub fn scanRdcXmtx(rdcMtx: []f32, rdcMtxCols: usize, isAug: bool, dim: usize, mtxScanInfRetPtr: *const RdcMtxScanInf) !void {
+    const mtxScanInfRet = mtxScanInfRetPtr.*;
+    const rdcMtxRows: usize = (rdcMtx.len / rdcMtxCols);
+    var aRdcMtxCols: usize = rdcMtxCols;
+    if(isAug and dim != rdcMtxCols) {
+        aRdcMtxCols -= 1;
+    }
+
+    if(aRdcMtxCols <= 0) {
+        prntNlStr("scanRdcXmtx: Error: aRdcMtxCols is less than zero.");
+        return Error.InvalidLengths;
+    }
+
+    var r: usize = 0;
+    var c: usize = 0;
+
+    while(r < rdcMtxRows): (r += 1) {
+        mtxScanInfRet.rdcRowInf[r].rowIdx = r;
+        mtxScanInfRet.rdcRowInf[r].isZeroRow = true;
+
+        c = 0;
+        while(c < aRdcMtxCols): (c += 1) {
+            mtxScanInfRet.rdcRowInf[r].rhsVars[c] = false;            
+            if(rdcMtx[(r * rdcMtxCols) + c] != 0) {
+                mtxScanInfRet.rdcRowInf[r].isZeroRow = false;
+                if(c > 0) {
+                    mtxScanInfRet.rdcRowInf[r].rhsVars[c] = true;
+                }                
+            }
+        }
+
+        if(!mtxScanInfRet.rdcRowInf[r].isZeroRow) {
+            mtxScanInfRet.rdcRowInf[0].notZeroRowCount += 1;
+        }
+    }
+
+    c = 0;
+    while(c < aRdcMtxCols): (c += 1) {
+        mtxScanInfRet.rdcColInf[c].colIdx = c;
+        mtxScanInfRet.rdcColInf[c].isRdcCol = true;
+
+        r = 0;
+        while(r < rdcMtxRows): (r += 1) {
+            if(rdcMtx[(r * rdcMtxCols) + c] != 0 and c != r) {
+                mtxScanInfRet.rdcColInf[c].isRdcCol = false;
+                break;
+            }
+        }
+
+        if(!mtxScanInfRet.rdcColInf[c].isRdcCol) {
+            mtxScanInfRet.rdcColInf[c].reqParams = true;
+            mtxScanInfRet.rdcRowInf[0].notRdcColCount += 1;
+        }
+    }
+}
+
+test "XMTX: scanRdcXmtx test" {
+    const mtx: [12]f32 = .{1, 0 ,-2, 0, 0, 1, 1, 0, 0, 0, 0, 0};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 4;
+    const dim: usize = 3;
+    const rows: usize = (mtx.len / cols);
+    const ret = RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try scanRdcXmtx(@constCast(&mtx), cols, true, dim, &ret);
+
+    prntNlStr("Mtx:");
+    prntXmtxNl(@constCast(&mtx), cols);
+    prntNl();
+    prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    try std.testing.expectEqual(1, ret.rdcRowInf[0].notRdcColCount);
+    prntNl();
+    try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
+    prntNl();
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        defer allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
 }
 
 //Compile function execution summary
