@@ -11062,7 +11062,12 @@ test  "XMTX: isLinXform test" {
     prntNl();    
 }
 
-//TODO: docs
+///Rotate 45 degrees counter clock-wise about the Z axis,
+/// 
+/// vec: The vector in R^3 to rotate counter clock-wise 45 degrees about the Z axis.. 
+/// 
+/// ret: The vector to hold the new, projected, vector values.
+/// 
 pub fn rotCntrClck45DegAboutZaxisXvec3(vec: *const [3]f32, ret: *const [3]f32) !void {
     var rotMtx: [9]f32 = .{(std.math.sqrt(2.0)/2.0), -(std.math.sqrt(2.0)/2.0), 0, (std.math.sqrt(2.0)/2.0), (std.math.sqrt(2.0)/2.0), 0, 0, 0, 1};
     const cols: usize = 3;
@@ -11094,7 +11099,12 @@ test  "XMTX: rotCntrClck45DegAboutZaxisXvec3 test" {
     prntNl();
 }
 
-//TODO: docs
+///Projects a given vector 3 onto the throught the XY plane.
+/// 
+/// vec: The vector in R^3 to project through the XY plane. 
+/// 
+/// ret: The vector to hold the new, projected, vector values.
+/// 
 pub fn projThroughXyPlaneXvec3(vec: *const [3]f32, ret: *const [3]f32) !void {
     var rotMtx: [9]f32 = .{-1, 0, 0, 0, 1, 0, 0, 0, 1};
     const cols: usize = 3;
@@ -11126,9 +11136,12 @@ test  "XMTX: projThroughXyPlaneXvec3 test" {
     prntNl();
 }
 
-//TODO: tests
-
-//TODO: docs
+///Projects a given vector 3 onto the XY plane.
+/// 
+/// vec: The vector in R^3 to project onto the XY plane. 
+/// 
+/// ret: The vector to hold the new, projected, vector values.
+/// 
 pub fn projOntoXyPlaneXvec3(vec: *const [3]f32, ret: *const [3]f32) !void {
     var rotMtx: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 0};
     const cols: usize = 3;
@@ -11396,7 +11409,18 @@ test "XMTX: leastSquaresSol test" {
     prntNl();
 }
 
-//TODO: docs
+///Scans a RREF matrix to determine the number of not-reduced columns and zero rows.
+/// 
+/// rdcMtx: The reduced matrix to scan for information.
+/// 
+/// rdcMtxCols: The number of columns that are in the reduced matrix.
+/// 
+/// isAug: A boolean value indicating if the matrix is augmented.
+/// 
+/// dim: The dimension of the matrix regardless of augmentation.
+/// 
+/// mtxScanInfRetPtr: A pointer to the reduced matrix scan results.
+/// 
 pub fn scanRdcXmtx(rdcMtx: []f32, rdcMtxCols: usize, isAug: bool, dim: usize, mtxScanInfRetPtr: *const RdcMtxScanInf) !void {
     const mtxScanInfRet = mtxScanInfRetPtr.*;
     const rdcMtxRows: usize = (rdcMtx.len / rdcMtxCols);
