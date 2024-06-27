@@ -20,8 +20,12 @@ This project was built using the following books as a basis.<br>
 2. Mathematics for 3D Game Programming and Computer Graphics 3rd Edition by Eric Lengyel
 
 ## Project Goals
-1. LT: Continuous development to complete the material covered in both books regarding linear algebra and matrix manipulations.<br>
-2. LT: Normalize the use of const across all slice based function arguments.
+Having worked on this project solo for a while I've almost reached my initial goal of porting the main body of material over to the Zig programming language.
+After the completion of chapter 6's material I'm going to switch gears for a little while and work on another coding project. This library will receive long-term updates
+in the interim period.
+
+1. LT: Continuous development to complete the material regarding linear algebra and matrix manipulations.<br>
+2. LT: Normalize the use of const across all slice based function arguments, refine function arguments.
 3. LT: To keep the project up to date with new versions of Zig as the language matures.
 4. LT: To complete and refine the code documentation.
 6. ST: Version 0.62 - 0.65: Complete base material for chapter 6 including the remaining sections 6.2 to 6.5.
