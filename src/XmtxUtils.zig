@@ -11062,6 +11062,104 @@ test  "XMTX: isLinXform test" {
     prntNl();    
 }
 
+//TODO: docs
+pub fn rotCntrClck45DegAboutZaxisXvec3(vec: *const [3]f32, ret: *const [3]f32) !void {
+    var rotMtx: [9]f32 = .{(std.math.sqrt(2.0)/2.0), -(std.math.sqrt(2.0)/2.0), 0, (std.math.sqrt(2.0)/2.0), (std.math.sqrt(2.0)/2.0), 0, 0, 0, 1};
+    const cols: usize = 3;
+    const b: bool = try tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);
+    if(!b) {
+        prntNlStr("rotCntrClck45DegAboutZaxisXvec3: Error: Failed operation: tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);");
+        return Error.OperationFailed;
+    }
+}
+
+test  "XMTX: rotCntrClck45DegAboutZaxisXvec3 test" {
+    var vec: [3]f32 = .{1, 1, 1};
+    var exp: [3]f32 = .{1.4142135e0, 0, 1};
+    var ret: [3]f32 = .{0, 0, 0};
+
+    try rotCntrClck45DegAboutZaxisXvec3(@constCast(&vec), @constCast(&ret));
+
+    prntNlStr("Vec:");
+    prntXvec(&vec);
+    prntNl();
+    prntNlStr("Exp:");
+    prntXvec(&exp);
+    prntNl();
+    prntNlStr("Ret:");
+    prntXvec(&ret);
+    prntNl();    
+
+    try std.testing.expectEqual(true, equXvecWrkr(@constCast(&exp), @constCast(&ret), false));
+    prntNl();
+}
+
+//TODO: docs
+pub fn projThroughXyPlaneXvec3(vec: *const [3]f32, ret: *const [3]f32) !void {
+    var rotMtx: [9]f32 = .{-1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const cols: usize = 3;
+    const b: bool = try tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);
+    if(!b) {
+        prntNlStr("projThroughXyPlaneXvec3: Error: Failed operation: tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);");
+        return Error.OperationFailed;
+    }
+}
+
+test  "XMTX: projThroughXyPlaneXvec3 test" {
+    var vec: [3]f32 = .{1, 1, 1};
+    var exp: [3]f32 = .{-1, 1, 1};
+    var ret: [3]f32 = .{0, 0, 0};
+
+    try projThroughXyPlaneXvec3(@constCast(&vec), @constCast(&ret));
+
+    prntNlStr("Vec:");
+    prntXvec(&vec);
+    prntNl();
+    prntNlStr("Exp:");
+    prntXvec(&exp);
+    prntNl();
+    prntNlStr("Ret:");
+    prntXvec(&ret);
+    prntNl();    
+
+    try std.testing.expectEqual(true, equXvecWrkr(@constCast(&exp), @constCast(&ret), false));
+    prntNl();
+}
+
+//TODO: tests
+
+//TODO: docs
+pub fn projOntoXyPlaneXvec3(vec: *const [3]f32, ret: *const [3]f32) !void {
+    var rotMtx: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 0};
+    const cols: usize = 3;
+    const b: bool = try tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);
+    if(!b) {
+        prntNlStr("projOntoXyPlaneXvec3: Error: Failed operation: tmsXmtx(@constCast(vec), cols, &rotMtx, cols, @constCast(ret), cols);");
+        return Error.OperationFailed;
+    }
+}
+
+test  "XMTX: projOntoXyPlaneXvec3 test" {
+    var vec: [3]f32 = .{1, 1, 1};
+    var exp: [3]f32 = .{1, 1, 0};
+    var ret: [3]f32 = .{0, 0, 0};
+
+    try projOntoXyPlaneXvec3(@constCast(&vec), @constCast(&ret));
+
+    prntNlStr("Vec:");
+    prntXvec(&vec);
+    prntNl();
+    prntNlStr("Exp:");
+    prntXvec(&exp);
+    prntNl();
+    prntNlStr("Ret:");
+    prntXvec(&ret);
+    prntNl();    
+
+    try std.testing.expectEqual(true, equXvecWrkr(@constCast(&exp), @constCast(&ret), false));
+    prntNl();
+}
+
 ///Rotates the given vector, vec, about the origin in a counter clockwise direction the number of radians specified, angleInRad.
 /// 
 /// vec: A vector to rotate about the origin. 

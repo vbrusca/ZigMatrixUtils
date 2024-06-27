@@ -1722,6 +1722,386 @@ test "XMTX: ELA - Larson, Edwards: 6.2 Example 7 test" {
     xmu.prntNl();
 }
 
+test "XMTX: ELA - Larson, Edwards: 6.2 Problem 7 test" {
+    //Find the rank and nullity of the linear transformation.
+    //A = | 1  2 |
+    //    | 3  4 |
+    //RDC = | 1  0 |
+    //      | 0  1 |
+    var mtx: [4]f32 = .{1, 0, 0, 1};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 2;
+    const dim: usize = 2;
+    const rows: usize = (mtx.len / cols);
+    const ret = xmu.RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(xmu.RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(xmu.RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try xmu.scanRdcXmtx(@constCast(&mtx), cols, false, dim, &ret);
+
+    xmu.prntNlStr("Mtx:");
+    xmu.prntXmtxNl(@constCast(&mtx), cols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    xmu.prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    xmu.prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        xmu.prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        xmu.prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        xmu.prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    xmu.prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        xmu.prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        xmu.prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        xmu.prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
+    try std.testing.expectEqual(0, ret.rdcRowInf[0].notRdcColCount);
+    xmu.prntNl();
+    try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.2 Problem 9 test" {
+    //Find the rank and nullity of the linear transformation.
+    //A = | 1 -1  2 |
+    //    | 0  1  2 |
+    //RDC = | 1  0  4 |
+    //      | 0  1  2 |
+    var mtx: [6]f32 = .{1, 0, 4, 0, 1, 2};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 3;
+    const dim: usize = 3;
+    const rows: usize = (mtx.len / cols);
+    const ret = xmu.RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(xmu.RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(xmu.RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try xmu.scanRdcXmtx(@constCast(&mtx), cols, true, dim, &ret);
+
+    xmu.prntNlStr("Mtx:");
+    xmu.prntXmtxNl(@constCast(&mtx), cols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    xmu.prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    xmu.prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        xmu.prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        xmu.prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        xmu.prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    xmu.prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        xmu.prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        xmu.prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        xmu.prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
+    try std.testing.expectEqual(1, ret.rdcRowInf[0].notRdcColCount);
+    xmu.prntNl();
+    try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.2 Problem 13 test" {
+    //Find the rank and nullity of the linear transformation.
+    //A = | 1  1 |
+    //    | 1 -1 |
+    //RDC = | 1  0 |
+    //      | 0  1 |
+    var mtx: [4]f32 = .{1, 0, 0, 1};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 2;
+    const dim: usize = 2;
+    const rows: usize = (mtx.len / cols);
+    const ret = xmu.RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(xmu.RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(xmu.RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try xmu.scanRdcXmtx(@constCast(&mtx), cols, false, dim, &ret);
+
+    xmu.prntNlStr("Mtx:");
+    xmu.prntXmtxNl(@constCast(&mtx), cols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    xmu.prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    xmu.prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        xmu.prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        xmu.prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        xmu.prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    xmu.prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        xmu.prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        xmu.prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        xmu.prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
+    try std.testing.expectEqual(0, ret.rdcRowInf[0].notRdcColCount);
+    xmu.prntNl();
+    try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.2 Problem 15 test" {
+    //Find the rank and nullity of the linear transformation.
+    //A = | 5 -3 |
+    //    | 1  1 |
+    //    | 1  1 |
+    //RDC = | 1  0 |
+    //      | 0  1 |
+    //      | 0  0 |    
+    var mtx: [6]f32 = .{1, 0, 0, 1, 0, 0};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 2;
+    const dim: usize = 2;
+    const rows: usize = (mtx.len / cols);
+    const ret = xmu.RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(xmu.RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(xmu.RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try xmu.scanRdcXmtx(@constCast(&mtx), cols, false, dim, &ret);
+
+    xmu.prntNlStr("Mtx:");
+    xmu.prntXmtxNl(@constCast(&mtx), cols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    xmu.prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    xmu.prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        xmu.prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        xmu.prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        xmu.prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    xmu.prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        xmu.prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        xmu.prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        xmu.prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
+    try std.testing.expectEqual(0, ret.rdcRowInf[0].notRdcColCount);
+    xmu.prntNl();
+    try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.2 Problem 17 test" {
+    //Find the rank and nullity of the linear transformation.
+    //A = | 0 -2   3 |
+    //    | 4  0  11 |
+    //RDC = | 1  0  11/4 |
+    //      | 0  1  -3/2 |
+    var mtx: [6]f32 = .{1, 0, (11.0 / 4.0), 0, 1, (-3.0 / 2.0)};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 3;
+    const dim: usize = 3;
+    const rows: usize = (mtx.len / cols);
+    const ret = xmu.RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(xmu.RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(xmu.RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try xmu.scanRdcXmtx(@constCast(&mtx), cols, false, dim, &ret);
+
+    xmu.prntNlStr("Mtx:");
+    xmu.prntXmtxNl(@constCast(&mtx), cols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    xmu.prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    xmu.prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        xmu.prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        xmu.prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        xmu.prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    xmu.prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        xmu.prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        xmu.prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        xmu.prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
+    try std.testing.expectEqual(1, ret.rdcRowInf[0].notRdcColCount);
+    xmu.prntNl();
+    try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.2 Problem 19 test" {
+    //Find the rank and nullity of the linear transformation.
+    //A = | 9/10  3/10 |
+    //    | 3/10  1/10 |
+    //RDC = | 1  1/3 |
+    //      | 0  0   |
+    var mtx: [4]f32 = .{1, (1.0 / 3.0), 0, 0};
+    const alloc = std.testing.allocator;
+    const allocPtr: *const std.mem.Allocator = &alloc;
+    const cols: usize = 2;
+    const dim: usize = 2;
+    const rows: usize = (mtx.len / cols);
+    const ret = xmu.RdcMtxScanInf {
+        .rdcRowInf = try allocPtr.*.alloc(xmu.RdcRowScanInf, rows),
+        .rdcColInf = try allocPtr.*.alloc(xmu.RdcColScanInf, dim)
+    };
+
+    defer allocPtr.*.free(ret.rdcRowInf);
+    defer allocPtr.*.free(ret.rdcColInf);    
+
+    var r: usize = 0;
+    var c: usize = 0;
+    while(r < rows): (r += 1) {
+        ret.rdcRowInf[r].rhsVars = try allocPtr.*.alloc(bool, dim);
+        ret.rdcRowInf[r].notRdcColCount = 0;
+        ret.rdcRowInf[r].notZeroRowCount = 0;
+    }
+
+    try xmu.scanRdcXmtx(@constCast(&mtx), cols, false, dim, &ret);
+
+    xmu.prntNlStr("Mtx:");
+    xmu.prntXmtxNl(@constCast(&mtx), cols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Cols: {}, Dim: {}, Rows: {}", .{cols, dim, rows});
+    xmu.prntNlStrArgs("Not Reduced Column Count: {}, Not Zero Row Count: {}", .{ret.rdcRowInf[0].notRdcColCount, ret.rdcRowInf[0].notZeroRowCount});
+
+    xmu.prntNl();
+    r = 0;
+    while(r < rows): (r += 1) {
+        xmu.prntNlStrArgs("\t Row Index: {}", .{ret.rdcRowInf[r].rowIdx});        
+        xmu.prntNlStrArgs("\t Is zero Row: {}", .{ret.rdcRowInf[r].isZeroRow});
+        xmu.prntNlStrArgs("\t Right-hand side vars: {any}", .{ret.rdcRowInf[r].rhsVars});
+    }
+
+    xmu.prntNl();
+    c = 0;
+    while(c < dim): (c += 1) {
+        xmu.prntNlStrArgs("\t Column Index: {}", .{ret.rdcColInf[c].colIdx});
+        xmu.prntNlStrArgs("\t Requires parameterization: {}", .{ret.rdcColInf[c].reqParams});
+        xmu.prntNlStrArgs("\t Is reduced column: {}", .{ret.rdcColInf[c].isRdcCol});        
+    }
+
+    r = 0;
+    while(r < rows): (r += 1) {
+        allocPtr.*.free(ret.rdcRowInf[r].rhsVars);   
+    }
+
+    try std.testing.expectEqual(1, ret.rdcRowInf[0].notRdcColCount);
+    xmu.prntNl();
+    try std.testing.expectEqual(1, ret.rdcRowInf[0].notZeroRowCount);
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
