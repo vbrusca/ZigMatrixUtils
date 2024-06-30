@@ -2815,7 +2815,6 @@ test "XMTX: clrXmtxPtr test" {
     prntNl();    
 }
 
-
 ///Clears the values of the given matrix.
 ///
 ///  mtx = The matrix to reset to zero for all values.
