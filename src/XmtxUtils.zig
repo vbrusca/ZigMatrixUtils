@@ -2794,16 +2794,26 @@ test "XMTX: crtXvec test" {
     prntNl();
 }
 
-//TODO: docs
+///Clears the given slice pointer, mtx.
+/// 
+/// mtx: A pointer to the matrix to zero out.
+/// 
 pub fn clrXmtxPtr(mtx: *[]f32) void {
-    const l = mtx.len;
+    const l = mtx.*.len;
     var i: usize = 0;
     while (i < l) : (i += 1) {
-        mtx[i] = 0;
+        mtx.*[i] = 0;
     }
 }
 
-//TODO: tests
+test "XMTX: clrXmtxPtr test" {
+    var mtx: [9]f32 = .{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    var mtxSlc: []f32 = mtx[0..9];
+    var exp: [9]f32 = .{0, 0, 0, 0, 0, 0, 0, 0, 0};
+    clrXmtxPtr(&mtxSlc);
+    try std.testing.expectEqual(true, equXvecWrkr(&mtx, &exp, false));
+    prntNl();    
+}
 
 
 ///Clears the values of the given matrix.
@@ -11547,51 +11557,85 @@ test "XMTX: scanRdcXmtx test" {
     prntNl();
 }
 
-//TODO: docs
-pub fn getStdXmtx(basis: []f32, colsIn: usize, ret: []f32, rowsOut: usize, linXform: *const fn (rowIn: []f32, colOut: []f32) void, alloc: *const std.mem.Allocator) !void {
-    const rowsIn: usize = basis.len / colsIn;
-    const colsOut: usize = 1;
+///Gets the standard matrix given a basis, basisMtxIn, and a linear transformation function, linXform.
+/// 
+/// basisMtxIn: A matrix that represents the basis for the given vector space.
+/// 
+/// basisColsIn: The number of columns in the basisMtxIn matrix.
+/// 
+/// retMtxOut: A matrix that is used to hold the resulting standard matrix.
+/// 
+/// retColsOut: The number of columns in the retMtxOut matrix.
+/// 
+/// linXform: A function that takes one matrix column, vector, and returns a new matrix column, vector.
+/// 
+/// alloc: The function argument used to allocate new memory for this function.
+/// 
+/// returns: Returns a void value or an error.
+/// 
+pub fn getStdXmtx(basisMtxIn: []f32, basisColsIn: usize, retMtxOut: []f32, retColsOut: usize, linXform: *const fn (rowIn: []f32, colOut: []f32) void, alloc: *const std.mem.Allocator) !void {
+    const basisRowsIn: usize = basisMtxIn.len / basisColsIn;
+    const retRowsOut: usize = retMtxOut.len / retColsOut;
 
-    if(rowsIn != colsIn) {
+    if(basisRowsIn != basisColsIn) {
         prntNlStr("getStdXmtx: Error: basis matrix should be a square matrix.");
         return Error.InvalidLengths;
     }
 
-    var rowIn: []f32 = alloc.*.alloc(f32, colsIn);
-    var colOut: []f32 = alloc.*.alloc(f32, rowsOut);
-    clrXmtxPtr(&rowIn);
+    var colIn: []f32 = try alloc.*.alloc(f32, basisRowsIn);
+    var colOut: []f32 = try alloc.*.alloc(f32, retRowsOut);
+    clrXmtxPtr(&colIn);
 
     if(VERBOSE or true) {
         prntNl();
         prntNlStr("basis:");
-        prntXmtxNl(basis, colsIn);
+        prntXmtxNl(basisMtxIn, basisColsIn);
         prntNl();
-        prntNlStrArgs("basis.len: {}, colsIn: {}, rowsIn: {}, ret.len: {}, colsOut: {}, rowsOut: {}", .{basis.len, colsIn, rowsIn, ret.len, colsOut, rowsOut});
+        prntNlStrArgs("basis.len: {}, colsIn: {}, rowsIn: {}, ret.len: {}, colsOut: {}, rowsOut: {}", .{basisMtxIn.len, basisColsIn, basisRowsIn, retMtxOut.len, retColsOut, retRowsOut});
     }
 
-    var r: usize = 0;
-    while(r < rowsIn): (r += 1) {
-        cpyXmtxSqr(basis, colsIn, rowIn, colsIn, 0, colsIn, r, (r + 1), 0, 0);
+    var c: usize = 0;
+    while(c < basisColsIn): (c += 1) {
+        cpyXmtxSqr(basisMtxIn, basisColsIn, colIn, 1, c, (c + 1), 0, basisRowsIn, 0, 0);
         clrXmtxPtr(&colOut);
-        linXform(rowIn, colOut);
-        cpyXmtxSqr(colOut, colsOut, ret, colsOut, 0, colsOut, 0, rowsOut, 0, r);
+        linXform(colIn, colOut);
+        cpyXmtxSqr(colOut, 1, retMtxOut, retColsOut, 0, 1, 0, retRowsOut, c, 0);
 
         if(VERBOSE or true) {
             prntNl();
-            prntNlStrArgs("rowIn for row: {}", .{r});
-            prntXmtxNl(rowIn, colsIn);
+            prntNlStrArgs("colIn for col: {}", .{c});
+            prntXmtxNl(colIn, 1);
             prntNl();
-            prntNlStrArgs("colOut for row: {}", .{r});
+            prntNlStrArgs("colOut for col: {}", .{c});
             prntXmtxNl(colOut, 1);
             prntNl();
-            prntNlStr("ret for row: {}", .{r});
-            prntXmtxNl(ret, 1);
+            prntNlStrArgs("retMtxOut for col: {}", .{c});
+            prntXmtxNl(retMtxOut, retColsOut);
         }
     }
+
+    defer alloc.*.free(colIn);
+    defer alloc.*.free(colOut);    
 }
 
-//TODO: tests
+fn linXformA(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (colIn[0] - (2.0 * colIn[1]));
+    colOut[1] = ((2.0 * colIn[0]) + colIn[1]);
+}
 
+test "XMTX: getStdXmtx test" {
+    var basisMtxIn: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const basisColsIn: usize = 3;
+    var retMtxOut: [6]f32 = .{0, 0, 0, 0, 0, 0};
+    const retColsOut: usize = 3;
+    const alloc = std.testing.allocator;
+    const linXform = linXformA;
+    var exp: [6]f32 = .{1, -2, 0, 2, 1, 0};    
+    try getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    try std.testing.expectEqual(true, equXvecWrkr(&exp, &retMtxOut, false));
+    prntNl();
+}
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
