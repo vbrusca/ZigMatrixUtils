@@ -2794,6 +2794,18 @@ test "XMTX: crtXvec test" {
     prntNl();
 }
 
+//TODO: docs
+pub fn clrXmtxPtr(mtx: *[]f32) void {
+    const l = mtx.len;
+    var i: usize = 0;
+    while (i < l) : (i += 1) {
+        mtx[i] = 0;
+    }
+}
+
+//TODO: tests
+
+
 ///Clears the values of the given matrix.
 ///
 ///  mtx = The matrix to reset to zero for all values.
@@ -11534,6 +11546,52 @@ test "XMTX: scanRdcXmtx test" {
     try std.testing.expectEqual(2, ret.rdcRowInf[0].notZeroRowCount);
     prntNl();
 }
+
+//TODO: docs
+pub fn getStdXmtx(basis: []f32, colsIn: usize, ret: []f32, rowsOut: usize, linXform: *const fn (rowIn: []f32, colOut: []f32) void, alloc: *const std.mem.Allocator) !void {
+    const rowsIn: usize = basis.len / colsIn;
+    const colsOut: usize = 1;
+
+    if(rowsIn != colsIn) {
+        prntNlStr("getStdXmtx: Error: basis matrix should be a square matrix.");
+        return Error.InvalidLengths;
+    }
+
+    var rowIn: []f32 = alloc.*.alloc(f32, colsIn);
+    var colOut: []f32 = alloc.*.alloc(f32, rowsOut);
+    clrXmtxPtr(&rowIn);
+
+    if(VERBOSE or true) {
+        prntNl();
+        prntNlStr("basis:");
+        prntXmtxNl(basis, colsIn);
+        prntNl();
+        prntNlStrArgs("basis.len: {}, colsIn: {}, rowsIn: {}, ret.len: {}, colsOut: {}, rowsOut: {}", .{basis.len, colsIn, rowsIn, ret.len, colsOut, rowsOut});
+    }
+
+    var r: usize = 0;
+    while(r < rowsIn): (r += 1) {
+        cpyXmtxSqr(basis, colsIn, rowIn, colsIn, 0, colsIn, r, (r + 1), 0, 0);
+        clrXmtxPtr(&colOut);
+        linXform(rowIn, colOut);
+        cpyXmtxSqr(colOut, colsOut, ret, colsOut, 0, colsOut, 0, rowsOut, 0, r);
+
+        if(VERBOSE or true) {
+            prntNl();
+            prntNlStrArgs("rowIn for row: {}", .{r});
+            prntXmtxNl(rowIn, colsIn);
+            prntNl();
+            prntNlStrArgs("colOut for row: {}", .{r});
+            prntXmtxNl(colOut, 1);
+            prntNl();
+            prntNlStr("ret for row: {}", .{r});
+            prntXmtxNl(ret, 1);
+        }
+    }
+}
+
+//TODO: tests
+
 
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
