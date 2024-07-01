@@ -2409,6 +2409,123 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Problem 7 test" {
     xmu.prntNl();
 }
 
+fn linXformK(colIn: []f32, colOut: []f32) void {
+    colOut[0] = ((13.0 * colIn[0]) - (9.0 * colIn[1]) + (4.0 * colIn[2]));
+    colOut[1] = ((6.0 * colIn[0]) + (5.0 * colIn[1]) - (3.0 * colIn[2]));
+} 
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Problem 9 test" {
+    var basisMtxIn: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const basisColsIn: usize = 3;
+    const alloc = std.testing.allocator;
+    const linXform = linXformK;
+    var retMtxOut: [6]f32 = .{0, 0, 0, 0, 0, 0};
+    const retColsOut: usize = 3;
+    var exp: [6]f32 = .{13, -9, 4, 6, 5, -3};
+    var b: bool = false;
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    xmu.prntNlStrArgs("retMtxOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("exp: {}", .{retColsOut});
+    xmu.prntXmtxNl(&exp, retColsOut);
+    xmu.prntNl();    
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+
+    const dim: usize = 2;
+    var v: [3]f32 = .{1, -2, 1};
+    var fin: [2]f32 = .{0, 0};
+    var expFin: [2]f32 = .{35, -7};    
+    b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices, a and sol into fin.");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("Fin: {}", .{dim});
+    xmu.prntXmtxNl(&fin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ExpFin: {}", .{dim});
+    xmu.prntXmtxNl(&expFin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("v: {}", .{1});
+    xmu.prntXmtxNl(&v, 1);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
+    xmu.prntNl();
+}
+
+fn linXformL(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (colIn[0] + colIn[1]);
+    colOut[1] = (colIn[2] + colIn[3]);
+} 
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Problem 11 test" {
+    var basisMtxIn: [16]f32 = .{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    const basisColsIn: usize = 4;
+    const alloc = std.testing.allocator;
+    const linXform = linXformL;
+    var retMtxOut: [8]f32 = .{0, 0, 0, 0, 0, 0, 0, 0};
+    const retColsOut: usize = 4;
+    var exp: [8]f32 = .{1, 1, 0, 0, 0, 0, 1, 1};
+    var b: bool = false;
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    xmu.prntNlStrArgs("retMtxOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("exp: {}", .{retColsOut});
+    xmu.prntXmtxNl(&exp, retColsOut);
+    xmu.prntNl();    
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+
+    const dim: usize = 2;
+    var v: [4]f32 = .{1, -1, 1, -1};
+    var fin: [2]f32 = .{0, 0};
+    var expFin: [2]f32 = .{0, 0};    
+    b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices, a and sol into fin.");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("Fin: {}", .{dim});
+    xmu.prntXmtxNl(&fin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ExpFin: {}", .{dim});
+    xmu.prntXmtxNl(&expFin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("v: {}", .{1});
+    xmu.prntXmtxNl(&v, 1);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
+    xmu.prntNl();
+
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
