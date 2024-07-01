@@ -2218,6 +2218,28 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Example 5 test" {
     xmu.prntNl();
 }
 
+//TODO: finish
+test "XMTX: ELA - Larson, Edwards: 6.3 Example 6 test" {
+    var basisMtxIn: [4]f32 = .{1, -1, 2, 1};
+    const basisColsIn: usize = 2;
+    const alloc = std.testing.allocator;
+    const linXform = linXformF;
+    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
+    const retColsOut: usize = 2;
+    var exp: [4]f32 = .{3, 0, 0, -3};
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
