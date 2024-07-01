@@ -2220,23 +2220,64 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Example 5 test" {
 
 //TODO: finish
 test "XMTX: ELA - Larson, Edwards: 6.3 Example 6 test" {
-    var basisMtxIn: [4]f32 = .{1, -1, 2, 1};
-    const basisColsIn: usize = 2;
-    const alloc = std.testing.allocator;
-    const linXform = linXformF;
-    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
-    const retColsOut: usize = 2;
-    var exp: [4]f32 = .{3, 0, 0, -3};
+    var mtx: [6]f32 = .{1, -1, 2, 2, 1, 1};
+    const mtxCols: usize = 3;
+    //const alloc = std.testing.allocator;
+    var ret: [6]f32 = .{0, 0, 0, 0, 0, 0};
+    const retCols: usize = 3;
+    var exp: [6]f32 = .{1, 0, 1, 0, 1, -1};
+    var sclr: f32 = 0.0;
+    var idt: [4]f32 = .{1, 0, 0, 1};
+    var b: bool = false;
+    const dim: usize = 2;
 
-    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
-    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    b = try xmu.rdcXmtx(&mtx, mtxCols, true, &ret, false, &idt, dim, false, &sclr);
+    if(!b) {
+        xmu.prntNlStr("Error: could not reduce the given matrix, mtc.");
+        return xmu.Error.OperationFailed;
+    }
+
+    var sol: [2]f32 = .{ret[0], ret[5]};
+
+    xmu.prntNlStrArgs("Mtx: {}", .{mtxCols});
+    xmu.prntXmtxNl(&mtx, mtxCols);
     xmu.prntNl();
-    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
-    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNlStrArgs("Ret: {}", .{retCols});
+    xmu.prntXmtxNl(&ret, retCols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Exp: {}", .{retCols});
+    xmu.prntXmtxNl(&exp, retCols);
+    xmu.prntNl();    
+    xmu.prntNlStrArgs("Sol: {}", .{1});
+    xmu.prntXmtxNl(&sol, 2);
+    xmu.prntNl();            
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &ret, false));
     xmu.prntNl();
 
-    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
-    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    var a: [4]f32 = .{3, 0, 0, -3};
+    var fin: [2]f32 = .{0, 0};
+    var expFin: [2]f32 = .{3, 3};    
+    b = try xmu.tmsXmtx(&a, dim, &sol, 1, &fin, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices, a and sol into fin.");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("a: {}", .{dim});
+    xmu.prntXmtxNl(&a, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Fin: {}", .{dim});
+    xmu.prntXmtxNl(&fin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ExpFin: {}", .{dim});
+    xmu.prntXmtxNl(&expFin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Sol: {}", .{1});
+    xmu.prntXmtxNl(&sol, 2);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
     xmu.prntNl();
 }
 
