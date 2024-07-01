@@ -2218,11 +2218,9 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Example 5 test" {
     xmu.prntNl();
 }
 
-//TODO: finish
 test "XMTX: ELA - Larson, Edwards: 6.3 Example 6 test" {
     var mtx: [6]f32 = .{1, -1, 2, 2, 1, 1};
     const mtxCols: usize = 3;
-    //const alloc = std.testing.allocator;
     var ret: [6]f32 = .{0, 0, 0, 0, 0, 0};
     const retCols: usize = 3;
     var exp: [6]f32 = .{1, 0, 1, 0, 1, -1};
