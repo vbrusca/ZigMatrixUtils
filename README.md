@@ -37,7 +37,7 @@ You can run the full set of unit tests from inside the project with the followin
 <pre>
 zig test ./src/main.zig
 </pre>
-There are over 240 test run to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on DOS terminals. You'll have to search around and find an equivalent command if you are on MacOS, Linux, or Unix for your respective shell.
+There are over 350 test run to verify functionality. Feel free to think of them as demonstrations of the associated functions. You can also capture the test output with the following command on DOS terminals. You'll have to search around and find an equivalent command if you are on MacOS, Linux, or Unix for your respective shell.
 <pre>
 zig test ./src/main.zig > all_test_output.txt 2>&1
 </pre>
