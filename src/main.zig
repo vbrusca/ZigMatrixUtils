@@ -2102,6 +2102,122 @@ test "XMTX: ELA - Larson, Edwards: 6.2 Problem 19 test" {
     xmu.prntNl();
 }
 
+fn linXformB(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (colIn[0] - (2.0 * colIn[1]) + (5.0 * colIn[2]));
+    colOut[1] = ((2.0 * colIn[0]) + (3.0 * colIn[2]));
+    colOut[2] = ((4.0 * colIn[0]) + colIn[1] - (2.0 * colIn[2]));    
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Example 1.B test" {
+    var basisMtxIn: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const basisColsIn: usize = 3;
+    var retMtxOut: [9]f32 = .{0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const retColsOut: usize = 3;
+    const alloc = std.testing.allocator;
+    const linXform = linXformB;
+    var exp: [9]f32 = .{1, -2, 5, 2, 0, 3, 4, 1, -2};
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+}
+
+fn linXformC(colIn: []f32, colOut: []f32) void {
+    colOut[0] = colIn[0];
+    colOut[1] = 0;
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Example 2 test" {
+    var basisMtxIn: [4]f32 = .{1, 0, 0, 1};
+    const basisColsIn: usize = 2;
+    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
+    const retColsOut: usize = 2;
+    const alloc = std.testing.allocator;
+    const linXform = linXformC;
+    var exp: [4]f32 = .{1, 0, 0, 0};
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+}
+
+fn linXformD1(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (2.0 * colIn[0]) + colIn[1];
+    colOut[1] = 0;
+    colOut[2] = (colIn[0] + colIn[2]);    
+}
+
+fn linXformD2(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (colIn[0] - colIn[1]);
+    colOut[1] = colIn[2];
+    colOut[2] = colIn[1]
+    ;    
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Example 3 test" {
+    var basisMtxIn: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const basisColsIn: usize = 3;
+    const alloc = std.testing.allocator;
+    const linXform1 = linXformD1;
+    var retMtxOut1: [9]f32 = .{0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const retColsOut1: usize = 3;    
+    var exp1: [9]f32 = .{2, 1, 0, 0, 0, 0, 1, 0, 1};
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut1, retColsOut1, linXform1, &alloc);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp1, &retMtxOut1, false));
+    xmu.prntNl();
+
+    const linXform2 = linXformD2;
+    var retMtxOut2: [9]f32 = .{0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const retColsOut2: usize = 3;    
+    var exp2: [9]f32 = .{1, -1, 0, 0, 0, 1, 0, 1, 0};
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut2, retColsOut2, linXform2, &alloc);    
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp2, &retMtxOut2, false));
+    xmu.prntNl();
+}
+
+fn linXformE(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (2.0 * colIn[0]) + (3.0 * colIn[1]) + colIn[2];
+    colOut[1] = (3.0 * colIn[0]) + (3.0 * colIn[1]) + colIn[2];
+    colOut[2] = (2.0 * colIn[0]) + (4.0 * colIn[1]) + colIn[2];    
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Example 4 test" {
+    var basisMtxIn: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const basisColsIn: usize = 3;
+    const alloc = std.testing.allocator;
+    const linXform = linXformE;
+    var retMtxOut: [9]f32 = .{0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const retColsOut: usize = 3;
+    var exp: [9]f32 = .{2, 3, 1, 3, 3, 1, 2, 4, 1};
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+}
+
+fn linXformF(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (colIn[0] + colIn[1]);
+    colOut[1] = (2.0 * colIn[0]) - colIn[1];
+} 
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Example 5 test" {
+    var basisMtxIn: [4]f32 = .{1, -1, 2, 1};
+    const basisColsIn: usize = 2;
+    const alloc = std.testing.allocator;
+    const linXform = linXformF;
+    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
+    const retColsOut: usize = 2;
+    var exp: [4]f32 = .{3, 0, 0, -3};
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+}
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

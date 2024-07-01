@@ -11585,7 +11585,7 @@ pub fn getStdXmtx(basisMtxIn: []f32, basisColsIn: usize, retMtxOut: []f32, retCo
     var colOut: []f32 = try alloc.*.alloc(f32, retRowsOut);
     clrXmtxPtr(&colIn);
 
-    if(VERBOSE or true) {
+    if(VERBOSE) {
         prntNl();
         prntNlStr("basis:");
         prntXmtxNl(basisMtxIn, basisColsIn);
@@ -11600,7 +11600,7 @@ pub fn getStdXmtx(basisMtxIn: []f32, basisColsIn: usize, retMtxOut: []f32, retCo
         linXform(colIn, colOut);
         cpyXmtxSqr(colOut, 1, retMtxOut, retColsOut, 0, 1, 0, retRowsOut, c, 0);
 
-        if(VERBOSE or true) {
+        if(VERBOSE) {
             prntNl();
             prntNlStrArgs("colIn for col: {}", .{c});
             prntXmtxNl(colIn, 1);
@@ -11631,7 +11631,6 @@ test "XMTX: getStdXmtx test" {
     const linXform = linXformA;
     var exp: [6]f32 = .{1, -2, 0, 2, 1, 0};    
     try getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
-
     try std.testing.expectEqual(true, equXvecWrkr(&exp, &retMtxOut, false));
     prntNl();
 }
