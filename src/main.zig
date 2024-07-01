@@ -2705,6 +2705,10 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Problem 17 test" {
 }
 
 fn linXformP(colIn: []f32, colOut: []f32) void {
+    //x' = xcosθ - ysinθ.
+    //y' = xsinθ + ycosθ.
+    //cos 180 deg = -1
+    //sin 180 deg = 0
     colOut[0] = (-1.0 * colIn[0]);
     colOut[1] = (-1.0 * colIn[1]);
 } 
