@@ -24,13 +24,14 @@ Having worked on this project solo for a while I've almost reached my initial go
 After the completion of chapter 6's material I'm going to switch gears for a little while and work on another coding project. This library will receive long-term updates
 in the interim period.
 
-1. LT: Continuous development to complete the material regarding linear algebra and matrix manipulations.<br>
-2. LT: Normalize the use of const across all slice based function arguments, refine function arguments.
-3. LT: To keep the project up to date with new versions of Zig as the language matures.
-4. LT: To complete and refine the code documentation.
-6. ST: Version 0.62 - 0.65: Complete base material for chapter 6 including the remaining sections 6.2 to 6.5.
-8. ST: Add execution time tracking to the remaining theorem, problem, and unit tests.
-9. ST: To complete all missing function documentation, unit tests, and extended tests.
+01. LT: Continuous development to complete the material regarding linear algebra and matrix manipulations.<br>
+02. LT: Normalize the use of const across all slice based function arguments, refine function arguments.
+03. LT: To keep the project up to date with new versions of Zig as the language matures.
+04. LT: To complete and refine the code documentation.
+06. ST: Version 0.64 - 0.65: Complete base material for chapter 6 including the remaining sections 6.4 and 6.5.
+08. ST: Add execution time tracking to the remaining theorem, problem, and unit tests.
+09. ST: To complete all missing function documentation, unit tests, and extended tests.
+10. LT: Revisit the project and apply needed material for chapter 7.
 
 ## Running Unit Tests
 You can run the full set of unit tests from inside the project with the following command.<br>
