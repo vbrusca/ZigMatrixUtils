@@ -2449,7 +2449,7 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Problem 9 test" {
     var expFin: [2]f32 = .{35, -7};    
     b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
     if(!b) {
-        xmu.prntNlStr("Error: could not multiply the given matrices, a and sol into fin.");
+        xmu.prntNlStr("Error: could not multiply the given matrices, ret and v into fin.");
         return xmu.Error.OperationFailed;
     }
 
@@ -2507,7 +2507,7 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Problem 11 test" {
     var expFin: [2]f32 = .{0, 0};    
     b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
     if(!b) {
-        xmu.prntNlStr("Error: could not multiply the given matrices, a and sol into fin.");
+        xmu.prntNlStr("Error: could not multiply the given matrices, ret and v into fin.");
         return xmu.Error.OperationFailed;
     }
 
@@ -2523,7 +2523,235 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Problem 11 test" {
 
     try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
     xmu.prntNl();
+}
 
+fn linXformM(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (-1.0 * colIn[0]);
+    colOut[1] = (-1.0 * colIn[1]);
+} 
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Problem 13 test" {
+    var basisMtxIn: [4]f32 = .{1, 0, 0, 1};
+    const basisColsIn: usize = 2;
+    const alloc = std.testing.allocator;
+    const linXform = linXformM;
+    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
+    const retColsOut: usize = 2;
+    var exp: [4]f32 = .{-1, 0, 0, -1};
+    var b: bool = false;
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    xmu.prntNlStrArgs("retMtxOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("exp: {}", .{retColsOut});
+    xmu.prntXmtxNl(&exp, retColsOut);
+    xmu.prntNl();    
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+
+    const dim: usize = 2;
+    var v: [2]f32 = .{3, 4};
+    var fin: [2]f32 = .{0, 0};
+    var expFin: [2]f32 = .{-3, -4};    
+    b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices, ret and v into fin.");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("Fin: {}", .{dim});
+    xmu.prntXmtxNl(&fin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ExpFin: {}", .{dim});
+    xmu.prntXmtxNl(&expFin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("v: {}", .{1});
+    xmu.prntXmtxNl(&v, 1);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
+    xmu.prntNl();    
+}
+
+fn linXformN(colIn: []f32, colOut: []f32) void {
+    //x' = xcosθ - ysinθ.
+    //y' = xsinθ + ycosθ.
+    //cos 135 deg = -0.70710678118
+    //sin 135 deg = 0.70710678118
+    colOut[0] = (colIn[0] * ((-1.0 * std.math.sqrt(2.0)) / 2.0)) - (colIn[1] * ((1.0 * std.math.sqrt(2.0)) / 2.0));
+    colOut[1] = (colIn[0] * ((1.0 * std.math.sqrt(2.0)) / 2.0)) + (colIn[1] * ((-1.0 * std.math.sqrt(2.0)) / 2.0));
+} 
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Problem 15 test" {
+    var basisMtxIn: [4]f32 = .{1, 0, 0, 1};
+    const basisColsIn: usize = 2;
+    const alloc = std.testing.allocator;
+    const linXform = linXformN;
+    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
+    const retColsOut: usize = 2;
+    var exp: [4]f32 = .{((-1.0 * std.math.sqrt(2.0)) / 2.0), ((-1.0 * std.math.sqrt(2.0)) / 2.0), ((1.0 * std.math.sqrt(2.0)) / 2.0), ((-1.0 * std.math.sqrt(2.0)) / 2.0)};
+    var b: bool = false;
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    xmu.prntNlStrArgs("retMtxOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("exp: {}", .{retColsOut});
+    xmu.prntXmtxNl(&exp, retColsOut);
+    xmu.prntNl();    
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+
+    const dim: usize = 2;
+    var v: [2]f32 = .{4, 4};
+    var fin: [2]f32 = .{0, 0};
+    var expFin: [2]f32 = .{(-4.0 * std.math.sqrt(2.0)), 0};    
+    b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices, ret and v into fin.");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("Fin: {}", .{dim});
+    xmu.prntXmtxNl(&fin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ExpFin: {}", .{dim});
+    xmu.prntXmtxNl(&expFin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("v: {}", .{1});
+    xmu.prntXmtxNl(&v, 1);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
+    xmu.prntNl();
+}
+
+fn linXformO(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (1.0 * colIn[0]);
+    colOut[1] = (1.0 * colIn[1]);
+    colOut[2] = (-1.0 * colIn[2]);    
+} 
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Problem 17 test" {
+    var basisMtxIn: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, 1};
+    const basisColsIn: usize = 3;
+    const alloc = std.testing.allocator;
+    const linXform = linXformO;
+    var retMtxOut: [9]f32 = .{0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const retColsOut: usize = 3;
+    var exp: [9]f32 = .{1, 0, 0, 0, 1, 0, 0, 0, -1};
+    var b: bool = false;
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    xmu.prntNlStrArgs("retMtxOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("exp: {}", .{retColsOut});
+    xmu.prntXmtxNl(&exp, retColsOut);
+    xmu.prntNl();    
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+
+    const dim: usize = 3;
+    var v: [3]f32 = .{3, 2, 2};
+    var fin: [3]f32 = .{0, 0, 0};
+    var expFin: [3]f32 = .{3, 2, -2};    
+    b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices, ret and v into fin.");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("Fin: {}", .{dim});
+    xmu.prntXmtxNl(&fin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ExpFin: {}", .{dim});
+    xmu.prntXmtxNl(&expFin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("v: {}", .{1});
+    xmu.prntXmtxNl(&v, 1);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
+    xmu.prntNl();    
+}
+
+fn linXformP(colIn: []f32, colOut: []f32) void {
+    colOut[0] = (-1.0 * colIn[0]);
+    colOut[1] = (-1.0 * colIn[1]);
+} 
+
+test "XMTX: ELA - Larson, Edwards: 6.3 Problem 19 test" {
+    var basisMtxIn: [4]f32 = .{1, 0, 0, 1};
+    const basisColsIn: usize = 2;
+    const alloc = std.testing.allocator;
+    const linXform = linXformP;
+    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
+    const retColsOut: usize = 2;
+    var exp: [4]f32 = .{-1, 0, 0, -1};
+    var b: bool = false;
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+
+    const dim: usize = 2;
+    var v: [2]f32 = .{1, 2};
+    var fin: [2]f32 = .{0, 0};
+    var expFin: [2]f32 = .{-1, -2};    
+    b = try xmu.tmsXmtx(&retMtxOut, retColsOut, &v, 1, &fin, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices, ret and v into fin.");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("Fin: {}", .{dim});
+    xmu.prntXmtxNl(&fin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ExpFin: {}", .{dim});
+    xmu.prntXmtxNl(&expFin, dim);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("v: {}", .{1});
+    xmu.prntXmtxNl(&v, 1);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
+    xmu.prntNl();
 }
 
 //--------------------------------------------------------------------------------------
