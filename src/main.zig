@@ -2731,6 +2731,14 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Problem 19 test" {
     xmu.prntNl();
 
     try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    xmu.prntNlStrArgs("retMtxOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("exp: {}", .{retColsOut});
+    xmu.prntXmtxNl(&exp, retColsOut);
+    xmu.prntNl();
+
     try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
     xmu.prntNl();
 
@@ -2756,6 +2764,109 @@ test "XMTX: ELA - Larson, Edwards: 6.3 Problem 19 test" {
 
     try std.testing.expectEqual(true, xmu.equXvecWrkr(&expFin, &fin, false));
     xmu.prntNl();
+}
+
+fn linXform64A(colIn: []f32, colOut: []f32) void {
+    colOut[0] = ((2.0 * colIn[0]) - (2.0 * colIn[1]));
+    colOut[1] = ((-1.0 * colIn[0]) + (3.0 * colIn[1]));
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.4 Example 1 test" {
+    //p. 361 Find the matrix AP (A prime) for T: R^2 -> R^2 T(x,y)= (2x-2y,-x+3y)
+    var basisMtxIn: [4]f32 = .{1, 0, 0, 1};
+    const basisColsIn: usize = 2;
+    const alloc = std.testing.allocator;
+    const linXform = linXform64A;
+    var retMtxOut: [4]f32 = .{0, 0, 0, 0};
+    const retColsOut: usize = 2;
+    var exp: [4]f32 = .{2, -2, -1, 3};
+    var b: bool = false;
+
+    xmu.prntNlStrArgs("BasisMtxIn: {}", .{basisColsIn});
+    xmu.prntXmtxNl(&basisMtxIn, basisColsIn);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("RetColsOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+
+    try xmu.getStdXmtx(&basisMtxIn, basisColsIn, &retMtxOut, retColsOut, linXform, &alloc);
+
+    xmu.prntNlStrArgs("retMtxOut: {}", .{retColsOut});
+    xmu.prntXmtxNl(&retMtxOut, retColsOut);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("exp: {}", .{retColsOut});
+    xmu.prntXmtxNl(&exp, retColsOut);
+    xmu.prntNl();
+    
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &retMtxOut, false));
+    xmu.prntNl();
+
+    var bP: [4]f32 = .{1, 1, 0, 1};
+    const bPcols: usize = 2;
+    var ret: [4]f32 = .{0, 0, 0, 0};
+    var idt: [4]f32 = .{1, 0, 0, 1};
+    var sclr: f32 = 0;
+
+    b = try xmu.rdcXmtx(&bP, bPcols, false, &ret, true, &idt, 2, false, &sclr);
+    if(!b) {
+        xmu.prntNlStr("Error: could not reduce the given matrices rdcXmtx(bP, bPcols, false, ret, true, idt, 2, false, &sclr)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("bP: {}", .{bPcols});
+    xmu.prntXmtxNl(&bP, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("ret: {}", .{bPcols});
+    xmu.prntXmtxNl(&ret, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("idt: {}", .{bPcols});
+    xmu.prntXmtxNl(&idt, bPcols);
+    xmu.prntNl();
+
+    var P: [4]f32 = bP;
+    var Pinv: [4]f32 = idt;
+    var A: [4]f32 = retMtxOut;
+    ret = .{0, 0, 0, 0};
+    var ret2: [4]f32 = .{0, 0, 0, 0};
+    exp = .{3, -2, -1, 2};
+
+    xmu.prntNlStrArgs("P: {}", .{bPcols});
+    xmu.prntXmtxNl(&P, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Pinv: {}", .{bPcols});
+    xmu.prntXmtxNl(&Pinv, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("A: {}", .{bPcols});
+    xmu.prntXmtxNl(&A, bPcols);
+    xmu.prntNl();
+
+    b = try xmu.tmsXmtx(&Pinv, bPcols, &A, bPcols, &ret, bPcols); 
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&Pinv, bPcols, &A, bPcols, &ret, bPcols)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("ret: {}", .{bPcols});
+    xmu.prntXmtxNl(&ret, bPcols);
+    xmu.prntNl();
+
+    b = try xmu.tmsXmtx(&ret, bPcols, &P, bPcols, &ret2, bPcols); 
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&Pinv, bPcols, &A, bPcols, &ret, bPcols)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("AP: {}", .{bPcols});
+    xmu.prntXmtxNl(&ret2, bPcols);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &ret2, false));
+    xmu.prntNl();    
+}
+
+//TODO: finish
+test "XMTX: ELA - Larson, Edwards: 6.4 Example 2 test" {
+
 }
 
 //--------------------------------------------------------------------------------------
