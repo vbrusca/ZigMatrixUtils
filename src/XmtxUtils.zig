@@ -11635,6 +11635,147 @@ test "XMTX: getStdXmtx test" {
     prntNl();
 }
 
+//TODO: docs
+pub fn isSimilarXmtx(P:[]f32, Pcols: usize, Pinv:[]f32, PinvCols: usize, A: []f32, Acols: usize, AP: []f32, APcols: usize, tmp1: []f32, tmp1Cols: usize, tmp2: []f32, tmp2Cols: usize) !bool {
+    //AP = Pinv * A * P
+    var b: bool = false;
+
+    b = try tmsXmtx(Pinv, PinvCols, A, Acols, tmp1, tmp1Cols);
+    if(!b) {
+        prntNlStr("isSimilarXmtx: Error: could not multiply the given matrices tmsXmtx(Pinv, PinvCols, A, Acols, &tmp1, tmp1Cols)!!");
+        return Error.OperationFailed;
+    }
+
+    b = try tmsXmtx(tmp1, tmp1Cols, P, Pcols, tmp2, tmp2Cols);
+    if(!b) {
+        prntNlStr("isSimilarXmtx: Error: could not multiply the given matrices tmsXmtx(Pinv, PinvCols, A, Acols, &tmp1, tmp1Cols)!!");
+        return Error.OperationFailed;
+    }
+
+    _ = APcols;
+    return equXvecWrkr(tmp2, AP, false);
+}
+
+test "XMTX: isSimilarXmtx.A test" {
+    //Ex 4.a)
+    var A:[4]f32 = .{2, -2, -1, 3};
+    var AP:[4]f32 = .{3, -2, -1, 2};
+    var P: [4]f32 = .{1, 1, 0, 1};
+    var Pinv: [4]f32 = .{1, 0, 0, 1};
+    var ret: [4]f32 = .{0, 0, 0, 0};
+    var tmp1: [4]f32 = .{0, 0, 0, 0};
+    var tmp2: [4]f32 = .{0, 0, 0, 0};
+    var sclr: f32 = 0;
+    var b: bool = false;
+
+    b = try rdcXmtx(&P, 2, false, &ret, true, &Pinv, 2, false, &sclr);
+
+    prntNlStrArgs("AAA P: {}", .{2});
+    prntXmtxNl(&P, 2);
+    prntNl();
+    prntNlStrArgs("Pinv: {}", .{2});
+    prntXmtxNl(&Pinv, 2);
+    prntNl();
+    prntNlStrArgs("A: {}", .{2});
+    prntXmtxNl(&A, 2);
+    prntNl();
+    prntNlStrArgs("AP: {}", .{2});
+    prntXmtxNl(&AP, 2);
+    prntNl();
+    prntNlStrArgs("ret: {}", .{2});
+    prntXmtxNl(&ret, 2);
+    prntNl();
+    prntNlStrArgs("tmp1: {}", .{2});
+    prntXmtxNl(&tmp1, 2);
+    prntNl();
+    prntNlStrArgs("tmp2: {}", .{2});
+    prntXmtxNl(&tmp2, 2);
+    prntNl();
+
+    b = try isSimilarXmtx(&P, 2, &Pinv, 2, &A, 2, &AP, 2, &tmp1, 2, &tmp2, 2);
+
+    prntNlStrArgs("BBB P: {}", .{2});
+    prntXmtxNl(&P, 2);
+    prntNl();
+    prntNlStrArgs("Pinv: {}", .{2});
+    prntXmtxNl(&Pinv, 2);
+    prntNl();
+    prntNlStrArgs("A: {}", .{2});
+    prntXmtxNl(&A, 2);
+    prntNl();
+    prntNlStrArgs("AP: {}", .{2});
+    prntXmtxNl(&AP, 2);
+    prntNl();
+    prntNlStrArgs("ret: {}", .{2});
+    prntXmtxNl(&ret, 2);
+    prntNl();
+    prntNlStrArgs("tmp1: {}", .{2});
+    prntXmtxNl(&tmp1, 2);
+    prntNl();
+    prntNlStrArgs("tmp2: {}", .{2});
+    prntXmtxNl(&tmp2, 2);
+    prntNl();
+
+    try std.testing.expectEqual(true, b);
+    prntNl();
+}
+
+test "XMTX: isSimilarXmtx.B test" {
+    var bP: [4]f32 = .{-1, 2, 2, -2};
+    var b: [4]f32 = .{-3, 4, 2, -2};
+    const bPcols: usize = 2;
+    var ret: [4]f32 = .{0, 0, 0, 0};
+    var ret2: [4]f32 = .{0, 0, 0, 0};
+    var idt: [4]f32 = .{-3, 4, 2, -2};
+    var idt2: [4]f32 = .{-1, 2, 2, -2};    
+    var sclr: f32 = 0;
+    var res: bool = false;
+
+    res = try rdcXmtx(&bP, bPcols, false, &ret, true, &idt, 2, false, &sclr);
+    if(!res) {
+        prntNlStr("Error: could not reduce the given matrices rdcXmtx(bP, bPcols, false, ret, true, idt, 2, false, &sclr)!!");
+        return Error.OperationFailed;
+    }
+
+    res = try rdcXmtx(&b, bPcols, false, &ret2, true, &idt2, 2, false, &sclr);
+    if(!res) {
+        prntNlStr("Error: could not reduce the given matrices rdcXmtx(bP, bPcols, false, ret, true, idt, 2, false, &sclr)!!");
+        return Error.OperationFailed;
+    }
+
+    prntNlStrArgs("bP: {}", .{bPcols});
+    prntXmtxNl(&bP, bPcols);
+    prntNl();
+    prntNlStrArgs("b: {}", .{bPcols});
+    prntXmtxNl(&b, bPcols);
+    prntNl();
+    prntNlStrArgs("idt (Pinv): {}", .{bPcols});
+    prntXmtxNl(&idt, bPcols);
+    prntNl();
+    prntNlStrArgs("idt2 (P): {}", .{bPcols});
+    prntXmtxNl(&idt2, bPcols);
+    prntNl(); 
+
+    var exp: [4]f32 =  .{3, -2, 2, -1};
+    var P: [4]f32 = idt2;
+    var Pinv: [4]f32 = idt;
+    var A: [4]f32 = .{-2, 7, -3, 7};
+    var AP: [4]f32 = .{2, 1, -1, 3};
+    ret = .{0, 0, 0, 0};
+    ret2 = .{0, 0, 0, 0};
+
+    try std.testing.expectEqual(true, equXvecWrkr(&exp, &P, false));
+    prntNl();
+
+    exp = .{-1, 2, -2, 3};
+    try std.testing.expectEqual(true, equXvecWrkr(&exp, &Pinv, false));
+    prntNl();
+
+    res = try isSimilarXmtx(&P, 2, &Pinv, 2, &A, 2, &AP, 2, &ret, 2, &ret2, 2);
+    try std.testing.expectEqual(true, res);
+    prntNl();    
+}
+
 //Compile function execution summary
 test "XMTX: sortExecTimeList process" {
     //collapse exec time entries into a string hashmap

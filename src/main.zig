@@ -2864,9 +2864,164 @@ test "XMTX: ELA - Larson, Edwards: 6.4 Example 1 test" {
     xmu.prntNl();    
 }
 
-//TODO: finish
 test "XMTX: ELA - Larson, Edwards: 6.4 Example 2 test" {
+    var bP: [4]f32 = .{-1, 2, 2, -2};
+    var b: [4]f32 = .{-3, 4, 2, -2};
+    const bPcols: usize = 2;
+    var ret: [4]f32 = .{0, 0, 0, 0};
+    var ret2: [4]f32 = .{0, 0, 0, 0};
+    var idt: [4]f32 = .{-3, 4, 2, -2};
+    var idt2: [4]f32 = .{-1, 2, 2, -2};    
+    var sclr: f32 = 0;
+    var res: bool = false;
 
+    res = try xmu.rdcXmtx(&bP, bPcols, false, &ret, true, &idt, 2, false, &sclr);
+    if(!res) {
+        xmu.prntNlStr("Error: could not reduce the given matrices rdcXmtx(bP, bPcols, false, ret, true, idt, 2, false, &sclr)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    res = try xmu.rdcXmtx(&b, bPcols, false, &ret2, true, &idt2, 2, false, &sclr);
+    if(!res) {
+        xmu.prntNlStr("Error: could not reduce the given matrices rdcXmtx(bP, bPcols, false, ret, true, idt, 2, false, &sclr)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("bP: {}", .{bPcols});
+    xmu.prntXmtxNl(&bP, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("b: {}", .{bPcols});
+    xmu.prntXmtxNl(&b, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("idt (Pinv): {}", .{bPcols});
+    xmu.prntXmtxNl(&idt, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("idt2 (P): {}", .{bPcols});
+    xmu.prntXmtxNl(&idt2, bPcols);
+    xmu.prntNl(); 
+
+    var exp: [4]f32 =  .{3, -2, 2, -1};
+    var P: [4]f32 = idt2;
+    var Pinv: [4]f32 = idt;
+    var A: [4]f32 = .{-2, 7, -3, 7};
+    ret = .{0, 0, 0, 0};
+    ret2 = .{0, 0, 0, 0};
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &P, false));
+    xmu.prntNl();
+
+    exp = .{-1, 2, -2, 3};
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &Pinv, false));
+    xmu.prntNl();
+
+    exp = .{2, 1, -1, 3};
+    xmu.prntNlStrArgs("P: {}", .{bPcols});
+    xmu.prntXmtxNl(&P, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("Pinv: {}", .{bPcols});
+    xmu.prntXmtxNl(&Pinv, bPcols);
+    xmu.prntNl();
+    xmu.prntNlStrArgs("A: {}", .{bPcols});
+    xmu.prntXmtxNl(&A, bPcols);
+    xmu.prntNl();
+
+    res = try xmu.tmsXmtx(&Pinv, bPcols, &A, bPcols, &ret, bPcols); 
+    if(!res) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&Pinv, bPcols, &A, bPcols, &ret, bPcols)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("ret: {}", .{bPcols});
+    xmu.prntXmtxNl(&ret, bPcols);
+    xmu.prntNl();
+
+    res = try xmu.tmsXmtx(&ret, bPcols, &P, bPcols, &ret2, bPcols); 
+    if(!res) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&Pinv, bPcols, &A, bPcols, &ret, bPcols)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("AP: {}", .{bPcols});
+    xmu.prntXmtxNl(&ret2, bPcols);
+    xmu.prntNl();
+
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &ret2, false));
+    xmu.prntNl();
+}
+
+test "XMTX: ELA - Larson, Edwards: 6.4 Example 3 test" {
+    var P: [4]f32 = .{3, -2, 2, -1};
+    var A: [4]f32 = .{-2, 7, -3, 7};
+    var Pinv: [4]f32 = .{-1, 2, -2, 3};
+    var AP: [4]f32 = .{2, 1, -1, 3};
+
+    var vBp: [2]f32 = .{-3, -1};
+    var vB: [2]f32 = .{0, 0};
+    var tVb: [2]f32 = .{0, 0};
+    var tVbP1: [2]f32 = .{0, 0};
+    var tVbP2: [2]f32 = .{0, 0};    
+    var exp: [2]f32 = .{0, 0};
+    var b: bool = false;
+
+    //vB = P * vBp
+    b = try xmu.tmsXmtx(&P, 2, &vBp, 1, &vB, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&P, 2, &vBp, 1, &vB, 1)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("vB: {}", .{1});
+    xmu.prntXmtxNl(&vB, 1);
+    xmu.prntNl();
+
+    exp = .{-7, -5};
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &vB, false));
+    xmu.prntNl();
+
+    //tVb = A * vB
+    b = try xmu.tmsXmtx(&A, 2, &vB, 1, &tVb, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&A, 2, &vB, 1, &tVb, 1)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("tVb: {}", .{1});
+    xmu.prntXmtxNl(&tVb, 1);
+    xmu.prntNl();
+
+    exp = .{-21, -14};
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &tVb, false));
+    xmu.prntNl();
+
+    //tVbP1 = Pinv * tVb
+    b = try xmu.tmsXmtx(&Pinv, 2, &tVb, 1, &tVbP1, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&Pinv, 2, &tVb, 1, &tVbP1, 1)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("tVbP1: {}", .{1});
+    xmu.prntXmtxNl(&tVbP1, 1);
+    xmu.prntNl();
+
+    exp = .{-7, 0};
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &tVbP1, false));
+    xmu.prntNl();
+
+    //tVbP2 = Ap * vBp
+    b = try xmu.tmsXmtx(&AP, 2, &vBp, 1, &tVbP2, 1);
+    if(!b) {
+        xmu.prntNlStr("Error: could not multiply the given matrices tmsXmtx(&AP, 2, &vBp, 1, &tVbP2, 1)!!");
+        return xmu.Error.OperationFailed;
+    }
+
+    xmu.prntNlStrArgs("tVbP2: {}", .{1});
+    xmu.prntXmtxNl(&tVbP2, 1);
+    xmu.prntNl();
+
+    exp = .{-7, 0};
+    try std.testing.expectEqual(true, xmu.equXvecWrkr(&exp, &tVbP2, false));
+    xmu.prntNl();
 }
 
 //--------------------------------------------------------------------------------------
