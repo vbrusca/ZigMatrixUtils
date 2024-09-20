@@ -16079,9 +16079,9 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 7, 9 test" {
 
     //7: u=(0, 4, 3), v=(1,-2,1)
     //Exp: (a) 5, (b) sqrt(6.0), (c) sqrt(21.0)
-    const u: [3]f32 = .{ 0, 4, 3 };
-    const v: [3]f32 = .{ 1, -2, 1 };
-    const t: [3]f32 = .{ 0, 0, 0 };
+    var u: [3]f32 = .{ 0, 4, 3 };
+    var v: [3]f32 = .{ 1, -2, 1 };
+    var t: [3]f32 = .{ 0, 0, 0 };
     var val: f32 = 0;
     var exp: f32 = 0;
 
@@ -16102,8 +16102,8 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 7, 9 test" {
     prntNl();
 
     //(c)
-    sum2Xvec(@constCast(&t), @constCast(&u), @constCast(&v));
-    val = magXvec(@constCast(&t));
+    sum2Xvec(&t, &u, &v);
+    val = magXvec(&t);
     exp = std.math.sqrt(21.0);
     prntNlStrArgs("7c Found val: {any}", .{val});
     prntNlStrArgs("7c Found exp: {any}", .{exp});
@@ -16112,12 +16112,12 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 7, 9 test" {
 
     //9: u=(0, 4, 3), v=(1,-2,1)
     //Exp: (a) sqrt(6.0), (b) sqrt(11.0), (c) sqrt(13.0)
-    const lu: [4]f32 = .{ 0, 1, -1, 2 };
-    const lv: [4]f32 = .{ 1, 1, 3, 0 };
-    const lt: [4]f32 = .{ 0, 0, 0, 0 };
+    var lu: [4]f32 = .{ 0, 1, -1, 2 };
+    var lv: [4]f32 = .{ 1, 1, 3, 0 };
+    var lt: [4]f32 = .{ 0, 0, 0, 0 };
 
     //(a)
-    val = magXvec(@constCast(&lu));
+    val = magXvec(&lu);
     exp = std.math.sqrt(6.0);
     prntNlStrArgs("9a Found val: {any}", .{val});
     prntNlStrArgs("9a Found exp: {any}", .{exp});
@@ -16125,7 +16125,7 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 7, 9 test" {
     prntNl();
 
     //(b)
-    val = magXvec(@constCast(&lv));
+    val = magXvec(&lv);
     exp = std.math.sqrt(11.0);
     prntNlStrArgs("9b Found val: {any}", .{val});
     prntNlStrArgs("9b Found exp: {any}", .{exp});
@@ -16133,8 +16133,8 @@ test "XMTX: ELA - Larson, Edwards: 5.1 Problem 7, 9 test" {
     prntNl();
 
     //(c)
-    sum2Xvec(@constCast(&lt), @constCast(&lu), @constCast(&lv));
-    val = magXvec(@constCast(&lt));
+    sum2Xvec(&lt, &lu, &lv);
+    val = magXvec(&lt);
     exp = std.math.sqrt(13.0);
     prntNlStrArgs("9c Found val: {any}", .{val});
     prntNlStrArgs("9c Found exp: {any}", .{exp});

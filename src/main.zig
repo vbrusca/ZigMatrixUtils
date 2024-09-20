@@ -397,10 +397,10 @@ test "XMTX: ELA - Larson, Edwards: 5.2 Example 10 test" {
     //Use the Euclidean inner product in R^3 to find the orthogonal projection of u=(6, 2, 4)
     //onto v=(1, 2, 0)
     //version 1
-    const u: [3]f32 = .{ 6, 2, 4 };
-    const v: [3]f32 = .{ 1, 2, 0 };
+    var u: [3]f32 = .{ 6, 2, 4 };
+    var v: [3]f32 = .{ 1, 2, 0 };
     const exp: [3]f32 = .{ 2, 4, 0 };
-    const projUontoV: []f32 = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(@constCast(&u), @constCast(&v), xmu.dotPrdXvec);
+    const projUontoV: []f32 = xmu.projXvec_VecP_Onto_VecQ_InrPrdctSpc(&u, &v, xmu.dotPrdXvec);
 
     xmu.prntNlStr("Expected:");
     xmu.prntXvec(@constCast(&exp));
